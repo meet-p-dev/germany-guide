@@ -1009,3 +1009,314 @@ insert into partner_offers (slug, kind, task_slugs, name, blurb_md, cta_label, u
 on conflict (slug, locale) do update set
   kind=excluded.kind, task_slugs=excluded.task_slugs, name=excluded.name, blurb_md=excluded.blurb_md,
   cta_label=excluded.cta_label, url=excluded.url, sort_order=excluded.sort_order, status=excluded.status;
+
+-- ================================================================
+-- Round 6 (2026-07-02): fill previously-null city_task_variants
+-- facts (booking URL, address, hours, wait time) with real,
+-- web-verified data for all 30 rows (15 cities × anmeldung +
+-- residence-permit). Fields with no confident source stay null —
+-- several cities are genuinely decentralized across district
+-- offices, so no single address is picked arbitrarily. This is an
+-- UPDATE-only pass; the base rows already exist from Rounds 2–3.
+-- ================================================================
+
+-- ---- Anmeldung: Hamburg, Cologne, Frankfurt, Stuttgart ----
+update city_task_variants v set
+  booking_url = 'https://serviceportal.hamburg.de/HamburgGateway/Service/Entry/DigiTermin',
+  office_hours = 'Varies by location — main Hamburg Service centers typically Mon–Fri 07:00–19:00',
+  city_notes_md = 'Hamburg runs Anmeldung through its citizen service centers (Hamburg Service, formerly Kundenzentren). Book online via the HamburgService portal, or call 115. As in most large German cities, slots can be scarce — book as early as possible via the city''s official portal.',
+  sources = '[{"url": "https://serviceportal.hamburg.de/HamburgGateway/Service/Entry/DigiTermin", "title": "HamburgService — online appointment booking", "accessed_at": "2026-07-02"}, {"url": "https://www.hamburg.de/service/suche/termin/", "title": "hamburg.de — service search", "accessed_at": "2026-07-02"}]'::jsonb,
+  last_verified_at = '2026-07-02'
+from cities c, tasks t
+where v.city_id = c.id and v.task_id = t.id and c.slug = 'hamburg' and t.slug = 'anmeldung';
+
+update city_task_variants v set
+  booking_url = 'https://terminator.koeln/',
+  walk_in_possible = true,
+  office_hours = 'Mon & Wed: walk-in possible (expect queues); Tue, Thu, Fri: appointment required',
+  typical_wait_time = 'Often several weeks — book as early as possible and check terminator.koeln daily for newly released slots',
+  city_notes_md = 'Cologne (Köln) has several Kundenzentren (Bürgerämter) across the city, bookable via terminator.koeln. Unusually, Monday and Wednesday allow walk-in visits (with wait), while Tuesday/Thursday/Friday require a booked appointment — check availability at more than one district office if your closest one is booked out.',
+  sources = '[{"url": "https://www.stadt-koeln.de/artikel/06415/index.html", "title": "Stadt Köln — Terminvereinbarung online", "accessed_at": "2026-07-02"}, {"url": "https://terminator.koeln/", "title": "terminator.koeln — official Cologne appointment portal", "accessed_at": "2026-07-02"}]'::jsonb,
+  last_verified_at = '2026-07-02'
+from cities c, tasks t
+where v.city_id = c.id and v.task_id = t.id and c.slug = 'cologne' and t.slug = 'anmeldung';
+
+update city_task_variants v set
+  booking_url = 'https://frankfurt.de/service-und-rathaus/service/online-terminvereinbarungen',
+  walk_in_possible = true,
+  office_hours = 'Mon & Wed: walk-in possible; Tue, Thu, Fri: appointment required',
+  typical_wait_time = 'New slots release each weekday at 06:00, two weeks ahead — check the portal in the morning, or set a Terminwunsch alert for automatic email notification',
+  city_notes_md = 'As a major international city, Frankfurt''s Bürgerämter see high demand. Monday and Wednesday allow walk-in visits; Tuesday/Thursday/Friday require an appointment. New slots open two weeks in advance each weekday morning — the booking system also lets you leave a standing "Terminwunsch" that emails you when a matching slot appears.',
+  sources = '[{"url": "https://frankfurt.de/service-und-rathaus/service/online-terminvereinbarungen", "title": "Frankfurt.de — Online-Terminvereinbarungen", "accessed_at": "2026-07-02"}, {"url": "https://frankfurt.de/service-und-rathaus/verwaltung/aemter-und-institutionen/buergeramt-statistik-und-wahlen/buergeraemter/terminservice", "title": "Frankfurt.de — Bürgerämter Terminservice", "accessed_at": "2026-07-02"}]'::jsonb,
+  last_verified_at = '2026-07-02'
+from cities c, tasks t
+where v.city_id = c.id and v.task_id = t.id and c.slug = 'frankfurt' and t.slug = 'anmeldung';
+
+update city_task_variants v set
+  booking_url = 'https://service.stuttgart.de/ssc-app-stuttgart/?m=32-42',
+  city_notes_md = 'Stuttgart''s Bürgerbüros (11 locations: Mitte, Vaihingen, West, Ost, Süd, Zuffenhausen, Sillenbuch, Plieningen, Bad Cannstatt, Weilimdorf, plus one for newcomers/training) share a single citywide online booking system — book via service.stuttgart.de and pick whichever location has the earliest slot. Opening hours vary by district office.',
+  sources = '[{"url": "https://www.stuttgart.de/en/service/buergerbueros", "title": "Stuttgart.de — Citizens'' Bureaus", "accessed_at": "2026-07-02"}, {"url": "https://service.stuttgart.de/ssc-app-stuttgart/?m=32-42", "title": "Stuttgart — Terminservice", "accessed_at": "2026-07-02"}]'::jsonb,
+  last_verified_at = '2026-07-02'
+from cities c, tasks t
+where v.city_id = c.id and v.task_id = t.id and c.slug = 'stuttgart' and t.slug = 'anmeldung';
+
+-- ---- Anmeldung: Düsseldorf, Leipzig, Dortmund, Essen ----
+update city_task_variants v set
+  booking_url = 'https://termine.duesseldorf.de/',
+  city_notes_md = 'Düsseldorf''s Bürgerbüros only see visitors by appointment, bookable via termine.duesseldorf.de or service.duesseldorf.de. All offices offer extended hours on Wednesday afternoons (until 18:00). Try a less central district office if your closest one is fully booked.',
+  sources = '[{"url": "https://termine.duesseldorf.de/", "title": "Terminvereinbarung Stadt Düsseldorf", "accessed_at": "2026-07-02"}, {"url": "https://www.duesseldorf.de/einwohnerangelegenheiten", "title": "Landeshauptstadt Düsseldorf — Einwohnermeldeamt", "accessed_at": "2026-07-02"}]'::jsonb,
+  last_verified_at = '2026-07-02'
+from cities c, tasks t
+where v.city_id = c.id and v.task_id = t.id and c.slug = 'duesseldorf' and t.slug = 'anmeldung';
+
+update city_task_variants v set
+  booking_url = 'https://www.leipzig.de/buergerservice-und-verwaltung/aemter-und-behoerdengaenge/aemtertermine-online/',
+  appointment_required = false,
+  walk_in_possible = true,
+  typical_wait_time = 'Walk-in is possible during opening hours (since Nov 2023) — check current wait times online. If you prefer an appointment, new slots release daily at 17:00, two weeks ahead.',
+  city_notes_md = 'Leipzig has grown quickly in recent years — good news is that since 1 November 2023 you can walk into any of its 15 Bürgerbüros during opening hours without an appointment (check live wait times on the city site first). Appointments are also available if you''d rather book ahead.',
+  sources = '[{"url": "https://www.leipzig.de/buergerservice-und-verwaltung/aemter-und-behoerdengaenge/aemtertermine-online/", "title": "Stadt Leipzig — Ämtertermine online", "accessed_at": "2026-07-02"}, {"url": "https://www.leipzig.de/buergerservice-und-verwaltung/aemter-und-behoerdengaenge/buergerbueros/", "title": "Stadt Leipzig — Bürgerbüros", "accessed_at": "2026-07-02"}]'::jsonb,
+  last_verified_at = '2026-07-02'
+from cities c, tasks t
+where v.city_id = c.id and v.task_id = t.id and c.slug = 'leipzig' and t.slug = 'anmeldung';
+
+update city_task_variants v set
+  booking_url = 'https://www.dortmund.de/rathaus/verwaltung/buergerdienste/terminvereinbarungen/',
+  office_name = 'Dienstleistungszentrum Innenstadt (Bürgerdienste)',
+  office_address = 'Südwall 2–4, 44137 Dortmund',
+  office_hours = 'Mon 07:00–16:00, Tue 07:00–16:00, Wed 07:00–12:00, Thu 07:00–18:00, Fri 07:00–12:00 (district offices open slightly later, from 08:00)',
+  typical_wait_time = 'Slots release daily at 07:00 for same-day, +7 days and +14 days — often bookable within 1–2 weeks',
+  city_notes_md = 'Dortmund''s Bürgerdienste (citizen services) handle registration at the central Dienstleistungszentrum Innenstadt or a district office (Bezirksverwaltungsstelle). Appointments are required — book online or call (0231) 50-1 11 50.',
+  sources = '[{"url": "https://www.dortmund.de/rathaus/verwaltung/buergerdienste/terminvereinbarungen/", "title": "Stadt Dortmund — Terminvereinbarungen", "accessed_at": "2026-07-02"}, {"url": "https://www.dortmund.de/dortmund/projekte/rathaus/verwaltung/buergerdienste/downloads/oeffnungszeiten_buergerdienste.pdf", "title": "Stadt Dortmund — Öffnungszeiten der Bürgerdienste", "accessed_at": "2026-07-02"}]'::jsonb,
+  last_verified_at = '2026-07-02'
+from cities c, tasks t
+where v.city_id = c.id and v.task_id = t.id and c.slug = 'dortmund' and t.slug = 'anmeldung';
+
+update city_task_variants v set
+  booking_url = 'https://www.essen.de/rathaus/onlinetermine_der_stadtessen.de.html',
+  typical_wait_time = 'A base allotment of slots opens 6 weeks ahead, with extra capacity released 1 week ahead and same-day each morning before office hours',
+  city_notes_md = 'Essen''s Bürgerämter (including Gildehof, Steele, Kupferdreh, Kettwig) only see visitors by appointment — book online via the city''s service portal or call +49 201 88 33 222. If nothing''s available weeks out, check again the same morning for released same-day slots.',
+  sources = '[{"url": "https://www.essen.de/rathaus/onlinetermine_der_stadtessen.de.html", "title": "Stadt Essen — Online-Termine", "accessed_at": "2026-07-02"}, {"url": "https://www.essen.de/buergeraemter", "title": "Serviceportal Stadt Essen — Bürgeramt", "accessed_at": "2026-07-02"}]'::jsonb,
+  last_verified_at = '2026-07-02'
+from cities c, tasks t
+where v.city_id = c.id and v.task_id = t.id and c.slug = 'essen' and t.slug = 'anmeldung';
+
+-- ---- Anmeldung: Bremen, Dresden, Hannover, Nuremberg, Aachen ----
+update city_task_variants v set
+  booking_url = 'https://www.service.bremen.de/terminbuchung-1469',
+  office_name = 'BürgerServiceCenter-Mitte',
+  office_hours = 'Mon & Thu 07:30–17:00, Tue & Fri 07:30–12:00, Wed 07:30–13:00 (varies at other BürgerServiceCenter locations)',
+  city_notes_md = 'Bremen''s BürgerServiceCenters (Mitte, Nord and others) only see visitors by appointment — book via service.bremen.de or call 115 / 0421-361 0.',
+  sources = '[{"url": "https://www.service.bremen.de/terminbuchung-1469", "title": "Serviceportal Bremen — Terminbuchung", "accessed_at": "2026-07-02"}]'::jsonb,
+  last_verified_at = '2026-07-02'
+from cities c, tasks t
+where v.city_id = c.id and v.task_id = t.id and c.slug = 'bremen' and t.slug = 'anmeldung';
+
+update city_task_variants v set
+  booking_url = 'https://termine-buergerbuero.dresden.de/',
+  walk_in_possible = true,
+  office_hours = 'Tue & Thu 13:00–16:00: walk-in possible at most Bürgerbüros (expect a wait) — otherwise by appointment',
+  typical_wait_time = 'Book ahead via the online portal, or walk in Tuesday/Thursday afternoon if urgent',
+  city_notes_md = 'Dresden''s Bürgerbüros (Altstadt, Blasewitz, Cotta, Klotzsche, Leuben, Neustadt, Pieschen, Plauen, Prohlis and others) mostly require an appointment, but allow walk-ins Tuesday and Thursday 13:00–16:00 if you can''t book ahead — expect longer waits. Some matters can also be handled online or via video appointment.',
+  sources = '[{"url": "https://www.dresden.de/de/rathaus/dienstleistungen/Terminvereinbarung_Buergerbueros.php", "title": "Landeshauptstadt Dresden — Terminvereinbarung in Bürgerbüros", "accessed_at": "2026-07-02"}, {"url": "https://termine-buergerbuero.dresden.de/", "title": "Dresden — Bürgerbüro appointment booking", "accessed_at": "2026-07-02"}]'::jsonb,
+  last_verified_at = '2026-07-02'
+from cities c, tasks t
+where v.city_id = c.id and v.task_id = t.id and c.slug = 'dresden' and t.slug = 'anmeldung';
+
+update city_task_variants v set
+  booking_url = 'https://serviceportal.hannover-stadt.de/buergerservice/online/angebot/buergeramt-termin-buchen-900000037-30810.html',
+  walk_in_possible = true,
+  typical_wait_time = 'New online slots release daily around 08:00. Walk-in possible Thursdays 08:00–13:00 & 14:00–18:00 at the Aegi, Bemerode, Herrenhausen, Linden and Podbi-Park offices only (not at Döhren, Ricklingen, Sahlkamp or Schützenplatz).',
+  city_notes_md = 'Hannover''s Bürgerämter handle registration city-wide — you can visit any office regardless of which district you live in. A useful protection: for deadline-bound matters like Anmeldung, your booked appointment confirmation itself counts as proof you met the legal deadline, even if the appointment date is later.',
+  sources = '[{"url": "https://www.hannover.de/Leben-in-der-Region-Hannover/B%C3%BCrger-Service/B%C3%BCrger-Service-in-der-Landeshauptstadt-Hannover/Termine-bei-Beh%C3%B6rden-buchen/Terminvereinbarung-in-den-B%C3%BCrger%C3%A4mtern", "title": "Hannover.de — Terminvereinbarung in den Bürgerämtern", "accessed_at": "2026-07-02"}]'::jsonb,
+  last_verified_at = '2026-07-02'
+from cities c, tasks t
+where v.city_id = c.id and v.task_id = t.id and c.slug = 'hannover' and t.slug = 'anmeldung';
+
+update city_task_variants v set
+  booking_url = 'https://nuernberg.termine-reservieren.de/',
+  walk_in_possible = true,
+  office_name = 'Bürgeramt Mitte',
+  office_address = 'Äußere Laufer Gasse 25, Nürnberg',
+  office_hours = 'Wed 08:00–12:00: walk-in for urgent cases only (Bürgeramt Mitte); otherwise by appointment',
+  typical_wait_time = 'Slots for the next 14 days release daily at 06:30, with extra same-day slots released around 08:00',
+  city_notes_md = 'Nuremberg''s Bürgerämter require an appointment, bookable online or by calling 0911 231-0. For urgent cases without a booked slot, Bürgeramt Mitte allows walk-ins Wednesday mornings only.',
+  sources = '[{"url": "https://nuernberg.termine-reservieren.de/", "title": "Terminvereinbarung Stadt Nürnberg", "accessed_at": "2026-07-02"}, {"url": "https://www.nuernberg.de/internet/buergeramt_mitte/termine.html", "title": "Nürnberg.de — Bürgeramt Mitte Termine", "accessed_at": "2026-07-02"}]'::jsonb,
+  last_verified_at = '2026-07-02'
+from cities c, tasks t
+where v.city_id = c.id and v.task_id = t.id and c.slug = 'nuremberg' and t.slug = 'anmeldung';
+
+update city_task_variants v set
+  booking_url = 'https://serviceportal.aachen.de/suche/-/vr-bis-detail/dienstleistung/5790/show',
+  office_name = 'Bürger*innenbüro Aachen-Mitte',
+  office_address = 'Hackländerstraße 1, 52058 Aachen (Bahnhofplatz) — a second location exists at Johannes-Paul-II.-Straße 1, 52062 Aachen (Katschhof)',
+  typical_wait_time = 'Additional same-day slots release around 07:45; the appointment phone line (0241 432-1234) is staffed Mon–Fri 07:00–18:00',
+  city_notes_md = 'Aachen, close to the Dutch and Belgian borders and home to a large student population, requires an appointment for registration at its Bürger*innenbüro locations — book online at aachen.de or by phone.',
+  sources = '[{"url": "https://serviceportal.aachen.de/suche/-/vr-bis-detail/dienstleistung/5790/show", "title": "Serviceportal der Stadt Aachen — Terminbuchung", "accessed_at": "2026-07-02"}]'::jsonb,
+  last_verified_at = '2026-07-02'
+from cities c, tasks t
+where v.city_id = c.id and v.task_id = t.id and c.slug = 'aachen' and t.slug = 'anmeldung';
+
+-- ---- residence-permit: Hamburg, Cologne, Frankfurt, Stuttgart ----
+update city_task_variants v set
+  booking_url = 'https://www.hamburg.de/go/17584',
+  office_name = 'Ausländerbehörde Hamburg',
+  office_address = 'Hammer Str. 30–34, 22041 Hamburg',
+  typical_wait_time = 'Appointment allocation can take several weeks to months — in urgent cases you can call and request an earlier slot',
+  city_notes_md = 'Hamburg''s immigration matters are handled by the Ausländerbehörde at Hammer Straße. Visits without a booked appointment are generally not possible — book online well before your current permit expires; if no slot is available in time, submit your application in writing to preserve your legal stay.',
+  sources = '[{"url": "https://www.hamburg.de/go/17584", "title": "hamburg.de — Ausländerbehörde appointment booking", "accessed_at": "2026-07-02"}, {"url": "https://www.hamburg.de/auslaenderbehoerde/", "title": "hamburg.de — Ausländerbehörde", "accessed_at": "2026-07-02"}]'::jsonb,
+  last_verified_at = '2026-07-02'
+from cities c, tasks t
+where v.city_id = c.id and v.task_id = t.id and c.slug = 'hamburg' and t.slug = 'residence-permit';
+
+update city_task_variants v set
+  booking_url = 'https://www.stadt-koeln.de/leben-in-koeln/soziales/auslaenderamt/74526/index.html',
+  office_name = 'Bezirksausländeramt (district office — assigned by your postcode)',
+  city_notes_md = 'Cologne''s Ausländeramt is split into district offices (Bezirksausländerämter); since April 2026 you book online by entering your postcode, which routes you to the right one — e.g. the Innenstadt office is at Ludwigstraße 8. Personal visits require both a booked appointment and an invitation letter from the office, so don''t show up without one.',
+  sources = '[{"url": "https://www.stadt-koeln.de/leben-in-koeln/soziales/auslaenderamt/74526/index.html", "title": "Stadt Köln — Online-Terminvereinbarung Bezirksausländerämter", "accessed_at": "2026-07-02"}, {"url": "https://www.stadt-koeln.de/leben-in-koeln/soziales/auslaenderamt/index.html", "title": "Stadt Köln — Ausländeramt", "accessed_at": "2026-07-02"}]'::jsonb,
+  last_verified_at = '2026-07-02'
+from cities c, tasks t
+where v.city_id = c.id and v.task_id = t.id and c.slug = 'cologne' and t.slug = 'residence-permit';
+
+update city_task_variants v set
+  booking_url = 'https://frankfurt.de/auslaenderangelegenheiten',
+  office_name = 'Ausländerbehörde Frankfurt',
+  office_address = 'Kleyerstraße 86, 60326 Frankfurt am Main (second entrance: Rebstöcker Straße 4)',
+  city_notes_md = 'Frankfurt''s Ausländerbehörde doesn''t use a simple public calendar for new applications — you submit your request online first, and a caseworker then assigns you an appointment (some departments send a separate online-booking link after you apply). Phone hotline: +49 69 212-42485, Mon–Thu 08:00–16:00, Fri 08:00–12:00. As a major international city, demand is high — apply as early as possible.',
+  sources = '[{"url": "https://frankfurt.de/auslaenderangelegenheiten", "title": "Frankfurt.de — Ausländerangelegenheiten", "accessed_at": "2026-07-02"}]'::jsonb,
+  last_verified_at = '2026-07-02'
+from cities c, tasks t
+where v.city_id = c.id and v.task_id = t.id and c.slug = 'frankfurt' and t.slug = 'residence-permit';
+
+update city_task_variants v set
+  booking_url = 'https://www.stuttgart.de/en/buergerinnen-und-buerger/migranten/informationen-der-auslaenderbehoerde/auslaenderbehoerde-terminvereinbarung',
+  office_name = 'Ausländerbehörde Stuttgart',
+  office_address = 'Eberhardstraße 39, 70173 Stuttgart',
+  city_notes_md = 'Stuttgart''s Ausländerbehörde requires an appointment for all visits. For collecting your finished eAT card, booking depends on your application date — permits applied for since 17 Feb 2025 trigger an automatic email notification once the card arrives, which you then use to book a collection slot. If your permit or Fiktionsbescheinigung is expiring within 7 days, you can request an emergency appointment online rather than risk a gap in your legal stay.',
+  sources = '[{"url": "https://www.stuttgart.de/en/buergerinnen-und-buerger/migranten/informationen-der-auslaenderbehoerde/auslaenderbehoerde-terminvereinbarung", "title": "Stuttgart.de — Ausländerbehörde appointment", "accessed_at": "2026-07-02"}, {"url": "https://www.stuttgart.de/en/buergerinnen-und-buerger/migranten/informationen-der-auslaenderbehoerde/notfall-termin", "title": "Stuttgart.de — Emergency appointment", "accessed_at": "2026-07-02"}]'::jsonb,
+  last_verified_at = '2026-07-02'
+from cities c, tasks t
+where v.city_id = c.id and v.task_id = t.id and c.slug = 'stuttgart' and t.slug = 'residence-permit';
+
+-- ---- residence-permit: Düsseldorf, Leipzig, Dortmund, Essen ----
+update city_task_variants v set
+  booking_url = 'https://service.duesseldorf.de/online-dienst-auslaenderbehoerde',
+  office_name = 'Kommunale Ausländerbehörde Düsseldorf',
+  office_address = 'Erkrather Straße 377, 40231 Düsseldorf',
+  typical_wait_time = 'An appointment is typically mailed to you automatically about 6–8 weeks before your current permit expires',
+  city_notes_md = 'Düsseldorf''s Ausländerbehörde now requires all applications to go through its online services (email applications are no longer accepted). Issuing or extending a residence permit requires an in-person appointment, which the office notifies you of in writing roughly 6–8 weeks before your current permit runs out — if that timing feels late, don''t wait passively, follow up via the online portal.',
+  sources = '[{"url": "https://www.duesseldorf.de/auslaenderamt", "title": "Landeshauptstadt Düsseldorf — Ausländerbehörde", "accessed_at": "2026-07-02"}, {"url": "https://service.duesseldorf.de/online-dienst-auslaenderbehoerde", "title": "Serviceportal Düsseldorf — Online-Dienst Ausländerbehörde", "accessed_at": "2026-07-02"}]'::jsonb,
+  last_verified_at = '2026-07-02'
+from cities c, tasks t
+where v.city_id = c.id and v.task_id = t.id and c.slug = 'duesseldorf' and t.slug = 'residence-permit';
+
+update city_task_variants v set
+  booking_url = 'https://www.leipzig.de/jugend-familie-und-soziales/auslaender-und-migranten/auslaender-und-staatsangehoerigkeitsrecht-auslaenderbehoerde/aufenthalt/vom-antrag-zum-aufenthaltsdokument',
+  office_name = 'Ausländerbehörde Leipzig',
+  office_address = 'Technisches Rathaus, Haus B, Eingang Prager Straße 128, Leipzig',
+  city_notes_md = 'Leipzig''s Ausländerbehörde works differently from a public booking calendar: after your application is fully processed, the office automatically mails you an appointment. For collecting your finished eAT card, you instead get a code by post that you use to self-book a pickup slot online. Walk-in visits without an appointment are not possible.',
+  sources = '[{"url": "https://www.leipzig.de/jugend-familie-und-soziales/auslaender-und-migranten/auslaender-und-staatsangehoerigkeitsrecht-auslaenderbehoerde/aufenthalt/vom-antrag-zum-aufenthaltsdokument", "title": "Stadt Leipzig — Vom Antrag zum Aufenthaltsdokument", "accessed_at": "2026-07-02"}]'::jsonb,
+  last_verified_at = '2026-07-02'
+from cities c, tasks t
+where v.city_id = c.id and v.task_id = t.id and c.slug = 'leipzig' and t.slug = 'residence-permit';
+
+update city_task_variants v set
+  booking_url = 'https://termine.dortmund.de/32/select2?md=1',
+  walk_in_possible = true,
+  office_name = 'Ausländerbehörde Dortmund',
+  office_address = 'Altes Stadthaus, Olpe 1, 44122 Dortmund (eAT card collection at Berswordthalle, entrance via Kleppingstraße or Friedensplatz)',
+  city_notes_md = 'Dortmund''s Ausländerbehörde requires a booked appointment for issuing or extending a residence permit. Once your card is ready, though, you can now collect your electronic residence permit (eAT) without an appointment via a self-service collection box at the Berswordthalle — free and step-free access.',
+  sources = '[{"url": "https://integreat.app/dortmund/de/willkommen/wichtige-aemter/auslaenderbehoerde/", "title": "Dortmund — Ausländerbehörde overview", "accessed_at": "2026-07-02"}, {"url": "https://www.wirindortmund.de/dortmund/kundinnen-koennen-elektronische-aufenthaltstitel-kuenftig-ohne-termin-abholen-244597", "title": "Wir in Dortmund — eAT ohne Termin abholen", "accessed_at": "2026-07-02"}]'::jsonb,
+  last_verified_at = '2026-07-02'
+from cities c, tasks t
+where v.city_id = c.id and v.task_id = t.id and c.slug = 'dortmund' and t.slug = 'residence-permit';
+
+update city_task_variants v set
+  booking_url = 'https://service.essen.de/detail/-/vr-bis-detail/dienstleistung/42944/show',
+  office_name = 'Staatsangehörigkeits- und Ausländerangelegenheiten (ABH) Essen',
+  office_address = 'Kruppstraße 16, 45128 Essen',
+  city_notes_md = 'Essen''s Ausländerbehörde (ABH) books appointments by phone via the ServiceCenter on 0201-88-38883 (Mon, Tue, Thu 07:30–15:00; Wed, Fri 07:30–12:00), or by email for eAT pickup appointments specifically at 38883@abh.essen.de.',
+  sources = '[{"url": "https://www.essen.de/leben/migration_und_integration/staatsangehoerigkeits__und_auslaenderangelegenheiten/terminvereinbarung.de.html", "title": "Stadt Essen — Terminvereinbarung Ausländerbehörde", "accessed_at": "2026-07-02"}]'::jsonb,
+  last_verified_at = '2026-07-02'
+from cities c, tasks t
+where v.city_id = c.id and v.task_id = t.id and c.slug = 'essen' and t.slug = 'residence-permit';
+
+-- ---- residence-permit: Bremen, Dresden, Hannover, Nuremberg, Aachen ----
+update city_task_variants v set
+  booking_url = 'https://www.service.bremen.de/die-senatorin-fuer-inneres-und-sport/migrationsamt-100086',
+  office_name = 'Migrationsamt Bremen',
+  office_address = 'Stresemannstr. 48, 28207 Bremen',
+  office_hours = 'Mon 08:00–12:00 & 14:00–17:00, Tue by arrangement only, Wed 08:00–12:00, Thu 08:00–12:00 — appointment required, walk-ins cannot be served',
+  city_notes_md = 'Bremen''s Migrationsamt only sees visitors with a booked appointment (phone 0421-361-15275/-15004, or email office@migrationsamt.bremen.de). If you already hold a Bremen residence permit, a renewal appointment is sent to you automatically before it expires — attend it if at all possible, since that''s what guarantees timely renewal.',
+  sources = '[{"url": "https://www.service.bremen.de/die-senatorin-fuer-inneres-und-sport/migrationsamt-100086", "title": "Serviceportal Bremen — Migrationsamt", "accessed_at": "2026-07-02"}]'::jsonb,
+  last_verified_at = '2026-07-02'
+from cities c, tasks t
+where v.city_id = c.id and v.task_id = t.id and c.slug = 'bremen' and t.slug = 'residence-permit';
+
+update city_task_variants v set
+  booking_url = 'https://www.dresden.de/de/rathaus/dienstleistungen/auslaenderangelegenheiten-terminabsprachen.php',
+  office_name = 'Ausländerbehörde Dresden',
+  office_address = 'Lingnerallee 3, Entrance North, 01069 Dresden',
+  office_hours = 'By appointment only: Tue & Thu 08:00–11:00 & 14:00–17:00, Fri 08:00–11:00',
+  typical_wait_time = 'Appointment allocation can take several weeks to months',
+  city_notes_md = 'Dresden''s Ausländerbehörde only sees visitors by appointment, arranged by phone (0351-4886009) or email (auslaenderbehoerde@dresden.de) — there''s no public self-service calendar. The office moved to Lingnerallee 3 in April 2026 (nearest tram stops: Deutsches Hygiene-Museum, Pirnaischer Platz).',
+  sources = '[{"url": "https://www.dresden.de/de/rathaus/dienstleistungen/auslaenderangelegenheiten-terminabsprachen.php", "title": "Landeshauptstadt Dresden — Terminvereinbarung Ausländerbehörde", "accessed_at": "2026-07-02"}]'::jsonb,
+  last_verified_at = '2026-07-02'
+from cities c, tasks t
+where v.city_id = c.id and v.task_id = t.id and c.slug = 'dresden' and t.slug = 'residence-permit';
+
+update city_task_variants v set
+  booking_url = 'https://auslaenderbehoerdeonline.hannover-stadt.de/',
+  office_name = 'HannoverServiceCenter (HSC)',
+  office_address = 'Am Schützenplatz 1, 30169 Hannover',
+  city_notes_md = 'If you live within the city of Hannover, the HannoverServiceCenter (HSC) handles residence permits — many applications can be submitted directly online without an in-person visit. If you live elsewhere in the wider Region Hannover, a separate body applies instead: the Ausländerbehörde der Region Hannover (Team Zuwanderung), Maschstraße 17, 30169 Hannover — check which one covers your registered address.',
+  sources = '[{"url": "https://www.hannover.de/Leben-in-der-Region-Hannover/B%C3%BCrger-Service/Ausl%C3%A4nder%C2%ADangelegen%C2%ADheiten/Ausl%C3%A4nderbeh%C3%B6rden/Ausl%C3%A4nderbeh%C3%B6rde-der-Region-Hannover", "title": "Hannover.de — Ausländerbehörden overview", "accessed_at": "2026-07-02"}]'::jsonb,
+  last_verified_at = '2026-07-02'
+from cities c, tasks t
+where v.city_id = c.id and v.task_id = t.id and c.slug = 'hannover' and t.slug = 'residence-permit';
+
+update city_task_variants v set
+  booking_url = 'https://www.nuernberg.de/internet/auslaenderbehoerde/aufenthaltstitel.html',
+  office_name = 'Amt für Migration und Integration der Stadt Nürnberg',
+  city_notes_md = 'Nuremberg''s Amt für Migration und Integration handles residence permits mostly online: you submit your application via the city''s portal, and once your documents are complete, you''re invited by post to an in-person appointment (the letter specifies the exact location). Appointments run through the city''s official booking portal.',
+  sources = '[{"url": "https://www.nuernberg.de/internet/auslaenderbehoerde/", "title": "Amt für Migration und Integration der Stadt Nürnberg", "accessed_at": "2026-07-02"}]'::jsonb,
+  last_verified_at = '2026-07-02'
+from cities c, tasks t
+where v.city_id = c.id and v.task_id = t.id and c.slug = 'nuremberg' and t.slug = 'residence-permit';
+
+update city_task_variants v set
+  booking_url = 'https://termine.staedteregion-aachen.de/auslaenderamt/',
+  office_name = 'Ausländeramt StädteRegion Aachen',
+  office_address = 'Hackländerstr. 1, 52064 Aachen (permit pickup at the branch office in Aachen Arkaden, ground floor, Trierer Straße 1, 52078 Aachen)',
+  office_hours = 'Mon 08:00–15:00, Tue 08:00–15:00, Wed 08:00–16:45, Thu 08:00–13:00, Fri 08:00–12:00',
+  city_notes_md = 'Unlike Anmeldung, which the city of Aachen itself handles, residence-permit matters are handled by the **StädteRegion Aachen** (the wider city-region authority) — a different office with its own booking system. Book via termine.staedteregion-aachen.de or call 0241-5198-5600.',
+  sources = '[{"url": "https://termine.staedteregion-aachen.de/auslaenderamt/", "title": "Termine Städteregion Aachen — Ausländerbehörde", "accessed_at": "2026-07-02"}, {"url": "https://www.staedteregion-aachen.de/de/navigation/aemter/auslaenderamt-a-33/infostelle-/-termine", "title": "StädteRegion Aachen — Infostelle/Termine", "accessed_at": "2026-07-02"}]'::jsonb,
+  last_verified_at = '2026-07-02'
+from cities c, tasks t
+where v.city_id = c.id and v.task_id = t.id and c.slug = 'aachen' and t.slug = 'residence-permit';
+
+-- ---- residence-permit: Berlin, Munich (gaps the initial scoping missed —
+-- their Anmeldung rows were already fact-checked in Round 1, but the
+-- separate residence-permit row for each was never researched) ----
+update city_task_variants v set
+  booking_url = 'https://www.berlin.de/einwanderung/en/services/appointments/',
+  office_name = 'Landesamt für Einwanderung (LEA)',
+  office_address = 'Friedrich-Krause-Ufer 24, 13353 Berlin',
+  typical_wait_time = 'Renewals can be requested up to 8 weeks before your permit expires; aim for an appointment 4–6 weeks before expiry',
+  city_notes_md = 'Berlin''s Landesamt für Einwanderung (LEA) no longer uses a public appointment calendar — its old online booking system (OTV) was permanently shut down. Applications are now fully digital: upload your documents via the LEA''s online contact form, and the office assigns you an appointment itself once they''ve reviewed them. Demand is very high — apply well before your current permit expires.',
+  sources = '[{"url": "https://www.berlin.de/einwanderung/en/services/appointments/", "title": "Berlin.de — Landesamt für Einwanderung, appointments", "accessed_at": "2026-07-02"}, {"url": "https://www.berlin.de/einwanderung/en/", "title": "Berlin.de — Landesamt für Einwanderung", "accessed_at": "2026-07-02"}]'::jsonb,
+  last_verified_at = '2026-07-02'
+from cities c, tasks t
+where v.city_id = c.id and v.task_id = t.id and c.slug = 'berlin' and t.slug = 'residence-permit';
+
+update city_task_variants v set
+  booking_url = 'https://stadt.muenchen.de/buergerservice/ausland-migration.html',
+  office_name = 'Ausländerbehörde München (KVR)',
+  office_address = 'Ruppertstr. 19, 80337 München',
+  office_hours = 'Service line reachable Mon–Thu 07:30–15:30, Fri 07:30–13:00',
+  typical_wait_time = 'Appointment allocation can take several weeks to months; new slots release 10 minutes before each opening (morning and afternoon), Mon–Fri',
+  city_notes_md = 'In Munich the KVR (Kreisverwaltungsreferat) at Ruppertstraße 19 handles residence permits, in the same building as its Bürgerbüro Anmeldung services. Visits without a booked appointment are generally not possible — in genuine emergencies you can call and ask for an earlier slot.',
+  sources = '[{"url": "https://stadt.muenchen.de/buergerservice/ausland-migration.html", "title": "Landeshauptstadt München — Aufenthalt und Migration", "accessed_at": "2026-07-02"}]'::jsonb,
+  last_verified_at = '2026-07-02'
+from cities c, tasks t
+where v.city_id = c.id and v.task_id = t.id and c.slug = 'munich' and t.slug = 'residence-permit';
