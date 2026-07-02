@@ -4,6 +4,7 @@ import type { Metadata } from "next";
 import { Checklist } from "@/components/Checklist";
 import { Disclaimer, FreshnessNote } from "@/components/Disclaimer";
 import { Markdown } from "@/components/Markdown";
+import { PartnerOffers } from "@/components/PartnerOffers";
 import {
   getStatesWithCities,
   getTasksByCategory,
@@ -119,6 +120,8 @@ export default async function TaskPage({
               <Markdown>{guide.after_md}</Markdown>
             </section>
           )}
+
+          <PartnerOffers taskSlug={task.slug} />
 
           <FreshnessNote
             lastVerifiedAt={guide.last_verified_at}

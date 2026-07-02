@@ -79,6 +79,21 @@ export async function getGlossaryTermBySlug(slug: string) {
   return data;
 }
 
+export type PartnerOffer = Tables<"partner_offers">;
+
+// Offers ("recommended services") shown on a task page: affiliate providers
+// plus our own apps. Only published rows are visible (RLS), so unfilled slots
+// simply don't render.
+export async function getPartnerOffers(taskSlug: string) {
+  const supabase = createStaticClient();
+  const { data } = await supabase
+    .from("partner_offers")
+    .select("*")
+    .contains("task_slugs", [taskSlug])
+    .order("sort_order", { ascending: true });
+  return (data ?? []) as PartnerOffer[];
+}
+
 export async function searchContent(q: string) {
   const supabase = createStaticClient();
   const { data, error } = await supabase.rpc("search_content", { q });

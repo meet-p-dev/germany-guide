@@ -379,6 +379,48 @@ export type Database = {
           },
         ]
       }
+      partner_offers: {
+        Row: {
+          blurb_md: string | null
+          cta_label: string
+          id: string
+          kind: string
+          locale: string
+          name: string
+          slug: string
+          sort_order: number
+          status: Database["public"]["Enums"]["content_status"]
+          task_slugs: string[]
+          url: string
+        }
+        Insert: {
+          blurb_md?: string | null
+          cta_label?: string
+          id?: string
+          kind: string
+          locale?: string
+          name: string
+          slug: string
+          sort_order?: number
+          status?: Database["public"]["Enums"]["content_status"]
+          task_slugs?: string[]
+          url: string
+        }
+        Update: {
+          blurb_md?: string | null
+          cta_label?: string
+          id?: string
+          kind?: string
+          locale?: string
+          name?: string
+          slug?: string
+          sort_order?: number
+          status?: Database["public"]["Enums"]["content_status"]
+          task_slugs?: string[]
+          url?: string
+        }
+        Relationships: []
+      }
       problems: {
         Row: {
           category_id: string | null

@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import Link from "next/link";
+import { Analytics } from "@vercel/analytics/next";
 import "./globals.css";
 import { DISCLAIMER_TEXT } from "@/components/Disclaimer";
 import { AuthButton } from "@/components/AuthButton";
@@ -80,8 +81,13 @@ export default function RootLayout({
               Made for internationals in Germany. Content is community-reviewed;
               always double-check with the official source linked on each page.
             </p>
+            <p>
+              Some pages link to partner services marked “Partner”; if you sign up
+              through them we may earn a commission, at no extra cost to you.
+            </p>
           </div>
         </footer>
+        <Analytics />
       </body>
     </html>
   );

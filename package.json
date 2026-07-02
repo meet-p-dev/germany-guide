@@ -7,7 +7,7 @@
     "build": "next build",
     "start": "next start",
     "lint": "eslint",
-    "seed": "echo \"Seed data lives in supabase/seed.sql \u2014 apply it via the Supabase SQL editor or MCP\"",
+    "seed": "echo \"Seed data lives in supabase/seed.sql — apply it via the Supabase SQL editor or MCP\"",
     "generate:guide": "tsx scripts/generate-guide.ts",
     "generate:variant": "tsx scripts/generate-variant.ts",
     "generate:problems": "tsx scripts/generate-problems.ts",
@@ -17,6 +17,7 @@
   "dependencies": {
     "@supabase/ssr": "^0.12.0",
     "@supabase/supabase-js": "^2.110.0",
+    "@vercel/analytics": "^2.0.1",
     "class-variance-authority": "^0.7.1",
     "clsx": "^2.1.1",
     "lucide-react": "^1.23.0",

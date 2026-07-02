@@ -5,6 +5,7 @@ import { Checklist } from "@/components/Checklist";
 import { CityFactsBox } from "@/components/CityFactsBox";
 import { Disclaimer, FreshnessNote } from "@/components/Disclaimer";
 import { Markdown } from "@/components/Markdown";
+import { PartnerOffers } from "@/components/PartnerOffers";
 import {
   getCityBySlug,
   getStatesWithCities,
@@ -157,6 +158,8 @@ export default async function CityTaskPage({
               <Markdown>{guide.after_md}</Markdown>
             </section>
           )}
+
+          <PartnerOffers taskSlug={task.slug} />
 
           <FreshnessNote
             lastVerifiedAt={guide.last_verified_at}

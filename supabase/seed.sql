@@ -990,3 +990,22 @@ on conflict (city_id, task_id, locale) do update set
   office_hours=excluded.office_hours, typical_wait_time=excluded.typical_wait_time,
   fees_eur=excluded.fees_eur, fees_note=excluded.fees_note, city_notes_md=excluded.city_notes_md,
   status=excluded.status, sources=excluded.sources, last_verified_at=excluded.last_verified_at;
+
+-- ================================================================
+-- Round 5 (2026-07-02): partner offers — affiliate providers +
+-- own-app cross-promo, shown as "Recommended services" on task pages.
+-- Affiliates published with real homepages (swap in tracking/affiliate
+-- URLs later); own apps kept 'draft' (hidden) until real URLs exist.
+-- ================================================================
+insert into partner_offers (slug, kind, task_slugs, name, blurb_md, cta_label, url, sort_order, status) values
+  ('expatrio', 'affiliate', '{blocked-account}', 'Expatrio', 'Blocked account + health insurance bundle for your student visa — fast online setup before you arrive.', 'Learn more', 'https://www.expatrio.com', 0, 'published'),
+  ('fintiba', 'affiliate', '{blocked-account}', 'Fintiba', 'Popular blocked account (Sperrkonto) with quick digital verification, accepted by German consulates.', 'Learn more', 'https://www.fintiba.com', 1, 'published'),
+  ('wise', 'affiliate', '{blocked-account,bank-account}', 'Wise', 'Send money across borders at the real exchange rate — handy for funding your account from home.', 'Learn more', 'https://wise.com', 2, 'published'),
+  ('feather', 'affiliate', '{health-insurance}', 'Feather', 'English-speaking expat health insurance (public & private) with a simple online sign-up.', 'Learn more', 'https://feather-insurance.com', 0, 'published'),
+  ('ottonova', 'affiliate', '{health-insurance}', 'ottonova', 'Fully digital private health insurance with an English app — good for higher earners and freelancers.', 'Learn more', 'https://www.ottonova.de', 1, 'published'),
+  ('n26', 'affiliate', '{bank-account}', 'N26', 'App-based German bank account you can often open with just your passport, before Anmeldung.', 'Learn more', 'https://n26.com', 0, 'published'),
+  ('moneytracker', 'own_app', '{bank-account,blocked-account,tax-id,health-insurance}', 'MoneyTracker', 'Track your spending and stay on budget while settling into a new country.', 'Get the app', '#', 10, 'draft'),
+  ('heimat', 'own_app', '{anmeldung}', 'Heimat', 'Split rent and shared-flat expenses easily with your flatmates.', 'Get the app', '#', 10, 'draft')
+on conflict (slug, locale) do update set
+  kind=excluded.kind, task_slugs=excluded.task_slugs, name=excluded.name, blurb_md=excluded.blurb_md,
+  cta_label=excluded.cta_label, url=excluded.url, sort_order=excluded.sort_order, status=excluded.status;
