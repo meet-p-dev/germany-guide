@@ -99,8 +99,51 @@ Vercel rebuilds and redeploys automatically. Content-only changes (new guides,
 problems) happen in Supabase and appear via ISR within an hour, or instantly if you
 publish through `/admin/review` (which triggers revalidation) — no redeploy needed.
 
-## Custom domain (optional, later)
+## Custom domain — full setup
 
-Buy a domain, add it in Vercel (Settings → Domains), update `NEXT_PUBLIC_SITE_URL`
-and the Supabase Auth URLs to match, and re-submit the sitemap under the new domain
-in Search Console.
+No code changes are needed — the app already reads `NEXT_PUBLIC_SITE_URL`, and the
+Google verification tag is already in `app/layout.tsx`. It's all buy + config.
+
+### 1. Pick + buy the domain — **(you)**
+
+Check availability + price live in the registrar's search. Candidates:
+`germanyguide.de`, `germany-guide.com`, `thegermanyguide.com`, `germanyguide.app`.
+
+- `.de` fits the German focus and ranks well for Germany-targeted searches. You're
+  in Germany, so DENIC's admin-c requirement is no problem. Buy via a DE-friendly
+  registrar (**Cloudflare**, **Namecheap**, or **INWX**), then point DNS at Vercel.
+- `.com` / `.app` are simplest via **Vercel Domains** (Vercel → your project →
+  Settings → Domains → "Buy") — it buys *and* auto-connects in one step, no DNS
+  fiddling.
+
+Cost is roughly €10–15/year either way.
+
+### 2. Connect it to Vercel — **(you)**
+
+- If bought through Vercel Domains: already connected. Set it as the **Primary**
+  domain (so the vercel.app URL redirects to it).
+- If bought elsewhere: Vercel → Settings → Domains → **Add** your domain, then add
+  the DNS records Vercel shows you (an `A` record and/or `CNAME`) at your
+  registrar. Wait for it to verify (minutes to a couple of hours).
+
+### 3. Point the app at the new domain — **(you)**
+
+- Vercel → Settings → Environment Variables → edit `NEXT_PUBLIC_SITE_URL` to the
+  new domain (e.g. `https://germanyguide.de`) → **Redeploy**. This makes the
+  sitemap, canonical tags, and social-share image use the real domain.
+
+### 4. Fix sign-in for the new domain — **(you)**
+
+- Supabase dashboard → **Authentication → URL Configuration**: set the Site URL to
+  the new domain and add `https://<new-domain>/auth/callback` to Redirect URLs.
+
+### 5. Re-register in Search Console — **(you)**
+
+- Search Console properties are per-domain, so add the new domain as a **new
+  property** (URL prefix). It should verify automatically via the
+  `google-site-verification` tag already baked into the site. Then **Sitemaps** →
+  submit `sitemap.xml`.
+- Keep the old `germany-guide-sand.vercel.app` property too — since Vercel now
+  redirects it to the new domain, any existing indexing carries over.
+
+That's it — the new domain is live, indexed, and sign-in works.
