@@ -26,6 +26,9 @@ export const metadata: Metadata = {
   },
   description:
     "City-by-city guides to German bureaucracy for internationals: Anmeldung, residence permits, health insurance, tax ID and more — with checklists and official links.",
+  verification: process.env.GOOGLE_SITE_VERIFICATION
+    ? { google: process.env.GOOGLE_SITE_VERIFICATION }
+    : undefined,
 };
 
 const NAV = [
