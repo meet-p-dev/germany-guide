@@ -1,0 +1,10 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 320 64" width="320" height="64">
+  
+  <g transform="translate(0,8) scale(0.75)">
+  <rect width="64" height="64" rx="14.4" fill="#1A1A1A"></rect>
+  <rect x="30.25" y="9.5" width="3.5" height="45" rx="1.75" fill="#F6F4EF"></rect>
+  <path d="M14 15 H42 L50 22 L42 29 H14 Z" fill="#FFCE00"></path>
+  <path d="M50 33 H22 L14 40 L22 47 H50 Z" fill="#DD0000"></path>
+  </g>
+  <text x="64" y="41" font-family="Barlow, &#39;Helvetica Neue&#39;, Arial, sans-serif" font-size="26" letter-spacing="-0.3" fill="#1A1A1A"><tspan font-weight="700">Germany</tspan> <tspan font-weight="500">Guide</tspan></text>
+</svg>
