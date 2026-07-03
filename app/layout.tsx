@@ -27,9 +27,14 @@ export const metadata: Metadata = {
   },
   description:
     "City-by-city guides to German bureaucracy for internationals: Anmeldung, residence permits, health insurance, tax ID and more — with checklists and official links.",
-  // Google Search Console ownership verification (see search.google.com/search-console).
+  // Google Search Console ownership verification (search.google.com/search-console).
+  // One token per property: the first verifies the old vercel.app property, the
+  // second verifies the germanyguide.net property. Both render as meta tags.
   verification: {
-    google: "qvxYXosopUWV3M41ODV1n5sI01fKjzq1JG6hg5ld1LY",
+    google: [
+      "qvxYXosopUWV3M41ODV1n5sI01fKjzq1JG6hg5ld1LY",
+      "Myho0KxbQnqqsAdexq_lAO0WsQTdyTyomBxIg5e5Lr4",
+    ],
   },
 };
 
