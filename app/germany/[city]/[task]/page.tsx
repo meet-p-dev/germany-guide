@@ -6,6 +6,7 @@ import { CityFactsBox } from "@/components/CityFactsBox";
 import { Disclaimer, FreshnessNote } from "@/components/Disclaimer";
 import { Markdown } from "@/components/Markdown";
 import { PartnerOffers } from "@/components/PartnerOffers";
+import { RelatedContent } from "@/components/RelatedContent";
 import {
   getCityBySlug,
   getStatesWithCities,
@@ -167,6 +168,8 @@ export default async function CityTaskPage({
           />
         </>
       )}
+
+      <RelatedContent taskId={task.id} />
     </div>
   );
 }

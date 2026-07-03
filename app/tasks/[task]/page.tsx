@@ -5,6 +5,8 @@ import { Checklist } from "@/components/Checklist";
 import { Disclaimer, FreshnessNote } from "@/components/Disclaimer";
 import { Markdown } from "@/components/Markdown";
 import { PartnerOffers } from "@/components/PartnerOffers";
+import { RelatedContent } from "@/components/RelatedContent";
+import { getCompareTopic } from "@/lib/compare";
 import {
   getStatesWithCities,
   getTasksByCategory,
@@ -93,6 +95,28 @@ export default async function TaskPage({
 
       <Disclaimer />
 
+      {task.slug === "anmeldung" && (
+        <Link
+          href="/tools/anmeldung-deadline"
+          className="block rounded-lg border bg-muted/40 p-4 text-sm hover:bg-accent"
+        >
+          <span className="font-medium underline">
+            Anmeldung deadline calculator — when must you register? →
+          </span>
+        </Link>
+      )}
+
+      {getCompareTopic(task.slug) && (
+        <Link
+          href={`/compare/${task.slug}`}
+          className="block rounded-lg border bg-muted/40 p-4 text-sm hover:bg-accent"
+        >
+          <span className="font-medium underline">
+            Compare providers for {task.title_en.toLowerCase()} →
+          </span>
+        </Link>
+      )}
+
       {!guide && (
         <p className="rounded-md border p-4 text-muted-foreground">
           The detailed guide for this task is still being reviewed.
@@ -129,6 +153,8 @@ export default async function TaskPage({
           />
         </>
       )}
+
+      <RelatedContent taskId={task.id} />
     </div>
   );
 }

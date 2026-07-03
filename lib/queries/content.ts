@@ -94,6 +94,25 @@ export async function getPartnerOffers(taskSlug: string) {
   return (data ?? []) as PartnerOffer[];
 }
 
+// Related problems + glossary terms for a task, for the "Related" section on
+// guide pages (internal linking + helps users find more).
+export async function getRelatedContent(taskId: string) {
+  const supabase = createStaticClient();
+  const [problems, glossary] = await Promise.all([
+    supabase
+      .from("problems")
+      .select("slug, title_en")
+      .contains("related_task_ids", [taskId])
+      .limit(6),
+    supabase
+      .from("glossary_terms")
+      .select("slug, term_de, term_en")
+      .contains("related_task_ids", [taskId])
+      .limit(8),
+  ]);
+  return { problems: problems.data ?? [], glossary: glossary.data ?? [] };
+}
+
 export async function searchContent(q: string) {
   const supabase = createStaticClient();
   const { data, error } = await supabase.rpc("search_content", { q });
