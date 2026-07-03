@@ -225,6 +225,42 @@ export type Database = {
           },
         ]
       }
+      commuter_areas: {
+        Row: {
+          city_id: string
+          commute_note: string
+          cost_note: string
+          id: string
+          locale: string
+          name: string
+          sort_order: number
+          status: Database["public"]["Enums"]["content_status"]
+          why_md: string | null
+        }
+        Insert: {
+          city_id: string
+          commute_note: string
+          cost_note: string
+          id?: string
+          locale?: string
+          name: string
+          sort_order?: number
+          status?: Database["public"]["Enums"]["content_status"]
+          why_md?: string | null
+        }
+        Update: {
+          city_id?: string
+          commute_note?: string
+          cost_note?: string
+          id?: string
+          locale?: string
+          name?: string
+          sort_order?: number
+          status?: Database["public"]["Enums"]["content_status"]
+          why_md?: string | null
+        }
+        Relationships: []
+      }
       glossary_terms: {
         Row: {
           definition_md: string

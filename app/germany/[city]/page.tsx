@@ -8,6 +8,7 @@ import {
   getTasksByCategory,
   getVariantsForCity,
 } from "@/lib/queries/guide";
+import { CommuterAreas } from "@/components/CommuterAreas";
 
 export const revalidate = 3600;
 
@@ -128,6 +129,8 @@ export default async function CityPage({
           </div>
         </section>
       ))}
+
+      <CommuterAreas cityId={city.id} cityName={city.name_en} />
     </div>
   );
 }

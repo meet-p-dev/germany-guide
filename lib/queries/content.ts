@@ -113,6 +113,20 @@ export async function getRelatedContent(taskId: string) {
   return { problems: problems.data ?? [], glossary: glossary.data ?? [] };
 }
 
+export type CommuterArea = Tables<"commuter_areas">;
+
+// Nearby towns you could live in and commute from — the unique "where to
+// actually afford to live near [city]" data, shown on each city page.
+export async function getCommuterAreas(cityId: string) {
+  const supabase = createStaticClient();
+  const { data } = await supabase
+    .from("commuter_areas")
+    .select("*")
+    .eq("city_id", cityId)
+    .order("sort_order", { ascending: true });
+  return (data ?? []) as CommuterArea[];
+}
+
 export async function searchContent(q: string) {
   const supabase = createStaticClient();
   const { data, error } = await supabase.rpc("search_content", { q });
