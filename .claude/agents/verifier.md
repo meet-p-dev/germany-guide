@@ -1,5 +1,7 @@
 ---
 name: verifier
+model: opus
+effort: high
 description: >
   Step ② of the Germany Guide content loop. Takes the Researcher's packet
   (.claude/pipeline/research.md) and independently checks that every claim is true,

@@ -1,5 +1,7 @@
 ---
 name: builder
+model: opus
+effort: high
 description: >
   Step ③ of the Germany Guide content loop. Takes the Verifier's approved packet
   (.claude/pipeline/verified.md) and makes it real: applies content to Supabase,

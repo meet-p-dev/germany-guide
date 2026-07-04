@@ -1,5 +1,7 @@
 ---
 name: researcher
+model: sonnet
+effort: xhigh
 description: >
   Step ① of the Germany Guide content loop. After the user picks an item from the
   Planner's menu, this agent gathers ALL the data and information needed for that
