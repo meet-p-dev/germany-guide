@@ -1,0 +1,11 @@
+{
+  "mode": "batch",
+  "next": "build",
+  "task": "User batch (2026-07-04): Anmeldung depth + residence-permit depth + commuter-town detail (all 15 existing cities); Anmeldung comparison = build-time synthesis; NEW hub cities HELD pending explicit confirm.",
+  "researched": ["anmeldung-depth (research.md)", "commuter-detail (research-commuter.md)", "residence-permit (research-respermit.md)"],
+  "in_flight": [],
+  "held": ["new hub cities (menu #4) — CONFIRMED HELD by user 2026-07-04; separate future task after existing-15 depth"],
+  "cycle": 1,
+  "updated": "2026-07-04",
+  "note": "BATCH MODE: research ALL selected items, verify them together, deploy ONCE. When research-*.md files are all in, flip next=verify. One agent per tick still applies to the automated loop."
+}

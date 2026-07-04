@@ -1749,3 +1749,127 @@ insert into commuter_areas (city_id, name, commute_note, cost_note, why_md, sort
   ((select id from cities where slug='stuttgart'), 'Böblingen / Sindelfingen', 'S-Bahn ~20 min', 'Moderate; a Mercedes-Benz hub', NULL, 3, 'en', 'published'),
   ((select id from cities where slug='stuttgart'), 'Waiblingen', 'S-Bahn ~15 min', 'Cheaper', NULL, 4, 'en', 'published'),
   ((select id from cities where slug='stuttgart'), 'Reutlingen', 'RE ~35–45 min', 'Cheaper; next to the university town Tübingen', NULL, 5, 'en', 'published');
+
+-- ================================================================
+-- Round 15 (2026-07-04): Verifier-approved corrections + enrichment
+-- (Anmeldung + residence-permit + commuter towns). Idempotent
+-- update-only pass over the Round-14 rows above, mirroring exactly
+-- what was applied to the live DB. Honesty over precision: eAT-not-
+-- supported caveat on every online_possible=true; residence-permit
+-- fees kept as a range (fees_eur stays null); provisional facts hedged.
+-- Migration 0006 adds the new commuter_areas columns; re-stated here
+-- defensively so this file also applies standalone.
+-- ================================================================
+
+alter table commuter_areas
+  add column if not exists commute_line text,
+  add column if not exists commute_minutes text,
+  add column if not exists rent_note text,
+  add column if not exists has_own_office boolean,
+  add column if not exists office_note text,
+  add column if not exists last_verified_at date,
+  add column if not exists sources jsonb not null default '[]'::jsonb;
+
+-- ---- residence-permit: corrected §§44–45 AufenthV fees_note (all 15; fees_eur stays null) ----
+update city_task_variants v
+set fees_note = 'Statutory fees (§§ 44–45 AufenthV): about €100 to issue a residence permit and €93–96 to extend one; a settlement permit (Niederlassungserlaubnis) is €113 (up to €124–147 for self-employment / highly-qualified routes). Reduced rates apply for minors, students in some cases, and certain nationalities (e.g. Turkish nationals under the EEC–Turkey Association Agreement). Pay by card or cash at your appointment — confirm the current figure before you go.',
+    last_verified_at = '2026-07-04'
+from tasks t
+where v.task_id = t.id and t.slug = 'residence-permit';
+
+-- ---- Dortmund residence-permit: walk_in_possible true -> false (box is pickup-only) ----
+update city_task_variants v
+set walk_in_possible = false, last_verified_at = '2026-07-04'
+from cities c, tasks t
+where v.city_id = c.id and v.task_id = t.id
+  and c.slug = 'dortmund' and t.slug = 'residence-permit';
+
+-- ---- Munich Anmeldung: cited source does NOT exempt primary Anmeldung -> appointment-required + verify-note ----
+update city_task_variants v
+set appointment_required = true,
+    walk_in_possible = false,
+    online_possible = false,
+    typical_wait_time = 'Often days to a couple of weeks — book an appointment',
+    city_notes_md = 'For your **primary residence (Hauptwohnung)**, Munich generally expects a **booked appointment** — book online via the KVR / Bürgerbüro portal and check the branch offices (Leonrodstraße, Forstenrieder Allee, Orleansplatz, Riesenfeldstraße), which often have earlier slots than the main office.
+
+> **Verify before relying on a walk-in:** Munich''s no-appointment exemption list covers secondary residence (Nebenwohnung) and Statuswechsel, but as of 2026-07-04 it does **not** list primary Anmeldung. Don''t count on taking a queue ticket for a first registration — book an appointment to be safe.
+
+Munich''s online registration for primary residence needs a German ID card / EU eID with the online-ID function; it is **not usable with an eAT residence-permit card**, so most non-EU arrivals register in person.',
+    last_verified_at = '2026-07-04'
+from cities c, tasks t
+where v.city_id = c.id and v.task_id = t.id
+  and c.slug = 'munich' and t.slug = 'anmeldung';
+
+-- ---- Stuttgart Anmeldung: booking_url -> konsentas (old ssc-app superseded) ----
+update city_task_variants v
+set booking_url = 'https://stuttgart.konsentas.de/form/29/',
+    city_notes_md = 'Stuttgart registers at district **Bürgerbüros** (Mitte, Bad Cannstatt, Vaihingen, West, Ost, Süd, Zuffenhausen, Sillenbuch, Plieningen, Weilimdorf). Booking moved to the new **konsentas** system in 2026 — use the city-wide appointment search (it shows a traffic-light busyness indicator) and try a less central office for an earlier slot.',
+    last_verified_at = '2026-07-04'
+from cities c, tasks t
+where v.city_id = c.id and v.task_id = t.id
+  and c.slug = 'stuttgart' and t.slug = 'anmeldung';
+
+-- ---- Berlin Anmeldung: keep online_possible=true, add eAT caveat, drop unverified deadline-proof claim ----
+update city_task_variants v
+set city_notes_md = 'In Berlin you can book at **any Bürgeramt in any district** — pick whichever has the earliest slot. New appointments are released **every morning**; refreshing the booking page between 7 and 9 am gives the best chances, and cancellations free up same-week slots during the day.
+
+Berlin offers **online residence registration (elektronische Wohnsitzanmeldung)** for straightforward moves — but service.berlin.de states plainly that **an electronic residence permit (eAT) cannot be used** for it. You need a German ID card or an EU/EEA eID card with the activated online-ID function + PIN, a BundID account and the AusweisApp. Most non-EU newcomers therefore register **in person**; if you have just arrived from abroad, expect to appear in person.',
+    typical_wait_time = 'Often several weeks for an appointment',
+    last_verified_at = '2026-07-04'
+from cities c, tasks t
+where v.city_id = c.id and v.task_id = t.id
+  and c.slug = 'berlin' and t.slug = 'anmeldung';
+
+-- ---- Bremen Anmeldung: online offered with eAT caveat + abroad-in-person path ----
+update city_task_variants v set online_possible = true, last_verified_at = '2026-07-04',
+  city_notes_md = 'Bremen uses **BürgerServiceCenter** offices (e.g. Mitte and Nord), booked through service.bremen.de. Slots can be scarce, so reserve as soon as you have your documents. There is a separate in-person "Zuzug aus dem Ausland" path for arrivals from abroad.
+
+Bremen offers **online residence registration**, but it works only with a German ID card or EU/EEA eID card (online-ID + PIN) — **an eAT residence-permit card is not accepted**. If you are moving from abroad, expect to register **in person**.'
+from cities c, tasks t where v.city_id = c.id and v.task_id = t.id and c.slug = 'bremen' and t.slug = 'anmeldung';
+
+-- ---- Essen Anmeldung: early eWA adopter, but registrations from abroad all in person ----
+update city_task_variants v set online_possible = true, last_verified_at = '2026-07-04',
+  city_notes_md = 'Essen registers you at district **Bürgerläden / Bürgeramt** offices booked via the city''s online-Termin system. Bring your Wohnungsgeberbestätigung and passport, and book early.
+
+Essen was an early adopter of **online residence registration (eWA)** — but it works only with a German ID card or EU/EEA eID card (online-ID + PIN); **an eAT residence-permit card is not accepted**. And for **registrations from abroad, all persons must appear in person**, so most non-EU newcomers register at the office.'
+from cities c, tasks t where v.city_id = c.id and v.task_id = t.id and c.slug = 'essen' and t.slug = 'anmeldung';
+
+-- ---- Hamburg Anmeldung: home of national eWA, online with eAT caveat ----
+update city_task_variants v set online_possible = true, last_verified_at = '2026-07-04',
+  city_notes_md = 'Hamburg runs Anmeldung through district **Kundenzentren** (customer centres), not one central office. Book via the Hamburg Serviceportal (DigiTermin) for any centre with a free slot — availability varies a lot between districts, so check several. Bring your Wohnungsgeberbestätigung and passport.
+
+Hamburg is the home of Germany''s national **online residence registration (eWA)**, but it works only with a German ID card or EU/EEA eID card (online-ID + PIN) — **an eAT residence-permit card is not accepted**. Most non-EU arrivals register in person.'
+from cities c, tasks t where v.city_id = c.id and v.task_id = t.id and c.slug = 'hamburg' and t.slug = 'anmeldung';
+
+-- ---- Hannover Anmeldung: online offered with eAT caveat ----
+update city_task_variants v set online_possible = true, last_verified_at = '2026-07-04',
+  city_notes_md = 'In Hannover the region''s **Bürgerämter** handle Anmeldung across several district offices. Book online and check more than one location if your nearest is fully booked. Some offices allow Thursday walk-ins (see opening hours).
+
+Hannover offers **online residence registration**, but it works only with a German ID card or EU/EEA eID card (online-ID + PIN) — **an eAT residence-permit card is not accepted**, so most non-EU newcomers register in person.'
+from cities c, tasks t where v.city_id = c.id and v.task_id = t.id and c.slug = 'hannover' and t.slug = 'anmeldung';
+
+-- ---- commuter_areas enrichment (verified fields; qualitative unless a sourced range survived) ----
+update commuter_areas set has_own_office = true, last_verified_at = '2026-07-04';
+
+update commuter_areas set commute_line = 'RB 81 / RE 8 (regional rail; future S4)', last_verified_at = '2026-07-04'
+where name = 'Ahrensburg';
+update commuter_areas set commute_line = 'RB / IRE (Neckar-Alb regional rail)', last_verified_at = '2026-07-04'
+where name = 'Reutlingen';
+
+-- Halle: only town with a sourced rent range that survived verification (official Mietspiegel).
+update commuter_areas set
+  rent_note = 'Official halle.de Mietspiegel 2026–2027 average ~€7.93/m² — roughly 15–20% below Leipzig on new-lease asking rent (Angebotsmiete), not on the Mietspiegel/ortsübliche Vergleichsmiete. Verify current listings.',
+  sources = '[{"url":"https://www.halle.de/leben-in-halle/bauen-und-wohnen/mietspiegel","title":"Stadt Halle (Saale) — Mietspiegel 2026–2027","accessed_at":"2026-07-04"}]'::jsonb,
+  last_verified_at = '2026-07-04'
+where name = 'Halle (Saale)';
+
+update commuter_areas set
+  office_note = 'Bürgerservicecenter; first municipality in Brandenburg to offer online residence registration (eWA, since June 2025) — free and no appointment for the online path. But eWA needs a German ID card or EU eID (online-ID + PIN); an eAT residence-permit card is not accepted, so most non-EU newcomers still register in person.',
+  sources = '[{"url":"https://www.potsdam.de/de/willkommen-zur-elektronischen-wohnsitzanmeldung","title":"Landeshauptstadt Potsdam — elektronische Wohnsitzanmeldung","accessed_at":"2026-07-04"}]'::jsonb,
+  last_verified_at = '2026-07-04'
+where name = 'Potsdam';
+
+update commuter_areas set
+  office_note = 'Own Meldebehörde; online residence registration (eWA) offered since 16 Sep 2024 — but only with a German ID card or EU eID (online-ID + PIN); an eAT residence-permit card is not accepted.',
+  last_verified_at = '2026-07-04'
+where name = 'Ahrensburg';

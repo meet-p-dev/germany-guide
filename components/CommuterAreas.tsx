@@ -1,4 +1,4 @@
-import { Train, Wallet } from "lucide-react";
+import { Landmark, Train, Wallet } from "lucide-react";
 import { getCommuterAreas } from "@/lib/queries/content";
 
 /**
@@ -32,12 +32,31 @@ export async function CommuterAreas({
             <p className="font-medium">{a.name}</p>
             <p className="mt-2 flex items-start gap-2 text-sm text-muted-foreground">
               <Train className="mt-0.5 h-3.5 w-3.5 shrink-0" aria-hidden="true" />
-              {a.commute_note}
+              <span>
+                {a.commute_note}
+                {a.commute_line && (
+                  <span className="block text-xs">Line: {a.commute_line}</span>
+                )}
+              </span>
             </p>
             <p className="mt-1 flex items-start gap-2 text-sm text-muted-foreground">
               <Wallet className="mt-0.5 h-3.5 w-3.5 shrink-0" aria-hidden="true" />
-              {a.cost_note}
+              <span>
+                {a.cost_note}
+                {a.rent_note && (
+                  <span className="block text-xs">{a.rent_note}</span>
+                )}
+              </span>
             </p>
+            {a.office_note && (
+              <p className="mt-1 flex items-start gap-2 text-sm text-muted-foreground">
+                <Landmark
+                  className="mt-0.5 h-3.5 w-3.5 shrink-0"
+                  aria-hidden="true"
+                />
+                <span className="text-xs">{a.office_note}</span>
+              </p>
+            )}
             {a.why_md && (
               <p className="mt-2 text-sm text-muted-foreground">{a.why_md}</p>
             )}

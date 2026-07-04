@@ -228,34 +228,55 @@ export type Database = {
       commuter_areas: {
         Row: {
           city_id: string
+          commute_line: string | null
+          commute_minutes: string | null
           commute_note: string
           cost_note: string
+          has_own_office: boolean | null
           id: string
+          last_verified_at: string | null
           locale: string
           name: string
+          office_note: string | null
+          rent_note: string | null
           sort_order: number
+          sources: Json
           status: Database["public"]["Enums"]["content_status"]
           why_md: string | null
         }
         Insert: {
           city_id: string
+          commute_line?: string | null
+          commute_minutes?: string | null
           commute_note: string
           cost_note: string
+          has_own_office?: boolean | null
           id?: string
+          last_verified_at?: string | null
           locale?: string
           name: string
+          office_note?: string | null
+          rent_note?: string | null
           sort_order?: number
+          sources?: Json
           status?: Database["public"]["Enums"]["content_status"]
           why_md?: string | null
         }
         Update: {
           city_id?: string
+          commute_line?: string | null
+          commute_minutes?: string | null
           commute_note?: string
           cost_note?: string
+          has_own_office?: boolean | null
           id?: string
+          last_verified_at?: string | null
           locale?: string
           name?: string
+          office_note?: string | null
+          rent_note?: string | null
           sort_order?: number
+          sources?: Json
           status?: Database["public"]["Enums"]["content_status"]
           why_md?: string | null
         }

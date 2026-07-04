@@ -33,6 +33,11 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
       changeFrequency: "monthly" as const,
       priority: 0.8,
     })),
+    {
+      url: `${base}/compare/anmeldung`,
+      changeFrequency: "monthly",
+      priority: 0.8,
+    },
     ...cities.map((c) => ({
       url: `${base}/germany/${c.slug}`,
       changeFrequency: "weekly" as const,

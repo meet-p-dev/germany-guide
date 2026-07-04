@@ -127,6 +127,46 @@ export async function getCommuterAreas(cityId: string) {
   return (data ?? []) as CommuterArea[];
 }
 
+// Derived city-to-city comparison for a single task (e.g. Anmeldung): the
+// per-city variants joined to city names, so the compare page can present an
+// honest side-by-side. No fabricated precision — it surfaces exactly the
+// verified booleans/notes already stored per city.
+export type CompareVariantRow = Pick<
+  Tables<"city_task_variants">,
+  | "appointment_required"
+  | "walk_in_possible"
+  | "online_possible"
+  | "booking_url"
+  | "typical_wait_time"
+  | "last_verified_at"
+> & { city: { slug: string; name_en: string } };
+
+export async function getVariantsForTask(taskSlug: string) {
+  const supabase = createStaticClient();
+  const { data: task } = await supabase
+    .from("tasks")
+    .select("id")
+    .eq("slug", taskSlug)
+    .maybeSingle();
+  if (!task) return [];
+  const { data } = await supabase
+    .from("city_task_variants")
+    .select(
+      "appointment_required, walk_in_possible, online_possible, booking_url, typical_wait_time, last_verified_at, cities(slug, name_en)"
+    )
+    .eq("task_id", task.id)
+    .eq("status", "published");
+  return (data ?? [])
+    .map((r) => {
+      const { cities, ...rest } = r as typeof r & {
+        cities: { slug: string; name_en: string } | null;
+      };
+      return cities ? { ...rest, city: cities } : null;
+    })
+    .filter((r): r is CompareVariantRow => r !== null)
+    .sort((a, b) => a.city.name_en.localeCompare(b.city.name_en));
+}
+
 export async function searchContent(q: string) {
   const supabase = createStaticClient();
   const { data, error } = await supabase.rpc("search_content", { q });
