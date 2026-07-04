@@ -40,6 +40,7 @@ export const metadata: Metadata = {
 
 const NAV = [
   { href: "/germany", label: "Cities" },
+  { href: "/compare", label: "Compare" },
   { href: "/problems", label: "Problems & solutions" },
   { href: "/letters", label: "Letter helper" },
   { href: "/glossary", label: "Glossary" },
