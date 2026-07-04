@@ -163,5 +163,21 @@ on Potsdam (eWA first-in-Brandenburg); `office_note` on Ahrensburg (eWA since 16
 ## 5. Live-verification evidence
 
 Verified locally against the live DB (dev server reads prod Supabase) before push; post-push
-re-verified on germanyguide.net via curl (allowing ISR delay). See the "Live verification" section
-appended at deploy time below.
+re-verified on germanyguide.net via curl (deploy went live ~90s after push, ISR immediate for
+DB-driven pages).
+
+**Live (germanyguide.net) — all confirmed 2026-07-04, HTTP 200:**
+- `/compare/anmeldung` — new page renders; carries the eAT-not-supported caveat and honest
+  "Not verified" cells for unconfirmed EWA cities.
+- `/germany/munich/anmeldung` — shows "Appointment required" and the "Verify before relying on a
+  walk-in" note; the old queue-ticket walk-in framing is gone.
+- `/germany/dortmund/residence-permit` — shows the corrected §§44–45 fees note
+  ("…self-employment / highly-qualified…"); no walk-in badge.
+- `/germany/stuttgart/anmeldung` — booking link is `stuttgart.konsentas.de/form/29`.
+- `/germany/leipzig` — Halle commuter card shows the official €7.93/m² Mietspiegel rent note.
+- `/germany/hamburg` — Ahrensburg commuter card shows the corrected "RB 81 / RE 8" line.
+
+**DB spot-check (2026-07-04):** 15/15 residence-permit rows carry the new §§44–45 fees_note;
+Dortmund residence-permit `walk_in_possible = false`; 5 Anmeldung rows `online_possible = true`
+(Berlin, Bremen, Essen, Hamburg, Hannover) — each with the eAT caveat in `city_notes_md`;
+`has_own_office = true` on all commuter rows; exactly 1 `rent_note` populated (Halle only).
