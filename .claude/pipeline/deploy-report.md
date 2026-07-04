@@ -4,7 +4,7 @@
 - **Supabase project:** ilfhjffpzvzphbvhdpup
 - **Input:** `.claude/pipeline/verified.md` (Verifier packet, 2026-07-04).
 - **Pre-deploy HEAD (parent):** `eaadd88d9992e95d9ba208aa74a2faf4e1665720`
-- **Deployed commit:** `45148842719a66e267bd7eee46016b67b589810d`
+- **Deployed commit:** `e6ed868e594d2a659bf640bfd6231fc057524d80`
 
 This is the UNDO LOG. To reverse a change, run the "REVERSE SQL" for it.
 
@@ -148,7 +148,7 @@ on Potsdam (eWA first-in-Brandenburg); `office_note` on Ahrensburg (eWA since 16
 
 ---
 
-## 4. Code / seed changes (git-reversible via `git revert 45148842719a66e267bd7eee46016b67b589810d`)
+## 4. Code / seed changes (git-reversible via `git revert e6ed868e594d2a659bf640bfd6231fc057524d80`)
 
 - `supabase/migrations/0006_commuter_areas_enrich.sql` — new migration (mirrors §1).
 - `supabase/seed.sql` — appended "Round 15" idempotent block mirroring §§2–3.
