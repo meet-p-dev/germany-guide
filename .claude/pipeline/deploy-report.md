@@ -4,7 +4,7 @@
 - **Supabase project:** ilfhjffpzvzphbvhdpup
 - **Input:** `.claude/pipeline/verified-cycle2.md` (Verifier packet, 2026-07-05).
 - **Pre-deploy HEAD (parent):** `e424e5053d290620ce1dad8fb3f6115cc37dbd69`
-- **Deployed commit:** `__FILLED_AFTER_COMMIT__`
+- **Deployed commit:** `48a1c46e4acb181066f9bcc868ee46fcbc842a06`
 
 This is the UNDO LOG. To reverse a change, run its "REVERSE SQL" and/or `git revert` the deployed commit (restores `lib/queries/guide.ts` + `supabase/seed.sql`).
 
