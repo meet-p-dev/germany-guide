@@ -1,183 +1,127 @@
-# Deploy report — Round 15 (Anmeldung + residence-permit + commuter towns)
+# Deploy report — Cycle 2 (national how-to + Finanzamt/Führerscheinstelle + ABH trio + recognition)
 
-- **Builder:** step ③. Deploy date: 2026-07-04.
+- **Builder:** step ③. Deploy date: 2026-07-05.
 - **Supabase project:** ilfhjffpzvzphbvhdpup
-- **Input:** `.claude/pipeline/verified.md` (Verifier packet, 2026-07-04).
-- **Pre-deploy HEAD (parent):** `eaadd88d9992e95d9ba208aa74a2faf4e1665720`
-- **Deployed commit:** `e6ed868e594d2a659bf640bfd6231fc057524d80`
+- **Input:** `.claude/pipeline/verified-cycle2.md` (Verifier packet, 2026-07-05).
+- **Pre-deploy HEAD (parent):** `e424e5053d290620ce1dad8fb3f6115cc37dbd69`
+- **Deployed commit:** `__FILLED_AFTER_COMMIT__`
 
-This is the UNDO LOG. To reverse a change, run the "REVERSE SQL" for it.
+This is the UNDO LOG. To reverse a change, run its "REVERSE SQL" and/or `git revert` the deployed commit (restores `lib/queries/guide.ts` + `supabase/seed.sql`).
 
----
-
-## 1. Schema migration
-
-**File added:** `supabase/migrations/0006_commuter_areas_enrich.sql`
-Applied via `apply_migration` (name `0006_commuter_areas_enrich`). Adds 7 nullable/additive
-columns to `commuter_areas`: `commute_line text`, `commute_minutes text`, `rent_note text`,
-`has_own_office boolean`, `office_note text`, `last_verified_at date`,
-`sources jsonb not null default '[]'`. Additive-only — did not touch existing rows or the
-"Where to live" panel (reads `commute_note`/`cost_note`).
-
-**REVERSE SQL (only if a full rollback of the feature is wanted):**
-```sql
-alter table commuter_areas
-  drop column if exists commute_line,
-  drop column if exists commute_minutes,
-  drop column if exists rent_note,
-  drop column if exists has_own_office,
-  drop column if exists office_note,
-  drop column if exists last_verified_at,
-  drop column if exists sources;
--- Then delete the migration row:
--- delete from supabase_migrations.schema_migrations where version = '0006';
-```
-(Dropping columns is destructive to the enrichment data below; prefer reversing the data
-updates individually and keeping the columns.)
+No schema/DDL changed this cycle → **no migration file added**. All DB work was data-only via `execute_sql` and is mirrored idempotently into `supabase/seed.sql`.
 
 ---
 
-## 2. `city_task_variants` data changes (all rows locale='en')
+## 1. Code change (single file)
 
-### 2a. Dortmund residence-permit — walk_in_possible true → false
-Prior value: `walk_in_possible = true`.
+**`lib/queries/guide.ts`** — added an app-layer fallback in `getVariant(cityId, taskId)`:
+when the task is one of the ABH trio (`visa-conversion`, `fiktionsbescheinigung`,
+`work-permit-change`) and it has **no own** `city_task_variants` row, it borrows the
+`residence-permit` variant for the same city (task_id
+`4a9cd0bd-b800-4dd9-9c1f-69a5edc69354`), strips inherited `city_step_overrides` to `[]`,
+and prepends a "handled by the same immigration office" note to `city_notes_md`.
+No schema change. **REVERSE:** `git revert <deployed commit>` (or restore the file to
+its `e424e50` version). Verified `tsc --noEmit -p tsconfig.json` → 0 errors.
+
+## 2. Guides enriched (11 rows, data UPDATE — all `status` unchanged = 'published')
+
+Task slugs updated (each: `intro_md`, `documents_md`, `after_md`, `sources` appended,
+`last_verified_at`=2026-07-05, and `legal_basis` where noted):
+`bank-account`, `blocked-account`, `health-insurance`, `rundfunkbeitrag`, `schufa`,
+`tax-id` (legal_basis += §38b EStG, §355 AO), `driving-license` (legal_basis set: §29/§31/§28 FeV),
+`visa-conversion` (legal_basis set: §6(3)/§81 AufenthG, AufenthV),
+`fiktionsbescheinigung` (legal_basis kept §81 AufenthG), `work-permit-change`
+(legal_basis set: §18a/§18b/§18g AufenthG, FEG 2.0),
+`qualification-recognition` (legal_basis += §16d AufenthG).
+
+**Prior values (before this cycle):** `last_verified_at` was `2026-07-02` for all 11;
+`legal_basis` was NULL for `bank-account`, `blocked-account`, `driving-license`,
+`visa-conversion`, `work-permit-change`; the other six kept their existing legal_basis
+strings. Prior `intro_md`/`documents_md`/`after_md`/`sources` are those in
+`git show e424e5053d290620ce1dad8fb3f6115cc37dbd69:supabase/seed.sql` for the six guides
+that had seed rows (bank/blocked/health/rundfunkbeitrag/schufa/tax-id/driving-license);
+the ABH-trio and recognition guides' prior bodies were the pre-cycle DB rows.
+
+**REVERSE:** re-run the guide `update` statements from the parent commit's `seed.sql`
+(the six with seed rows) and reset `last_verified_at='2026-07-02'` + `legal_basis=NULL`
+for the five that were NULL:
 ```sql
--- REVERSE:
-update city_task_variants v set walk_in_possible = true
-from cities c, tasks t
-where v.city_id=c.id and v.task_id=t.id and c.slug='dortmund' and t.slug='residence-permit';
+update guides set last_verified_at='2026-07-02', legal_basis=null
+ where task_id in (
+  '96ba38e2-66fd-479e-a84d-247a4d15f7ee', -- bank-account
+  '9849369a-e32c-4d1a-812b-05beaf410fdd', -- blocked-account
+  '410d4c2e-8f10-4b44-88d9-f92e08934129', -- driving-license  (legal_basis was NULL)
+  'c4f1d623-1614-4060-ab98-c54b8096f685', -- visa-conversion   (legal_basis was NULL)
+  '52ef1c0a-af8f-4868-b9ca-6109edf5e8f8'  -- work-permit-change(legal_basis was NULL)
+ );
+-- for the remaining 6, reset only the date:
+update guides set last_verified_at='2026-07-02'
+ where task_id in (
+  '166e1e00-fd22-4767-a0dd-8e9690f1cf7b', -- health-insurance
+  '44450b2a-e90e-406a-b374-cc92680d5cf9', -- rundfunkbeitrag
+  '8d3fc15d-aedc-44c2-b3fd-27d17b8c1475', -- schufa
+  '6fe90ed7-f0d6-477b-9c50-31fd3719f9df', -- tax-id
+  'dec19bd6-842a-4768-93fc-ac0ae7c76c15', -- fiktionsbescheinigung
+  '3af82801-e0b4-4bcd-b2c1-42b0e769e66a'  -- qualification-recognition
+ );
+```
+(Then restore the prior `intro_md/documents_md/after_md/sources` from the parent
+`seed.sql` blocks / DB backup if a full content rollback is wanted.)
+
+## 3. New `city_task_variants` — Finanzamt (tax-id), 15 rows (NET-NEW)
+
+task_id `6fe90ed7-f0d6-477b-9c50-31fd3719f9df`, all 15 cities. `appointment_required`
+left NULL; BZSt Finanzamtsuche as shared `booking_url`; concrete `office_address` only for
+Bremen, Aachen-Stadt, Leipzig, Dresden, Munich(Servicezentrum); Nuremberg = 1-Jan-2026
+merger note, null address; others null-address + finder pointer. Prior state: **no rows
+existed** for this task.
+
+**REVERSE SQL:**
+```sql
+delete from city_task_variants where task_id='6fe90ed7-f0d6-477b-9c50-31fd3719f9df';
 ```
 
-### 2b. residence-permit fees_note (all 15 cities) — set to corrected §§44–45 text
-Prior value on every residence-permit row: `fees_note = 'Roughly €50–140 depending on permit type and duration'`
-(Aachen's prior value was `'Roughly €50–140 depending on permit type'` — no "and duration"; both
-restored to the generic below is acceptable, but exact prior differed only for Aachen).
-`fees_eur` was and remains `null` (unchanged).
+## 4. New `city_task_variants` — Führerscheinstelle (driving-license), 15 rows (NET-NEW)
+
+task_id `410d4c2e-8f10-4b44-88d9-f92e08934129`, all 15 cities. `appointment_required=true`
+for all (Bremen "walk-in" claim rejected per Verifier). Concrete `office_address` for
+Berlin, Munich(Garmischer 19–21), Stuttgart(Krailenshalden 32), Cologne, Düsseldorf,
+Aachen(Würselen), Essen(Altendorfer 101); Hannover = Stadt Hannover (NOT Region), null
+address; others null address + booking URL. Prior state: **no rows existed** for this task.
+
+**REVERSE SQL:**
 ```sql
--- REVERSE (restores the prior generic note for all 15):
-update city_task_variants v set fees_note = 'Roughly €50–140 depending on permit type and duration'
-from tasks t where v.task_id=t.id and t.slug='residence-permit';
+delete from city_task_variants where task_id='410d4c2e-8f10-4b44-88d9-f92e08934129';
 ```
 
-### 2c. Munich Anmeldung — flipped booleans + reworded notes
-Prior values: `appointment_required=false`, `walk_in_possible=true`, `online_possible=false`,
-`typical_wait_time='Same day to 2 weeks'`, and the prior `city_notes_md` was the
-"walk-ins with a queue ticket" framing.
-```sql
--- REVERSE:
-update city_task_variants v set
-  appointment_required=false, walk_in_possible=true, online_possible=false,
-  typical_wait_time='Same day to 2 weeks',
-  city_notes_md='Munich''s Bürgerbüros accept **walk-ins with a queue ticket**, but daily ticket numbers are limited — arrive early in the morning, especially at the main KVR office.
+## 5. New `glossary_terms` — recognition set, 7 rows (NET-NEW)
 
-Booking an appointment online is still the more predictable option and usually possible within days at one of the branch offices (Leonrodstraße, Forstenrieder Allee, Orleansplatz, Riesenfeldstraße).'
-from cities c, tasks t
-where v.city_id=c.id and v.task_id=t.id and c.slug='munich' and t.slug='anmeldung';
+Slugs: `anabin`, `zab`, `statement-of-comparability`, `ihk-fosa`, `defizitbescheid`,
+`anerkennungspartnerschaft`, `anerkennungszuschuss` — all `status='published'`,
+`related_task_ids = {qualification-recognition}`. No prior rows (no slug collisions).
+
+**REVERSE SQL:**
+```sql
+delete from glossary_terms where slug in
+ ('anabin','zab','statement-of-comparability','ihk-fosa','defizitbescheid',
+  'anerkennungspartnerschaft','anerkennungszuschuss');
 ```
 
-### 2d. Stuttgart Anmeldung — booking_url + notes
-Prior values: `booking_url='https://service.stuttgart.de/ssc-app-stuttgart/?m=32-42'`,
-prior `city_notes_md` was the "Stuttgart registers at district Bürgerbüros. Book online early…" text.
-```sql
--- REVERSE:
-update city_task_variants v set
-  booking_url='https://service.stuttgart.de/ssc-app-stuttgart/?m=32-42',
-  city_notes_md='Stuttgart registers at district **Bürgerbüros**. Book online early, especially around summer and semester starts. Checking a less central Bürgerbüro can get you an earlier appointment.'
-from cities c, tasks t
-where v.city_id=c.id and v.task_id=t.id and c.slug='stuttgart' and t.slug='anmeldung';
-```
+## 6. ABH trio city offices — NO rows created (by design)
 
-### 2e. Berlin Anmeldung — notes reworded (eAT caveat added; unverified deadline-proof claim stays dropped)
-`online_possible` was and remains `true` (unchanged). Prior `typical_wait_time='2–6 weeks for an appointment'`.
-Prior `city_notes_md` was the "book at any Bürgeramt… online registration via service.berlin.de" text
-(which did NOT contain the deadline-proof claim — that claim was already absent).
-```sql
--- REVERSE:
-update city_task_variants v set
-  typical_wait_time='2–6 weeks for an appointment',
-  city_notes_md='In Berlin you can book at **any Bürgeramt in any district** — pick whichever has the earliest slot.
+`visa-conversion`, `fiktionsbescheinigung`, `work-permit-change` reuse the
+`residence-permit` office via the §1 code fallback. **Nothing to reverse in the DB.**
 
-New appointments are released **every morning**; refreshing the booking page between 7 and 9 am gives the best chances. Cancellations also free up same-week slots during the day.
+## 7. seed.sql mirror
 
-Berlin also offers **online registration** for straightforward moves (single household, no special cases) via service.berlin.de — check whether you qualify before hunting for an appointment.'
-from cities c, tasks t
-where v.city_id=c.id and v.task_id=t.id and c.slug='berlin' and t.slug='anmeldung';
-```
-
-### 2f. Bremen / Essen / Hamburg / Hannover Anmeldung — online_possible → true (+ eAT caveat notes)
-Prior values: `online_possible` was `null` for Bremen, Essen, Hamburg; `null` for Hannover.
-Each row's prior `city_notes_md` was the shorter pre-caveat text.
-```sql
--- REVERSE (Bremen):
-update city_task_variants v set online_possible=null,
-  city_notes_md='Bremen uses **BürgerServiceCenter** offices (e.g. Mitte and Nord), booked through service.bremen.de. Slots can be scarce, so reserve as soon as you have your documents.'
-from cities c, tasks t where v.city_id=c.id and v.task_id=t.id and c.slug='bremen' and t.slug='anmeldung';
--- REVERSE (Essen):
-update city_task_variants v set online_possible=null,
-  city_notes_md='Essen registers you at district **Bürgerläden / Bürgeramt** offices booked via the city''s online-Termin system. Bring your Wohnungsgeberbestätigung and passport, and book early.'
-from cities c, tasks t where v.city_id=c.id and v.task_id=t.id and c.slug='essen' and t.slug='anmeldung';
--- REVERSE (Hamburg):
-update city_task_variants v set online_possible=null,
-  city_notes_md='Hamburg runs Anmeldung through district **Kundenzentren** (customer centres), not one central office. Book via the Hamburg Serviceportal for any centre with a free slot — availability varies a lot between districts, so check several. Bring your Wohnungsgeberbestätigung and passport.'
-from cities c, tasks t where v.city_id=c.id and v.task_id=t.id and c.slug='hamburg' and t.slug='anmeldung';
--- REVERSE (Hannover):
-update city_task_variants v set online_possible=null,
-  city_notes_md='In Hannover the region''s **Bürgerämter** handle Anmeldung across several district offices. Book online and check more than one location if your nearest is fully booked.'
-from cities c, tasks t where v.city_id=c.id and v.task_id=t.id and c.slug='hannover' and t.slug='anmeldung';
-```
-
-(`last_verified_at` was bumped to 2026-07-04 on all touched variant rows; prior was 2026-07-02/03.
-Not reversed individually — cosmetic.)
+Appended one idempotent block to `supabase/seed.sql` (11 guide `update`s, 30
+`city_task_variants` upserts, 7 `glossary_terms` upserts, all
+`on conflict … do update`), generated from the live DB via Postgres
+`format()`/`quote_literal` to avoid escaping errors. **REVERSE:** `git revert` the
+deployed commit.
 
 ---
 
-## 3. `commuter_areas` data changes
+## 8. Live-verification evidence
 
-Prior values: all new columns were their defaults — `has_own_office`, `commute_line`, `rent_note`,
-`office_note`, `last_verified_at` were `null`; `sources` was `'[]'::jsonb`.
-```sql
--- REVERSE (resets all enrichment data, keeps columns):
-update commuter_areas set
-  has_own_office=null, commute_line=null, commute_minutes=null,
-  rent_note=null, office_note=null, last_verified_at=null, sources='[]'::jsonb;
-```
-Specifics set: `has_own_office=true` for all rows; `commute_line` on Ahrensburg
-("RB 81 / RE 8 (regional rail; future S4)") and Reutlingen ("RB / IRE (Neckar-Alb regional rail)");
-`rent_note` + `sources` on Halle (Saale) (official Mietspiegel €7.93/m²); `office_note` + `sources`
-on Potsdam (eWA first-in-Brandenburg); `office_note` on Ahrensburg (eWA since 16 Sep 2024).
-
----
-
-## 4. Code / seed changes (git-reversible via `git revert e6ed868e594d2a659bf640bfd6231fc057524d80`)
-
-- `supabase/migrations/0006_commuter_areas_enrich.sql` — new migration (mirrors §1).
-- `supabase/seed.sql` — appended "Round 15" idempotent block mirroring §§2–3.
-- `lib/database.types.ts` — added the 7 new `commuter_areas` columns to Row/Insert/Update.
-- `lib/queries/content.ts` — added `getVariantsForTask()` + `CompareVariantRow` for the comparison layer.
-- `components/CommuterAreas.tsx` — surfaces `commute_line`, `rent_note`, `office_note` when present (additive).
-- `app/compare/anmeldung/page.tsx` — new city-to-city Anmeldung comparison page (derived layer).
-- `app/sitemap.ts` — added `/compare/anmeldung`.
-
----
-
-## 5. Live-verification evidence
-
-Verified locally against the live DB (dev server reads prod Supabase) before push; post-push
-re-verified on germanyguide.net via curl (deploy went live ~90s after push, ISR immediate for
-DB-driven pages).
-
-**Live (germanyguide.net) — all confirmed 2026-07-04, HTTP 200:**
-- `/compare/anmeldung` — new page renders; carries the eAT-not-supported caveat and honest
-  "Not verified" cells for unconfirmed EWA cities.
-- `/germany/munich/anmeldung` — shows "Appointment required" and the "Verify before relying on a
-  walk-in" note; the old queue-ticket walk-in framing is gone.
-- `/germany/dortmund/residence-permit` — shows the corrected §§44–45 fees note
-  ("…self-employment / highly-qualified…"); no walk-in badge.
-- `/germany/stuttgart/anmeldung` — booking link is `stuttgart.konsentas.de/form/29`.
-- `/germany/leipzig` — Halle commuter card shows the official €7.93/m² Mietspiegel rent note.
-- `/germany/hamburg` — Ahrensburg commuter card shows the corrected "RB 81 / RE 8" line.
-
-**DB spot-check (2026-07-04):** 15/15 residence-permit rows carry the new §§44–45 fees_note;
-Dortmund residence-permit `walk_in_possible = false`; 5 Anmeldung rows `online_possible = true`
-(Berlin, Bremen, Essen, Hamburg, Hannover) — each with the eAT caveat in `city_notes_md`;
-`has_own_office = true` on all commuter rows; exactly 1 `rent_note` populated (Halle only).
+_(filled after push + ISR settle — see section below)_

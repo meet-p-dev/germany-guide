@@ -1,10 +1,14 @@
-# Your pick for the next cycle
+# Your pick for the next cycle (cycle 2)
 
-Active pick feeds the Researcher. Backlog lives in `backlog.md` (worked top-down,
-one per cycle). Standing directive: **deepen the 15 existing cities' city-specific
-detail first.**
+Menu is in `next-options.md`. Replace the SELECTION line with the number(s) you
+want (batch mode — multiple items become one research→verify→deploy task).
+Standing directive: **deepen the 15 existing cities first.**
 
-SELECTION: 1 — Deepen Anmeldung city-variant content for all 15 existing cities (booking reality, required forms, typical waits, walk-in truth, office address/hours). Honest ranges + verify-notes only.
+SELECTION:
 
-<!-- After each deploy the planner reports what's live; edit this line to steer the
-next cycle, or leave as-is to continue down backlog.md. -->
+<!--
+Examples:
+SELECTION: 1, 2
+SELECTION: 1 — Munich + Frankfurt commuter towns first
+Leave blank to keep the loop paused (nothing researches until you pick).
+-->

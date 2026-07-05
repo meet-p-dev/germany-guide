@@ -1,11 +1,16 @@
 {
-  "mode": "batch",
+  "mode": "batch-resilient",
   "next": "build",
-  "task": "User batch (2026-07-04): Anmeldung depth + residence-permit depth + commuter-town detail (all 15 existing cities); Anmeldung comparison = build-time synthesis; NEW hub cities HELD pending explicit confirm.",
-  "researched": ["anmeldung-depth (research.md)", "commuter-detail (research-commuter.md)", "residence-permit (research-respermit.md)"],
-  "in_flight": [],
-  "held": ["new hub cities (menu #4) — CONFIRMED HELD by user 2026-07-04; separate future task after existing-15 depth"],
-  "cycle": 1,
-  "updated": "2026-07-04",
-  "note": "BATCH MODE: research ALL selected items, verify them together, deploy ONCE. When research-*.md files are all in, flip next=verify. One agent per tick still applies to the automated loop."
+  "status": "RESUMED 2026-07-05 — all 5 research groups DONE. Awaiting go for Verifier (Opus).",
+  "cycle": 2,
+  "updated": "2026-07-05",
+  "task": "City detail for 11 more tasks — 6 local-office + 5 national. See backlog.md.",
+  "research_groups": ["A national-howto", "B tax-finanzamt", "C driving", "D abh-trio", "E recognition"],
+  "researched": ["A national-howto ✅", "B tax-finanzamt ✅", "C driving ✅", "D abh-trio ✅", "E recognition ✅"],
+  "verify_files": ["research-national-howto.md", "research-tax-finanzamt.md", "research-driving.md", "research-abh-trio.md", "research-recognition.md"],
+  "verify_exclude": ["research.md", "research-respermit.md", "research-commuter.md — these are cycle-1/Round-15, already deployed; DO NOT re-verify or re-deploy"],
+  "in_flight": ["BUILDER (opus/high) — applying verified-cycle2.md, deploying"],
+  "verify_status": "VERIFY DONE 2026-07-05 -> verified-cycle2.md (173k). Builder reads verified-cycle2.md (NOT verified.md).",
+  "held": ["new hub cities (menu #4) — confirmed held"],
+  "note": "Verifier(opus) over the 5 verify_files only -> Builder(opus) deploys once."
 }

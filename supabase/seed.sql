@@ -1873,3 +1873,568 @@ update commuter_areas set
   office_note = 'Own Meldebehörde; online residence registration (eWA) offered since 16 Sep 2024 — but only with a German ID card or EU eID (online-ID + PIN); an eAT residence-permit card is not accepted.',
   last_verified_at = '2026-07-04'
 where name = 'Ahrensburg';
+
+
+-- ================================================================
+-- Cycle 2 (2026-07-05): enrich 11 national/how-to guides, add
+-- per-city Finanzamt (tax-id) + Führerscheinstelle (driving-license)
+-- variants, and recognition glossary terms. ABH-trio office reuse is
+-- handled in lib/queries/guide.ts (no duplicate rows). Idempotent.
+-- ================================================================
+
+update guides set
+  intro_md='A German current account (**Girokonto**) is the same product nationwide — banking is federal, so there are **no city-specific rules** here. You need one to receive your salary, pay rent, and set up direct debits (**SEPA-Lastschrift**) for rent, insurance and utilities.
+
+**EU citizens** can generally open an account immediately with just a passport/ID. **Non-EU newcomers** can often start the process before Anmeldung with a digital bank, but a **registered German address is usually needed to receive the physical card** and to satisfy traditional banks.
+
+- **Digital / mobile banks** (e.g. N26, Revolut, bunq): open in minutes via smartphone using **video identification (Video-Ident)** or Photo-Ident — you show your passport to a video agent. Basic tiers are often free.
+- **Branch banks** (Sparkasse, Volksbank, Deutsche Bank, Commerzbank): usually an in-person appointment; typically ask for your **Anmeldebestätigung**.
+
+Every account comes with an **IBAN** (your German account number). You give this IBAN to your employer, landlord and health insurer. Fees vary by bank and account tier — digital-bank basic tiers are typically free, while some accounts charge a monthly fee, so compare current terms on each bank''s own site.',
+  documents_md='- Valid passport or EU ID card
+- Proof of address — **Anmeldebestätigung** (required by most traditional banks; some digital banks accept a foreign or temporary address to start, but need a German address for the card)
+- Your **Steuer-ID**, if you already have it (can usually be added later)
+- Proof of income or student status, for some account types
+- A German mobile number and, for Video-Ident, a smartphone with a working camera',
+  after_md='You will receive a debit card (Girocard or Visa/Mastercard debit) either instantly (virtual) or by post within one to two weeks, along with online-banking access. Give your **IBAN** to your employer, landlord and health insurer as needed. Set up SEPA direct debits (Lastschrift) for recurring bills, and a standing order (Dauerauftrag) for rent if your landlord prefers it.',
+  legal_basis=NULL,
+  last_verified_at='2026-07-05',
+  sources='[{"url": "https://www.verbraucherzentrale.de", "title": "Verbraucherzentrale — consumer protection guidance", "accessed_at": "2026-07-02"}, {"url": "https://n26.com/en-de/bank-account", "title": "N26 — opening a German bank account (Video-Ident)", "accessed_at": "2026-07-04"}, {"url": "https://www.monito.com/en/wiki/opening-a-bank-account-in-germany", "title": "Monito — opening a bank account in Germany", "accessed_at": "2026-07-04"}]'::jsonb
+where task_id=(select id from tasks where slug='bank-account');
+
+update guides set
+  intro_md='A blocked account (**Sperrkonto**) proves you can support yourself during your studies or job search in Germany. It is a **federal requirement for the visa** — the rules are the same nationwide, set by the German mission abroad and the Auswärtiges Amt, not by any city.
+
+You deposit a set sum, and the account is **"blocked"**: you can only withdraw a limited amount **each month** (roughly one-twelfth of the total), so it lasts the year. The account is **usually opened for one year**, unless your planned stay is shorter.
+
+**How much:** for students, as of 2026 the figure is **roughly €992 per month (about €11,904 for a year)** — it is tied to the BAföG maximum rate and **reviewed annually**, so confirm the current amount with your German mission or provider before you transfer. Job-seeker / Chancenkarte amounts are set separately and are **higher** — check the current figure with your mission.
+
+**Who releases the block:** the German mission (embassy/consulate) controls it before your visa is issued; after you arrive and register, the competent **Ausländerbehörde** takes over. Neither can take your money — they only lift the monthly withdrawal limit.
+
+**If your plans change:** if the visa is refused, not used, or you leave the Schengen area before getting a residence permit, the mission can lift the block — the **rejection notice alone is enough** to release the funds.',
+  documents_md='- Valid passport
+- Completed account-opening form from your chosen provider
+- Proof of admission / job offer, as required for your visa type
+- The blocking confirmation letter (the provider issues this once funded) — you submit it with your visa application
+
+Well-known providers include Fintiba, Expatrio, Coracle and some traditional banks. **Compare current fees and setup speed on each provider''s own site** — these change and vary by provider.',
+  after_md='Once the account is funded, the provider issues a **blocking confirmation** to submit with your visa or residence-permit paperwork. After you arrive in Germany, register (Anmeldung), open a normal Girokonto, and link it so your monthly allowance transfers automatically. If your visa is refused or you do not travel, contact the provider and your mission to unblock and refund the money.',
+  legal_basis=NULL,
+  last_verified_at='2026-07-05',
+  sources='[{"url": "https://www.auswaertiges-amt.de/en/sperrkonto-388600", "title": "Auswärtiges Amt — Blocked account (official mechanics)", "accessed_at": "2026-07-05"}, {"url": "https://managua.diplo.de", "title": "German mission — blocked-account amount corroboration (2026)", "accessed_at": "2026-07-05"}]'::jsonb
+where task_id=(select id from tasks where slug='blocked-account');
+
+update guides set
+  intro_md='Whether — and how easily — you can convert (**umschreiben**) a foreign driving licence into a German one depends on **where it was issued**. The rules are **federal (Fahrerlaubnis-Verordnung, FeV)**, applied by your local **Führerscheinstelle**.
+
+**The 6-month rule (§29 FeV) — this is the big one.** A non-EU/EEA licence is valid for driving in Germany for only **6 months** from the day you establish your ordinary residence here. After that you need a German licence. The office **may extend** the recognition by up to **6 more months** only if you credibly show your stay will be **under 12 months** total.
+
+- **Apply well before the 6 months run out** — processing typically takes **8–14 weeks**. Some city offices treat a **timely application** as sufficient even if processing overruns, but this is **not guaranteed by federal law**. Confirm with your own Führerscheinstelle, and **do not drive on an expired entitlement** — that is a criminal offence.
+
+**EU / EEA licences (§28 FeV):** licences from the 27 EU states plus Iceland, Liechtenstein and Norway are valid in Germany **until their own expiry date** — no conversion needed (car/motorcycle classes; truck/bus recognised for 5 years). A probationary-period nuance applies if you have held the licence under 2 years. All EU photocard licences must be exchanged by **19 January 2033** regardless.
+
+**Non-EU/EEA — three tiers (Anlage 11 FeV).** Countries fall into tiers depending on how much of a German test you must retake:
+- **No theory or practical test** (full recognition),
+- **theory only**, or
+- **full theory + practical test**.
+
+We do **not** reproduce the country list here because it changes and, for some countries, **depends on the issuing state/province** (the USA especially varies by state). Check **Anlage 11 FeV** or the ADAC country list for your case. Recent confirmed points: the **United Kingdom and Gibraltar** have been in the favourable tier since 2022; **Montenegro** is being added (2026).
+
+**Costs and documents (as ranges — they vary by city and ADAC club):**
+- A **certified translation + classification** of your licence — roughly **€50–85** via ADAC (or about **€25** for classification alone), about 10 working days.
+- A biometric photo (~€10–15) and, for non-EU/EEA conversions, an **eye test (Sehtest)** — or a medical exam for truck/bus classes — plus a **first-aid course**.
+- **Total cost is typically ~€35–90**, and **processing 4–14 weeks**. Fees vary slightly by city. An **International Driving Permit (IDP)** (~€15–20) can bridge the first months but does not replace conversion.',
+  documents_md='- Your **original foreign driving licence** (it is retained when the German one is issued)
+- A **certified translation + classification** (ADAC or a sworn translator) — unless your licence is exempt
+- Valid passport / ID and your **Anmeldebestätigung**
+- A **biometric passport photo**
+- An **eye-test certificate (Sehtest)** — for car/motorcycle; a medical/eyesight exam for truck/bus classes
+- A **first-aid course certificate** (required for non-EU/EEA conversions)
+- Proof of when you established residence (to show you are inside the 6-month window)',
+  after_md='You submit everything at the **Führerscheinstelle** (by appointment in most cities). If your country requires a test, you will be booked for the theory and/or practical exam; in some cities these are run via **DEKRA/TÜV** rather than an in-house examiner. Once approved, your foreign licence is **kept by the authority** and you receive a German **Führerschein**. Do not let your 6-month window lapse before you have either the German licence or a documented extension.',
+  legal_basis='§29 FeV (recognition / 6-month rule; extension for stays under 12 months); §31 FeV + Anlage 11 FeV (exchange country tiers); §28 FeV (EU/EEA licences)',
+  last_verified_at='2026-07-05',
+  sources='[{"url": "https://www.gesetze-im-internet.de/fev_2010/__29.html", "title": "§29 FeV — recognition of foreign driving licences (6-month rule)", "accessed_at": "2026-07-05"}, {"url": "https://www.adac.de/verkehr/fuehrerschein/auslaendischer-fuehrerschein/umschreibung/", "title": "ADAC — converting a foreign driving licence (country tiers, costs)", "accessed_at": "2026-07-05"}]'::jsonb
+where task_id=(select id from tasks where slug='driving-license');
+
+update guides set
+  intro_md='A **Fiktionsbescheinigung** ("fictional certificate") is a paper document your **Ausländerbehörde** issues when you have applied for a residence permit (or its extension) in time but they have not yet decided. It **bridges your legal stay** so you are not "illegal" during the wait. It is issued by the **same immigration office** that handles your residence permit.
+
+**The key is which paragraph of §81 AufenthG is ticked** — it decides what you may do:
+
+- **§81 Abs. 3 (Erlaubnisfiktion)** — you are here legally without a title yet and applied for your **first** permit. Work is **generally NOT allowed** unless the certificate explicitly says so.
+- **§81 Abs. 4 (Fortgeltungsfiktion)** — you applied **on time to extend an existing** title. Your **previous permit''''s conditions continue**, so if you were allowed to work, you generally may **keep working**.
+- **Abs. 5 / 5a** — the office''''s duty to issue the certificate, and the note about employment status.
+
+**Read your certificate carefully** and check the ticked box before assuming you may work.
+
+**Travelling:** whether a Fiktionsbescheinigung lets you re-enter Germany (especially with a valid visa/passport) is a matter of **administrative practice and interpretation** — §81 does not spell out travel rules. In practice it is often accepted alongside a valid passport, but **ask your caseworker before any international travel**.',
+  documents_md='- Your passport
+- Your residence-permit (or extension) application confirmation
+- Biometric photo, if the office asks for one for the certificate
+- Any fee the office charges — it is usually issued as part of your appointment; check whether your office charges for it',
+  after_md='Keep the Fiktionsbescheinigung with your passport — together they document your legal status until the decision. Note its **expiry date**: if it is close and you have heard nothing, contact the Ausländerbehörde proactively; most offices extend it rather than let your legal stay lapse through no fault of yours. Once your residence permit (eAT card) is issued, the Fiktionsbescheinigung is no longer needed.',
+  legal_basis='§81 Aufenthaltsgesetz (AufenthG)',
+  last_verified_at='2026-07-05',
+  sources='[{"url": "https://www.gesetze-im-internet.de/aufenthg_2004/__81.html", "title": "§81 AufenthG — Fiktionswirkung (Abs. 3, 4, 5, 5a)", "accessed_at": "2026-07-05"}, {"url": "https://www.asyl.net", "title": "asyl.net — Fiktionsbescheinigung: legal status while an application is pending", "accessed_at": "2026-07-05"}]'::jsonb
+where task_id=(select id from tasks where slug='fiktionsbescheinigung');
+
+update guides set
+  intro_md='Health insurance is **mandatory** for everyone living in Germany, and the framework is **federal (SGB V) — the same nationwide**, so there are no city-specific rules here. There are two systems:
+
+- **Statutory / public (GKV — gesetzliche Krankenversicherung):** the default for most employees and all students. Contributions are income-based; family members can often be co-insured for free. Examples: TK, AOK, Barmer, DAK. **TK** is popular with internationals for its English-language app and service.
+- **Private (PKV — private Krankenversicherung):** available to the self-employed, civil servants, and employees earning **above the compulsory-insurance threshold (Versicherungspflichtgrenze / JAEG)**, which for **2026 is €77,400 per year (€6,450 per month)** — up from €73,800 in 2025. Below that line, employees are in the GKV.
+
+**About "regional" insurers:** AOK is a federation of about a dozen **independent regional (state-level) insurers**, each with its own additional contribution (Zusatzbeitrag). This is a **state-level** difference, **not** a reason to expect city-by-city variation — you can join a GKV insurer regardless of where in Germany you live.
+
+**Students:** if you are under 30 / within the standard study period, you pay the reduced **student GKV rate — roughly €120–140 per month** (revised annually; the exact figure and each insurer''s Zusatzbeitrag change over time). Over 30 or beyond the standard period, you may need a voluntary or private plan.',
+  documents_md='- Valid passport / ID and your Anmeldebestätigung
+- Your **Steuer-ID** (add it as soon as you have it)
+- Enrolment certificate (students) or employment contract (employees)
+- German bank account (IBAN) for the contribution direct debit
+- Your insurer will issue a membership confirmation for your employer/university and, later, an **electronic health card (eGK)**',
+  after_md='Your insurer sends a **membership confirmation** — give it to your employer (they register you and split the contribution) or your university (needed to enrol). Your **electronic health card (elektronische Gesundheitskarte / eGK)** arrives by post within a couple of weeks; carry it to every doctor''s appointment. You can switch GKV insurers later (usually after a minimum membership period), so it is fine to start with whichever accepts you fastest.',
+  legal_basis='SGB V (Sozialgesetzbuch V) — gesetzliche Krankenversicherung',
+  last_verified_at='2026-07-05',
+  sources='[{"url": "https://www.gkv-spitzenverband.de", "title": "GKV-Spitzenverband — statutory health insurance framework", "accessed_at": "2026-07-02"}, {"url": "https://www.tk.de/en", "title": "Techniker Krankenkasse (TK) — English service", "accessed_at": "2026-07-05"}, {"url": "https://www.check24.de/gesetzliche-krankenversicherung/versicherungspflichtgrenze", "title": "Versicherungspflichtgrenze / JAEG 2026 = €77,400", "accessed_at": "2026-07-05"}]'::jsonb
+where task_id=(select id from tasks where slug='health-insurance');
+
+update guides set
+  intro_md='Whether you **need** your foreign qualification formally recognised depends on the profession — and the framework is **federal + profession/state-based, not city-based**, so there are no per-city offices here; you go to the **responsible body** for your profession.
+
+**The first fork — regulated vs non-regulated:**
+- **Regulated professions** (doctors, nurses, teachers, lawyers, many *Meister* craft trades): recognition is **legally required** before you may work under the professional title.
+- **Non-regulated professions** (most IT, engineering, business roles): recognition is **optional** — you can work without it — but it often **helps with visas and salary**.
+
+**Where to start:** use the official **Recognition Finder** at anerkennung-in-deutschland.de (run by the federal institute **BIBB**, available in 11 languages) to find your profession''''s responsible body. For **university degrees**, the **anabin** database rates institutions/degrees (H+, H+-, H-); we keep this conceptual rather than a click-by-click walkthrough.
+
+**Key routes and costs:**
+- **ZAB Statement of Comparability** (for degrees, from the Zentralstelle für ausländisches Bildungswesen): **€208** (a duplicate is €104). Processing is roughly **3 months standard**, about **2 months** on the skilled-worker fast-track, and about **2 weeks** for an EU Blue Card. It does not expire and is valid Germany-wide.
+- **Vocational qualifications:** **IHK-FOSA** is the national body for commercial/industrial/service occupations (fee **€100–600**, typically ~€350–450; **3-month** statutory processing under §6(3) BQFG). **HWK** (regional craft chambers) handle craft trades on the same legal basis.
+- If your qualification is only **partially** equivalent, you may get a **Defizitbescheid** listing the gaps, which you close via an adaptation course or exam.
+
+**Coming to Germany to get recognised — the Recognition Partnership (§16d Abs. 3 AufenthG):** you can enter to complete recognition while working. The residence title is granted for an **initial 12 months, extendable one year at a time up to 3 years total**; you generally need **A2 German** (higher for some professions), and up to **20 hours/week** of secondary employment is allowed.
+
+**Free help:** the **IQ Network** (Integration durch Qualifizierung) runs **16 regional counselling networks** — one per Bundesland — offering free advice regardless of nationality or status. The **BAMF/BA "Working and Living in Germany" hotline** is **+49 30 1815-1111** (Mon–Thu 09:00–16:00, Fri 09:00–12:00). Some regions offer an **Anerkennungszuschuss** grant toward costs — check current eligibility.',
+  documents_md='- Your **degree/diploma or vocational certificate** plus transcripts
+- **Certified translations** into German (and sometimes an apostille/legalisation)
+- A CV listing training and work experience
+- Passport / ID
+- For the Recognition Partnership route: proof of A2 German and, usually, an agreement with an employer',
+  after_md='You submit to the **responsible body** for your profession (found via the Recognition Finder), not a city office. You will receive either **full recognition**, **partial recognition with a Defizitbescheid** (do the listed course/exam to close the gap), or, for non-regulated jobs, a **Statement of Comparability** you can show employers. For anything involving **state-level professions** (health, teaching), the responsible body and any fees vary by Bundesland — use the Recognition Finder rather than assuming a single national office. Free counselling from your regional **IQ Network** can guide you through each step.',
+  legal_basis='Berufsqualifikationsfeststellungsgesetz (BQFG); §16d Aufenthaltsgesetz (AufenthG) — Anerkennungspartnerschaft',
+  last_verified_at='2026-07-05',
+  sources='[{"url": "https://www.anerkennung-in-deutschland.de/html/en/redirect_220.php", "title": "Recognition Finder (BIBB) — find your responsible body", "accessed_at": "2026-07-05"}, {"url": "https://www.zab.kmk.org/en/statement-of-comparability/faq", "title": "ZAB — Statement of Comparability (€208; processing times)", "accessed_at": "2026-07-05"}, {"url": "https://www.make-it-in-germany.com/en/working-in-germany/recognition", "title": "Make it in Germany — recognition & Anerkennungspartnerschaft (§16d)", "accessed_at": "2026-07-05"}, {"url": "https://www.bamf.de", "title": "BAMF — Working and Living in Germany hotline (+49 30 1815-1111)", "accessed_at": "2026-07-05"}]'::jsonb
+where task_id=(select id from tasks where slug='qualification-recognition');
+
+update guides set
+  intro_md='The **Rundfunkbeitrag** (broadcasting licence fee) funds public radio and TV (ARD, ZDF, Deutschlandradio). It is a **federal charge under the Rundfunkbeitragsstaatsvertrag (RBStV) — the same nationwide**, with no city variation.
+
+- **Amount: €18.36 per month per household** ("*für jede Wohnung*") — **per dwelling, not per person**. Flatmates sharing one apartment pay **one** fee between them, not one each.
+- It is billed **quarterly by default: €55.08 (3 × €18.36)**.
+- Liability starts on the **1st of the month you move in**, so your first bill can be larger (it may cover a back-period).
+
+Shortly after your Anmeldung, the **Beitragsservice** (the joint collection service) posts you a letter asking you to register your dwelling and set up payment. **This letter is genuine** — it is not a scam. Register at **rundfunkbeitrag.de**.
+
+**Exemptions and reductions** (must be **applied for, with proof**, at rundfunkbeitrag.de):
+- **BAföG recipients** (and Ausbildungsgeld apprentices) **not living with their parents** are **fully exempt by statute** — a rule in force since **October 2025**.
+- Other full-exemption groups: Bürgergeld / ALG II, Grundsicherung, asylum-seeker benefits (AsylbLG), and some severely disabled people with the "RF" mark on their disability card get a reduced rate.
+- Exemptions can be **backdated up to three years** if you were eligible.',
+  documents_md='- Your registration address (from your Anmeldung) and move-in date
+- The reference number from the Beitragsservice letter, if you already have one
+- For an exemption: proof of the qualifying benefit (e.g. your **BAföG Bescheid**, Bürgergeld/Grundsicherung notice, or disability card with "RF")
+- German bank account (IBAN) for the direct debit',
+  after_md='Once registered, the fee is normally collected by direct debit each quarter. If you qualify for an exemption, submit the application with proof — approval stops future billing and can refund up to three years back. If you move, update your address so you are not double-billed for two dwellings. If you receive a reminder (Mahnung) for a period before you were liable, respond with your actual move-in date rather than ignoring it.',
+  legal_basis='Rundfunkbeitragsstaatsvertrag (RBStV)',
+  last_verified_at='2026-07-05',
+  sources='[{"url": "https://www.rundfunkbeitrag.de", "title": "Rundfunkbeitrag — official site (€18.36/month per household; exemptions)", "accessed_at": "2026-07-05"}]'::jsonb
+where task_id=(select id from tasks where slug='rundfunkbeitrag');
+
+update guides set
+  intro_md='**SCHUFA** is Germany''s main credit bureau. Landlords routinely ask new tenants for a SCHUFA report to check creditworthiness. It is a **nationwide** private service — the same everywhere in Germany.
+
+There are **two different products**, and it matters which you get:
+
+- **SCHUFA-BonitätsAuskunft — €29.95 (paid).** This is the one **landlords accept**. Ordered online at meineschufa.de, you get it as an **instant PDF** (or in person at a Postbank branch). It is split: **page 1** is a clean creditworthiness summary meant to be handed to a landlord; **pages 2–3** contain your personal data and are **for your eyes only — do not hand them over**.
+- **Datenkopie (free copy under Art. 15 DSGVO/GDPR).** A free, once-a-year full disclosure of your stored data. It is for **your own review**, **not** designed to be shown to landlords. Requested by post, it must be provided within a **statutory maximum of 30 days** (in practice often 2–4 weeks).
+
+**No SCHUFA history yet?** As a newcomer you will have **no record**, which is normal and not negative. Landlords generally accept alternatives: your **employment contract and recent payslips**, a **guarantor (Bürge)**, a **reference from a previous landlord**, or a **larger deposit** — bearing in mind the deposit is legally capped.
+
+**Deposit cap:** under **§551 BGB**, a rental security deposit may not exceed **three months'' cold rent (Kaltmiete)**.',
+  documents_md='- Valid passport / ID and your registered German address
+- A German bank account or card to pay the €29.95 for the BonitätsAuskunft
+- For the free Datenkopie: your ID details for the postal request form at meineschufa.de',
+  after_md='For a flat application, order the **BonitätsAuskunft (€29.95)** and give the landlord **page 1 only**. Keep pages 2–3 private. If you have no German credit history, lead with your employment contract, payslips, and offer a guarantor or the (capped) deposit instead. Check your free **Datenkopie** once a year to catch and correct any errors in your record.',
+  legal_basis='Art. 15 DSGVO (GDPR) — right of access',
+  last_verified_at='2026-07-05',
+  sources='[{"url": "https://www.meineschufa.de", "title": "meineSCHUFA — BonitätsAuskunft (€29.95) and free Datenkopie", "accessed_at": "2026-07-05"}, {"url": "https://www.gesetze-im-internet.de/bgb/__551.html", "title": "§551 BGB — rental deposit capped at 3 months'' cold rent", "accessed_at": "2026-07-05"}]'::jsonb
+where task_id=(select id from tasks where slug='schufa');
+
+update guides set
+  intro_md='Germany has **two different tax numbers** — people constantly confuse them:
+
+- **Steuer-Identifikationsnummer (Steuer-ID):** an **11-digit lifelong** number issued **once** by the federal **Bundeszentralamt für Steuern (BZSt)**. It is **permanent** (never changes, even if you move or leave and return) and is **mailed by post only** — the BZSt will **never** ask for it by phone or email. After your Anmeldung it usually arrives in a few weeks (commonly 2–4). Give it to your employer so you are not taxed at the maximum rate.
+- **Steuernummer:** a separate number issued by your **local Finanzamt**, mainly relevant if you are **self-employed / freelance** or file a return. It **can change** when you move to a different Finanzamt''s area. Most employees do not need to worry about it.
+
+**The six tax classes (Steuerklassen I–VI, §38b EStG)** decide how much wage tax is withheld from your monthly pay. They affect your **monthly net only** — not your final annual tax liability, which is settled by your tax return:
+
+- **I** — single / unmarried, or married but permanently separated
+- **II** — single parents (entitled to the relief amount)
+- **III** — married, where the spouse has no or much lower income (used with class V)
+- **IV** — married, both earning similar amounts (the default for newly-married couples)
+- **V** — the partner of someone in class III
+- **VI** — for a **second and further jobs** (highest withholding)
+
+Married couples choose between **IV/IV** (similar incomes) and **III/V** (one much higher earner); there is also **IV/IV with factor**. The combination only shifts *when* you pay — any over- or under-withholding is reconciled in the annual return.
+
+**Changing your tax class** is done via **ELSTER** (the online tax portal) or on paper at the **Finanzamt** (form *Antrag auf Steuerklassenwechsel*). It can **generally be changed once per calendar year**, with exceptions such as **marriage, divorce, or the death of a spouse**. Using ELSTER requires a **one-time identity verification by post**, which takes a while — set it up ahead of time.
+
+**Deadlines:** a tax return (**Steuererklärung**) for the **2025** tax year that you are required to file is due **31 July 2026**; using a tax advisor or a Lohnsteuerhilfeverein extends this into 2027. A **voluntary** return has a **four-year window** (for 2025, until **31 December 2029**). You have **one month** to lodge an objection (**Einspruch**, §355 AO) against a tax assessment (Steuerbescheid). If you were on the wrong tax class, the excess comes back through your return.',
+  documents_md='- Your **Steuer-ID** (arrives automatically by post after Anmeldung)
+- Valid passport / ID and your Anmeldebestätigung
+- To change tax class: the *Antrag auf Steuerklassenwechsel* (via ELSTER or from the Finanzamt), plus your marriage certificate if the change is due to marriage
+- For ELSTER: an account with the one-time postal activation code',
+  after_md='Once you have your **Steuer-ID**, give it to your employer immediately — this moves you off the emergency class VI / maximum withholding and any excess already deducted is refunded (via payroll or your annual return). If your tax class is wrong for your situation (e.g. after marriage), file a change via **ELSTER** or your Finanzamt. Keep your Steuer-ID somewhere safe — you will reuse it for every job, bank, and tax filing for the rest of your life in Germany.',
+  legal_basis='§139b Abgabenordnung (AO); §38b Einkommensteuergesetz (EStG) — Steuerklassen; §355 AO — Einspruch',
+  last_verified_at='2026-07-05',
+  sources='[{"url": "https://www.bzst.de/DE/Privatpersonen/SteuerlicheIdentifikationsnummer/steuerlicheidentifikationsnummer_node.html", "title": "BZSt — Steuerliche Identifikationsnummer (Steuer-ID)", "accessed_at": "2026-07-05"}, {"url": "https://www.elster.de", "title": "ELSTER — online tax portal (tax-class change)", "accessed_at": "2026-07-05"}, {"url": "https://www.finanzamt.nrw.de", "title": "Finanzamt NRW — filing deadlines (2025 return due 31 Jul 2026)", "accessed_at": "2026-07-05"}]'::jsonb
+where task_id=(select id from tasks where slug='tax-id');
+
+update guides set
+  intro_md='If you entered Germany on a **national D-visa** (for study, work, family, etc.), that visa is only the entry document. Before it expires you must **convert it into a residence permit (Aufenthaltstitel)** — an electronic card (eAT) — at your local **Ausländerbehörde**. This is the **same immigration office** that handles your later extensions, so the process and the office are the same across all four immigration tasks.
+
+**The sequence:**
+1. **Register your address (Anmeldung)** first — your address determines which Ausländerbehörde is responsible for you.
+2. **Apply for the residence permit before your D-visa expires.** Your visa **sticker states its own expiry date** — apply before that date.
+3. If you apply on time but the office cannot decide immediately, **§81 AufenthG** protects you: you typically receive a **Fiktionsbescheinigung** that bridges your legal stay until the decision.
+
+**Timing reality:** the bottleneck is almost always **appointment backlogs**, not the paperwork. **Start looking for an appointment as soon as you register.** D-visa validity and processing times vary by consulate and office, so do not rely on a fixed lead-time — book the earliest appointment you can and apply before your visa''''s printed expiry.',
+  documents_md='- Valid passport with your **D-visa**
+- **Anmeldebestätigung** (proof of registered address)
+- Biometric passport photo
+- Proof for your specific purpose (enrolment certificate, employment contract + Blue Card/skilled-worker criteria, marriage certificate, etc.)
+- Proof of health insurance
+- Proof of financial means where required (e.g. blocked account for students)
+- The application form (Antrag auf Erteilung eines Aufenthaltstitels)
+- The fee (varies by permit type under the AufenthV)',
+  after_md='If the office cannot issue the eAT card on the spot, you usually get a **Fiktionsbescheinigung** confirming your stay remains legal while they decide — check which paragraph is ticked, as it governs whether you may keep working and travelling. The **eAT card** itself is produced centrally and arrives within a few weeks; you collect it at the office. Keep an eye on your Fiktionsbescheinigung''''s expiry and contact the office proactively if a decision is running late.',
+  legal_basis='§6 Abs. 3, §81 Aufenthaltsgesetz (AufenthG); Aufenthaltsverordnung (AufenthV) — fees',
+  last_verified_at='2026-07-05',
+  sources='[{"url": "https://www.gesetze-im-internet.de/aufenthg_2004/__81.html", "title": "§81 AufenthG — application for a residence title (Fiktion protection)", "accessed_at": "2026-07-05"}, {"url": "https://www.make-it-in-germany.com/en/visa-residence/types/residence-permit", "title": "Make it in Germany — from national visa to residence permit", "accessed_at": "2026-07-05"}]'::jsonb
+where task_id=(select id from tasks where slug='visa-conversion');
+
+update guides set
+  intro_md='Whether you can **change employers** — or take a materially different job — depends on your **residence permit type**, and the rules changed substantially with the **Skilled Immigration Act 2.0 (Fachkräfteeinwanderungsgesetz, in force 18 November 2023)**. This is handled by the **same Ausländerbehörde** as your residence permit.
+
+**EU Blue Card holders (§18g AufenthG) — the most liberal:**
+- After the reform, changing employer needs **no prior permission from the Ausländerbehörde** — the law says explicitly that, contrary to the general rule, "**keine Erlaubnis der Ausländerbehörde erforderlich**" for a Blue Card holder''''s job change.
+- **During your first 12 months** in the Blue Card, the Ausländerbehörde **may suspend** the change **for up to 30 days** and, within that window, **object** if the Blue Card conditions (salary threshold, qualifying job) are no longer met. After 12 months, even that falls away.
+- You must still **notify** the Ausländerbehörde of the change — this is a **notification, not an approval request**. The new job must still meet Blue Card criteria (recognised qualification + the salary threshold).
+
+**Other skilled-worker permits (§18a / §18b — vocational / academic):**
+- The wording of your permit matters. Many permits allow a change after an initial period, but the exact rule (**when a notification is enough vs. when you need the office''''s consent**) has **real regional and office-level variation**. **Confirm your own permit''''s wording with your Ausländerbehörde** before switching — do not assume a fixed year-count applies to you.
+- Some older routes (e.g. **ICT Card**) may in some cases still involve the **Agentur für Arbeit**. Check your specific case.
+
+**In short:** Blue Card = notify, don''''t ask (with a 30-day objection window in year one); other permits = **check your permit and your office first.**',
+  documents_md='- Your passport and current residence permit (eAT card)
+- Your **new employment contract** (showing salary and role)
+- Proof your new job still meets your permit''''s criteria (qualification, and for the Blue Card the salary threshold)
+- The Ausländerbehörde''''s notification / change form (varies by office)
+- Any Agentur für Arbeit paperwork, if your permit type still requires it',
+  after_md='For a **Blue Card**, notify the Ausländerbehörde of your new employer and job; within your first 12 months, wait out any 30-day objection window before assuming the change is final. For **other permits**, contact the office first to learn whether a notification suffices or consent is needed. Keep copies of everything you submit.
+
+**City note — Berlin:** Berlin''''s LEA lets Blue Card holders handle an employer change **entirely online** via service.berlin.de (dienstleistung 326856); the page also states the point at which no notification is needed. Other cities differ — always use your own city''''s Ausländerbehörde process.',
+  legal_basis='§18a, §18b, §18g Aufenthaltsgesetz (AufenthG); Fachkräfteeinwanderungsgesetz 2.0 (in force 18 Nov 2023)',
+  last_verified_at='2026-07-05',
+  sources='[{"url": "https://www.gesetze-im-internet.de/aufenthg_2004/__18g.html", "title": "§18g AufenthG — EU Blue Card (employer change; 30-day/12-month rule)", "accessed_at": "2026-07-05"}, {"url": "https://service.berlin.de/dienstleistung/326856/en/", "title": "Berlin LEA — Blue Card employer change (online)", "accessed_at": "2026-07-05"}]'::jsonb
+where task_id=(select id from tasks where slug='work-permit-change');
+
+-- ---- Cycle 2: per-city Finanzamt (tax-id) + Führerscheinstelle (driving-license) variants ----
+
+insert into city_task_variants (city_id, task_id, appointment_required, booking_url, office_name, office_address, city_notes_md, status, sources, last_verified_at, generated_by, reviewed_by, locale)
+values ((select id from cities where slug='aachen'), (select id from tasks where slug='driving-license'), true, 'https://www.staedteregion-aachen.de/de/navigation/aemter/strassenverkehrsamt-a-32/', 'Straßenverkehrsamt der StädteRegion Aachen', 'Carlo-Schmid-Straße 4, 52146 Würselen', 'Aachen''''s driving-licence matters are handled by the **StädteRegion Aachen**, physically in **Würselen** (Carlo-Schmid-Straße 4), by appointment. The no-appointment counter there is only for the mandatory paper-licence exchange, **not** foreign conversions.', 'published', '[{"url": "https://www.staedteregion-aachen.de/de/navigation/aemter/strassenverkehrsamt-a-32/", "title": "StädteRegion Aachen — Straßenverkehrsamt (Würselen)", "accessed_at": "2026-07-05"}]'::jsonb, '2026-07-05', 'cycle2-builder', 'verifier-cycle2', 'en')
+on conflict (city_id, task_id, locale) do update set
+  appointment_required=excluded.appointment_required, booking_url=excluded.booking_url,
+  office_name=excluded.office_name, office_address=excluded.office_address,
+  city_notes_md=excluded.city_notes_md, status=excluded.status, sources=excluded.sources,
+  last_verified_at=excluded.last_verified_at, generated_by=excluded.generated_by, reviewed_by=excluded.reviewed_by;
+
+insert into city_task_variants (city_id, task_id, appointment_required, booking_url, office_name, office_address, city_notes_md, status, sources, last_verified_at, generated_by, reviewed_by, locale)
+values ((select id from cities where slug='berlin'), (select id from tasks where slug='driving-license'), true, 'https://service.berlin.de/dienstleistung/327537/', 'LABO — Fahrerlaubnisbehörde', 'Puttkamerstraße 16–18, 10969 Berlin', 'Berlin handles driving-licence conversion centrally at the **LABO** for the whole city. Appointment required — book via service.berlin.de. Fees vary slightly by case.', 'published', '[{"url": "https://service.berlin.de/dienstleistung/327537/", "title": "Berlin LABO — conversion of a foreign driving licence", "accessed_at": "2026-07-05"}]'::jsonb, '2026-07-05', 'cycle2-builder', 'verifier-cycle2', 'en')
+on conflict (city_id, task_id, locale) do update set
+  appointment_required=excluded.appointment_required, booking_url=excluded.booking_url,
+  office_name=excluded.office_name, office_address=excluded.office_address,
+  city_notes_md=excluded.city_notes_md, status=excluded.status, sources=excluded.sources,
+  last_verified_at=excluded.last_verified_at, generated_by=excluded.generated_by, reviewed_by=excluded.reviewed_by;
+
+insert into city_task_variants (city_id, task_id, appointment_required, booking_url, office_name, office_address, city_notes_md, status, sources, last_verified_at, generated_by, reviewed_by, locale)
+values ((select id from cities where slug='bremen'), (select id from tasks where slug='driving-license'), true, 'https://www.service.bremen.de', 'Bürgerdienst / Führerscheinstelle Bremen', NULL, 'Bremen runs driving-licence matters through its **Bürgerdienst** (multiple locations), **by prior appointment only** ("nur nach vorheriger Terminvereinbarung") — book via service.bremen.de. Processing roughly 8–12 weeks.', 'published', '[{"url": "https://www.service.bremen.de", "title": "Bremen Bürgerdienst — driving-licence appointments", "accessed_at": "2026-07-05"}]'::jsonb, '2026-07-05', 'cycle2-builder', 'verifier-cycle2', 'en')
+on conflict (city_id, task_id, locale) do update set
+  appointment_required=excluded.appointment_required, booking_url=excluded.booking_url,
+  office_name=excluded.office_name, office_address=excluded.office_address,
+  city_notes_md=excluded.city_notes_md, status=excluded.status, sources=excluded.sources,
+  last_verified_at=excluded.last_verified_at, generated_by=excluded.generated_by, reviewed_by=excluded.reviewed_by;
+
+insert into city_task_variants (city_id, task_id, appointment_required, booking_url, office_name, office_address, city_notes_md, status, sources, last_verified_at, generated_by, reviewed_by, locale)
+values ((select id from cities where slug='cologne'), (select id from tasks where slug='driving-license'), true, 'https://www.stadt-koeln.de/service/produkte/00010/', 'Straßenverkehrsamt Köln', 'Stadthaus Deutz, Willy-Brandt-Platz 3, 50679 Köln', 'Cologne handles conversions at the **Straßenverkehrsamt** in Stadthaus Deutz. Appointment required.', 'published', '[{"url": "https://www.stadt-koeln.de/service/produkte/00010/", "title": "Stadt Köln — Straßenverkehrsamt (driving licences)", "accessed_at": "2026-07-05"}]'::jsonb, '2026-07-05', 'cycle2-builder', 'verifier-cycle2', 'en')
+on conflict (city_id, task_id, locale) do update set
+  appointment_required=excluded.appointment_required, booking_url=excluded.booking_url,
+  office_name=excluded.office_name, office_address=excluded.office_address,
+  city_notes_md=excluded.city_notes_md, status=excluded.status, sources=excluded.sources,
+  last_verified_at=excluded.last_verified_at, generated_by=excluded.generated_by, reviewed_by=excluded.reviewed_by;
+
+insert into city_task_variants (city_id, task_id, appointment_required, booking_url, office_name, office_address, city_notes_md, status, sources, last_verified_at, generated_by, reviewed_by, locale)
+values ((select id from cities where slug='dortmund'), (select id from tasks where slug='driving-license'), true, 'https://www.dortmund.de/de/leben_in_dortmund/verkehr/fuehrerschein/index.html', 'Führerscheinstelle Dortmund', NULL, 'Dortmund handles conversions at its Führerscheinstelle, by appointment — book via dortmund.de. Dortmund''''s own page states it treats a timely application as sufficient even if processing overruns; **do not rely on this elsewhere**, and do not drive on an expired entitlement.', 'published', '[{"url": "https://www.dortmund.de/de/leben_in_dortmund/verkehr/fuehrerschein/index.html", "title": "Stadt Dortmund — Führerscheinstelle", "accessed_at": "2026-07-05"}]'::jsonb, '2026-07-05', 'cycle2-builder', 'verifier-cycle2', 'en')
+on conflict (city_id, task_id, locale) do update set
+  appointment_required=excluded.appointment_required, booking_url=excluded.booking_url,
+  office_name=excluded.office_name, office_address=excluded.office_address,
+  city_notes_md=excluded.city_notes_md, status=excluded.status, sources=excluded.sources,
+  last_verified_at=excluded.last_verified_at, generated_by=excluded.generated_by, reviewed_by=excluded.reviewed_by;
+
+insert into city_task_variants (city_id, task_id, appointment_required, booking_url, office_name, office_address, city_notes_md, status, sources, last_verified_at, generated_by, reviewed_by, locale)
+values ((select id from cities where slug='dresden'), (select id from tasks where slug='driving-license'), true, 'https://www.dresden.de/de/leben/mobilitaet/verkehr/fuehrerschein.php', 'Führerscheinstelle Dresden', NULL, 'Dresden handles conversions at its Straßenverkehrsamt/Führerscheinstelle, by appointment — book via dresden.de.', 'published', '[{"url": "https://www.dresden.de/de/leben/mobilitaet/verkehr/fuehrerschein.php", "title": "Stadt Dresden — Führerscheinstelle", "accessed_at": "2026-07-05"}]'::jsonb, '2026-07-05', 'cycle2-builder', 'verifier-cycle2', 'en')
+on conflict (city_id, task_id, locale) do update set
+  appointment_required=excluded.appointment_required, booking_url=excluded.booking_url,
+  office_name=excluded.office_name, office_address=excluded.office_address,
+  city_notes_md=excluded.city_notes_md, status=excluded.status, sources=excluded.sources,
+  last_verified_at=excluded.last_verified_at, generated_by=excluded.generated_by, reviewed_by=excluded.reviewed_by;
+
+insert into city_task_variants (city_id, task_id, appointment_required, booking_url, office_name, office_address, city_notes_md, status, sources, last_verified_at, generated_by, reviewed_by, locale)
+values ((select id from cities where slug='duesseldorf'), (select id from tasks where slug='driving-license'), true, 'https://www.duesseldorf.de/strassenverkehrsamt', 'Straßenverkehrsamt Düsseldorf', 'Höherweg 101, 40233 Düsseldorf', 'Düsseldorf''''s **Straßenverkehrsamt** at Höherweg 101 handles conversions, by appointment via service.duesseldorf.de.', 'published', '[{"url": "https://www.duesseldorf.de/strassenverkehrsamt", "title": "Stadt Düsseldorf — Straßenverkehrsamt", "accessed_at": "2026-07-05"}]'::jsonb, '2026-07-05', 'cycle2-builder', 'verifier-cycle2', 'en')
+on conflict (city_id, task_id, locale) do update set
+  appointment_required=excluded.appointment_required, booking_url=excluded.booking_url,
+  office_name=excluded.office_name, office_address=excluded.office_address,
+  city_notes_md=excluded.city_notes_md, status=excluded.status, sources=excluded.sources,
+  last_verified_at=excluded.last_verified_at, generated_by=excluded.generated_by, reviewed_by=excluded.reviewed_by;
+
+insert into city_task_variants (city_id, task_id, appointment_required, booking_url, office_name, office_address, city_notes_md, status, sources, last_verified_at, generated_by, reviewed_by, locale)
+values ((select id from cities where slug='essen'), (select id from tasks where slug='driving-license'), true, 'https://www.essen.de/meintermin', 'Führerscheinstelle Essen', 'Altendorfer Str. 101, 45143 Essen', 'Essen''''s driving-licence office is at **Altendorfer Str. 101** (tel 0201 88-33888), appointment only via meintermin.essen.de. (Note: Hollestraße 3 / Technisches Rathaus is a different office.)', 'published', '[{"url": "https://www.service.essen.de", "title": "Stadt Essen — Führerscheinstelle (Altendorfer Str. 101)", "accessed_at": "2026-07-05"}]'::jsonb, '2026-07-05', 'cycle2-builder', 'verifier-cycle2', 'en')
+on conflict (city_id, task_id, locale) do update set
+  appointment_required=excluded.appointment_required, booking_url=excluded.booking_url,
+  office_name=excluded.office_name, office_address=excluded.office_address,
+  city_notes_md=excluded.city_notes_md, status=excluded.status, sources=excluded.sources,
+  last_verified_at=excluded.last_verified_at, generated_by=excluded.generated_by, reviewed_by=excluded.reviewed_by;
+
+insert into city_task_variants (city_id, task_id, appointment_required, booking_url, office_name, office_address, city_notes_md, status, sources, last_verified_at, generated_by, reviewed_by, locale)
+values ((select id from cities where slug='frankfurt'), (select id from tasks where slug='driving-license'), true, 'https://frankfurt.de/service-und-rathaus/verwaltung/aemter-und-institutionen/strassenverkehrsamt', 'Straßenverkehrsamt Frankfurt am Main', NULL, 'Frankfurt handles conversions through the Straßenverkehrsamt/Ordnungsamt, by appointment — the booking portal is the reliable pointer.', 'published', '[{"url": "https://frankfurt.de/service-und-rathaus/verwaltung/aemter-und-institutionen/strassenverkehrsamt", "title": "Stadt Frankfurt — Straßenverkehrsamt", "accessed_at": "2026-07-05"}]'::jsonb, '2026-07-05', 'cycle2-builder', 'verifier-cycle2', 'en')
+on conflict (city_id, task_id, locale) do update set
+  appointment_required=excluded.appointment_required, booking_url=excluded.booking_url,
+  office_name=excluded.office_name, office_address=excluded.office_address,
+  city_notes_md=excluded.city_notes_md, status=excluded.status, sources=excluded.sources,
+  last_verified_at=excluded.last_verified_at, generated_by=excluded.generated_by, reviewed_by=excluded.reviewed_by;
+
+insert into city_task_variants (city_id, task_id, appointment_required, booking_url, office_name, office_address, city_notes_md, status, sources, last_verified_at, generated_by, reviewed_by, locale)
+values ((select id from cities where slug='hamburg'), (select id from tasks where slug='driving-license'), true, 'https://www.hamburg.de/lbv/', 'Landesbetrieb Verkehr (LBV)', NULL, 'Hamburg handles conversions at the **Landesbetrieb Verkehr (LBV)**. Book an appointment via lbv-termine.de / hamburg.de.', 'published', '[{"url": "https://www.hamburg.de/lbv/", "title": "Hamburg LBV — driving-licence services", "accessed_at": "2026-07-05"}]'::jsonb, '2026-07-05', 'cycle2-builder', 'verifier-cycle2', 'en')
+on conflict (city_id, task_id, locale) do update set
+  appointment_required=excluded.appointment_required, booking_url=excluded.booking_url,
+  office_name=excluded.office_name, office_address=excluded.office_address,
+  city_notes_md=excluded.city_notes_md, status=excluded.status, sources=excluded.sources,
+  last_verified_at=excluded.last_verified_at, generated_by=excluded.generated_by, reviewed_by=excluded.reviewed_by;
+
+insert into city_task_variants (city_id, task_id, appointment_required, booking_url, office_name, office_address, city_notes_md, status, sources, last_verified_at, generated_by, reviewed_by, locale)
+values ((select id from cities where slug='hannover'), (select id from tasks where slug='driving-license'), true, 'https://www.hannover.de/Leben-in-der-Region-Hannover/Verwaltungen-Kommunen/Die-Verwaltung-der-Landeshauptstadt-Hannover', 'Führerscheinstelle der Stadt Hannover', NULL, '**Important:** if you are registered in the **city of Hannover**, your office is the **Stadt Hannover** Führerscheinstelle (book via hannover.de) — **not** the Region Hannover office at Hildesheimer Str. 20, which serves only the ~20 surrounding towns (its own page says "Einwohner*innen Hannovers wenden sich bitte an die Stadt Hannover"). Appointment required.', 'published', '[{"url": "https://www.hannover.de", "title": "Landeshauptstadt Hannover — Führerscheinstelle (city residents)", "accessed_at": "2026-07-05"}]'::jsonb, '2026-07-05', 'cycle2-builder', 'verifier-cycle2', 'en')
+on conflict (city_id, task_id, locale) do update set
+  appointment_required=excluded.appointment_required, booking_url=excluded.booking_url,
+  office_name=excluded.office_name, office_address=excluded.office_address,
+  city_notes_md=excluded.city_notes_md, status=excluded.status, sources=excluded.sources,
+  last_verified_at=excluded.last_verified_at, generated_by=excluded.generated_by, reviewed_by=excluded.reviewed_by;
+
+insert into city_task_variants (city_id, task_id, appointment_required, booking_url, office_name, office_address, city_notes_md, status, sources, last_verified_at, generated_by, reviewed_by, locale)
+values ((select id from cities where slug='leipzig'), (select id from tasks where slug='driving-license'), true, 'https://www.leipzig.de/buergerservice-und-verwaltung/aemter-und-behoerdengaenge/dienstleistungen/fahrerlaubnis', 'Fahrerlaubnisbehörde Leipzig', NULL, 'Leipzig handles conversions at its Fahrerlaubnisbehörde, by appointment. The Drittstaat theory and practical exams are administered via **DEKRA**, not an in-house examiner.', 'published', '[{"url": "https://www.leipzig.de", "title": "Stadt Leipzig — Fahrerlaubnisbehörde", "accessed_at": "2026-07-05"}]'::jsonb, '2026-07-05', 'cycle2-builder', 'verifier-cycle2', 'en')
+on conflict (city_id, task_id, locale) do update set
+  appointment_required=excluded.appointment_required, booking_url=excluded.booking_url,
+  office_name=excluded.office_name, office_address=excluded.office_address,
+  city_notes_md=excluded.city_notes_md, status=excluded.status, sources=excluded.sources,
+  last_verified_at=excluded.last_verified_at, generated_by=excluded.generated_by, reviewed_by=excluded.reviewed_by;
+
+insert into city_task_variants (city_id, task_id, appointment_required, booking_url, office_name, office_address, city_notes_md, status, sources, last_verified_at, generated_by, reviewed_by, locale)
+values ((select id from cities where slug='munich'), (select id from tasks where slug='driving-license'), true, 'https://www.muenchen.de/rathaus/terminvereinbarung.html', 'Führerscheinstelle im Kreisverwaltungsreferat (KVR)', 'Garmischer Straße 19–21, 81373 München', 'Munich''''s Führerscheinstelle (part of the KVR) is at **Garmischer Straße 19–21** — visit by appointment. Note: "Eichstätter Straße 2" is only the **postal correspondence address**, not a walk-in office.', 'published', '[{"url": "https://stadt.muenchen.de/service/info/fuehrerscheinstelle/", "title": "Stadt München — Führerscheinstelle (Garmischer Str. 19–21)", "accessed_at": "2026-07-05"}]'::jsonb, '2026-07-05', 'cycle2-builder', 'verifier-cycle2', 'en')
+on conflict (city_id, task_id, locale) do update set
+  appointment_required=excluded.appointment_required, booking_url=excluded.booking_url,
+  office_name=excluded.office_name, office_address=excluded.office_address,
+  city_notes_md=excluded.city_notes_md, status=excluded.status, sources=excluded.sources,
+  last_verified_at=excluded.last_verified_at, generated_by=excluded.generated_by, reviewed_by=excluded.reviewed_by;
+
+insert into city_task_variants (city_id, task_id, appointment_required, booking_url, office_name, office_address, city_notes_md, status, sources, last_verified_at, generated_by, reviewed_by, locale)
+values ((select id from cities where slug='nuremberg'), (select id from tasks where slug='driving-license'), true, 'https://www.nuernberg.de/internet/fuehrerscheinstelle/', 'Führerscheinstelle Nürnberg', NULL, 'Nuremberg handles conversions at its Führerscheinstelle, by appointment — book via nuernberg.de.', 'published', '[{"url": "https://www.nuernberg.de/internet/fuehrerscheinstelle/", "title": "Stadt Nürnberg — Führerscheinstelle", "accessed_at": "2026-07-05"}]'::jsonb, '2026-07-05', 'cycle2-builder', 'verifier-cycle2', 'en')
+on conflict (city_id, task_id, locale) do update set
+  appointment_required=excluded.appointment_required, booking_url=excluded.booking_url,
+  office_name=excluded.office_name, office_address=excluded.office_address,
+  city_notes_md=excluded.city_notes_md, status=excluded.status, sources=excluded.sources,
+  last_verified_at=excluded.last_verified_at, generated_by=excluded.generated_by, reviewed_by=excluded.reviewed_by;
+
+insert into city_task_variants (city_id, task_id, appointment_required, booking_url, office_name, office_address, city_notes_md, status, sources, last_verified_at, generated_by, reviewed_by, locale)
+values ((select id from cities where slug='stuttgart'), (select id from tasks where slug='driving-license'), true, 'https://www.stuttgart.de/leben/mobilitaet/fuehrerschein/', 'Führerscheinstelle Stuttgart', 'Krailenshaldenstraße 32, 70469 Stuttgart (Feuerbach)', 'Stuttgart''''s Führerscheinstelle is in Feuerbach at **Krailenshaldenstraße 32** (tel 0711 21698-200), by appointment. The "Löwentorbogen" address belongs to the vehicle-registration office (Kfz-Zulassungsstelle), not driving licences.', 'published', '[{"url": "https://www.stuttgart.de/leben/mobilitaet/fuehrerschein/", "title": "Stadt Stuttgart — Führerscheinstelle (Krailenshaldenstr. 32)", "accessed_at": "2026-07-05"}]'::jsonb, '2026-07-05', 'cycle2-builder', 'verifier-cycle2', 'en')
+on conflict (city_id, task_id, locale) do update set
+  appointment_required=excluded.appointment_required, booking_url=excluded.booking_url,
+  office_name=excluded.office_name, office_address=excluded.office_address,
+  city_notes_md=excluded.city_notes_md, status=excluded.status, sources=excluded.sources,
+  last_verified_at=excluded.last_verified_at, generated_by=excluded.generated_by, reviewed_by=excluded.reviewed_by;
+
+insert into city_task_variants (city_id, task_id, appointment_required, booking_url, office_name, office_address, city_notes_md, status, sources, last_verified_at, generated_by, reviewed_by, locale)
+values ((select id from cities where slug='aachen'), (select id from tasks where slug='tax-id'), null, 'https://www.bzst.de/DE/Service/Behoerdenwegweiser/Finanzamtsuche/finanzamtsuche_node.html', 'Finanzamt Aachen-Stadt', 'Krefelder Str. 210, 52070 Aachen', 'If you live **in the city of Aachen**, your office is **Finanzamt Aachen-Stadt** (phone 0241 469-0). The surrounding StädteRegion is handled by a separate office (Finanzamt Aachen-Kreis) — that one is **not** yours as a city resident.', 'published', '[{"url": "https://www.bzst.de/DE/Service/Behoerdenwegweiser/Finanzamtsuche/finanzamtsuche_node.html", "title": "BZSt Finanzamtsuche — find your responsible Finanzamt", "accessed_at": "2026-07-05"}]'::jsonb, '2026-07-05', 'cycle2-builder', 'verifier-cycle2', 'en')
+on conflict (city_id, task_id, locale) do update set
+  appointment_required=excluded.appointment_required, booking_url=excluded.booking_url,
+  office_name=excluded.office_name, office_address=excluded.office_address,
+  city_notes_md=excluded.city_notes_md, status=excluded.status, sources=excluded.sources,
+  last_verified_at=excluded.last_verified_at, generated_by=excluded.generated_by, reviewed_by=excluded.reviewed_by;
+
+insert into city_task_variants (city_id, task_id, appointment_required, booking_url, office_name, office_address, city_notes_md, status, sources, last_verified_at, generated_by, reviewed_by, locale)
+values ((select id from cities where slug='berlin'), (select id from tasks where slug='tax-id'), null, 'https://www.bzst.de/DE/Service/Behoerdenwegweiser/Finanzamtsuche/finanzamtsuche_node.html', 'Finanzämter Berlin (district-based)', NULL, 'Berlin has **several district-based Finanzämter** — the one responsible depends on your registered address. Use the finder to identify yours. (The surrounding Brandenburg offices are separate and not yours.)', 'published', '[{"url": "https://www.bzst.de/DE/Service/Behoerdenwegweiser/Finanzamtsuche/finanzamtsuche_node.html", "title": "BZSt Finanzamtsuche — find your responsible Finanzamt", "accessed_at": "2026-07-05"}]'::jsonb, '2026-07-05', 'cycle2-builder', 'verifier-cycle2', 'en')
+on conflict (city_id, task_id, locale) do update set
+  appointment_required=excluded.appointment_required, booking_url=excluded.booking_url,
+  office_name=excluded.office_name, office_address=excluded.office_address,
+  city_notes_md=excluded.city_notes_md, status=excluded.status, sources=excluded.sources,
+  last_verified_at=excluded.last_verified_at, generated_by=excluded.generated_by, reviewed_by=excluded.reviewed_by;
+
+insert into city_task_variants (city_id, task_id, appointment_required, booking_url, office_name, office_address, city_notes_md, status, sources, last_verified_at, generated_by, reviewed_by, locale)
+values ((select id from cities where slug='bremen'), (select id from tasks where slug='tax-id'), null, 'https://www.bzst.de/DE/Service/Behoerdenwegweiser/Finanzamtsuche/finanzamtsuche_node.html', 'Finanzamt Bremen', 'Rudolf-Hilferding-Platz 1, 28195 Bremen', 'Bremen is served by a **single Finanzamt** for the whole city (Bremerhaven has its own office). Phone 0421 361-90909. Note: for most tax-ID business you need **no appointment** — your Steuer-ID arrives by post automatically, and tax-class changes are done via ELSTER or by post.', 'published', '[{"url": "https://www.bzst.de/DE/Service/Behoerdenwegweiser/Finanzamtsuche/finanzamtsuche_node.html", "title": "BZSt Finanzamtsuche — find your responsible Finanzamt", "accessed_at": "2026-07-05"}]'::jsonb, '2026-07-05', 'cycle2-builder', 'verifier-cycle2', 'en')
+on conflict (city_id, task_id, locale) do update set
+  appointment_required=excluded.appointment_required, booking_url=excluded.booking_url,
+  office_name=excluded.office_name, office_address=excluded.office_address,
+  city_notes_md=excluded.city_notes_md, status=excluded.status, sources=excluded.sources,
+  last_verified_at=excluded.last_verified_at, generated_by=excluded.generated_by, reviewed_by=excluded.reviewed_by;
+
+insert into city_task_variants (city_id, task_id, appointment_required, booking_url, office_name, office_address, city_notes_md, status, sources, last_verified_at, generated_by, reviewed_by, locale)
+values ((select id from cities where slug='cologne'), (select id from tasks where slug='tax-id'), null, 'https://www.bzst.de/DE/Service/Behoerdenwegweiser/Finanzamtsuche/finanzamtsuche_node.html', 'Finanzämter Köln (district-based)', NULL, 'Cologne has **several district-based Finanzämter**; the responsible one depends on your address. Use the finder rather than assuming a specific office.', 'published', '[{"url": "https://www.bzst.de/DE/Service/Behoerdenwegweiser/Finanzamtsuche/finanzamtsuche_node.html", "title": "BZSt Finanzamtsuche — find your responsible Finanzamt", "accessed_at": "2026-07-05"}]'::jsonb, '2026-07-05', 'cycle2-builder', 'verifier-cycle2', 'en')
+on conflict (city_id, task_id, locale) do update set
+  appointment_required=excluded.appointment_required, booking_url=excluded.booking_url,
+  office_name=excluded.office_name, office_address=excluded.office_address,
+  city_notes_md=excluded.city_notes_md, status=excluded.status, sources=excluded.sources,
+  last_verified_at=excluded.last_verified_at, generated_by=excluded.generated_by, reviewed_by=excluded.reviewed_by;
+
+insert into city_task_variants (city_id, task_id, appointment_required, booking_url, office_name, office_address, city_notes_md, status, sources, last_verified_at, generated_by, reviewed_by, locale)
+values ((select id from cities where slug='dortmund'), (select id from tasks where slug='tax-id'), null, 'https://www.bzst.de/DE/Service/Behoerdenwegweiser/Finanzamtsuche/finanzamtsuche_node.html', 'Finanzämter Dortmund (district-based)', NULL, 'Dortmund has **several district-based Finanzämter**; the responsible one depends on your address. The surrounding Kreis Unna is a separate office. Use the finder.', 'published', '[{"url": "https://www.bzst.de/DE/Service/Behoerdenwegweiser/Finanzamtsuche/finanzamtsuche_node.html", "title": "BZSt Finanzamtsuche — find your responsible Finanzamt", "accessed_at": "2026-07-05"}]'::jsonb, '2026-07-05', 'cycle2-builder', 'verifier-cycle2', 'en')
+on conflict (city_id, task_id, locale) do update set
+  appointment_required=excluded.appointment_required, booking_url=excluded.booking_url,
+  office_name=excluded.office_name, office_address=excluded.office_address,
+  city_notes_md=excluded.city_notes_md, status=excluded.status, sources=excluded.sources,
+  last_verified_at=excluded.last_verified_at, generated_by=excluded.generated_by, reviewed_by=excluded.reviewed_by;
+
+insert into city_task_variants (city_id, task_id, appointment_required, booking_url, office_name, office_address, city_notes_md, status, sources, last_verified_at, generated_by, reviewed_by, locale)
+values ((select id from cities where slug='dresden'), (select id from tasks where slug='tax-id'), null, 'https://www.bzst.de/DE/Service/Behoerdenwegweiser/Finanzamtsuche/finanzamtsuche_node.html', 'Finanzamt Dresden-Nord / Dresden-Süd', 'Rabenerstraße 1, 01069 Dresden', 'Dresden splits along the Elbe into Dresden-Nord and Dresden-Süd, but **both sit at the same address**; reception routes you to the right one by your street.', 'published', '[{"url": "https://www.bzst.de/DE/Service/Behoerdenwegweiser/Finanzamtsuche/finanzamtsuche_node.html", "title": "BZSt Finanzamtsuche — find your responsible Finanzamt", "accessed_at": "2026-07-05"}]'::jsonb, '2026-07-05', 'cycle2-builder', 'verifier-cycle2', 'en')
+on conflict (city_id, task_id, locale) do update set
+  appointment_required=excluded.appointment_required, booking_url=excluded.booking_url,
+  office_name=excluded.office_name, office_address=excluded.office_address,
+  city_notes_md=excluded.city_notes_md, status=excluded.status, sources=excluded.sources,
+  last_verified_at=excluded.last_verified_at, generated_by=excluded.generated_by, reviewed_by=excluded.reviewed_by;
+
+insert into city_task_variants (city_id, task_id, appointment_required, booking_url, office_name, office_address, city_notes_md, status, sources, last_verified_at, generated_by, reviewed_by, locale)
+values ((select id from cities where slug='duesseldorf'), (select id from tasks where slug='tax-id'), null, 'https://www.bzst.de/DE/Service/Behoerdenwegweiser/Finanzamtsuche/finanzamtsuche_node.html', 'Finanzämter Düsseldorf (district-based)', NULL, 'Düsseldorf has **several district-based Finanzämter**; the responsible one depends on your address. The surrounding Kreis Mettmann is a separate office — not yours as a city resident. Use the finder.', 'published', '[{"url": "https://www.bzst.de/DE/Service/Behoerdenwegweiser/Finanzamtsuche/finanzamtsuche_node.html", "title": "BZSt Finanzamtsuche — find your responsible Finanzamt", "accessed_at": "2026-07-05"}]'::jsonb, '2026-07-05', 'cycle2-builder', 'verifier-cycle2', 'en')
+on conflict (city_id, task_id, locale) do update set
+  appointment_required=excluded.appointment_required, booking_url=excluded.booking_url,
+  office_name=excluded.office_name, office_address=excluded.office_address,
+  city_notes_md=excluded.city_notes_md, status=excluded.status, sources=excluded.sources,
+  last_verified_at=excluded.last_verified_at, generated_by=excluded.generated_by, reviewed_by=excluded.reviewed_by;
+
+insert into city_task_variants (city_id, task_id, appointment_required, booking_url, office_name, office_address, city_notes_md, status, sources, last_verified_at, generated_by, reviewed_by, locale)
+values ((select id from cities where slug='essen'), (select id from tasks where slug='tax-id'), null, 'https://www.bzst.de/DE/Service/Behoerdenwegweiser/Finanzamtsuche/finanzamtsuche_node.html', 'Finanzämter Essen (district-based)', NULL, 'Essen has **more than one Finanzamt** (Essen-NordOst / Essen-Süd); the responsible one depends on your address. Use the NRW finder to confirm yours.', 'published', '[{"url": "https://www.bzst.de/DE/Service/Behoerdenwegweiser/Finanzamtsuche/finanzamtsuche_node.html", "title": "BZSt Finanzamtsuche — find your responsible Finanzamt", "accessed_at": "2026-07-05"}]'::jsonb, '2026-07-05', 'cycle2-builder', 'verifier-cycle2', 'en')
+on conflict (city_id, task_id, locale) do update set
+  appointment_required=excluded.appointment_required, booking_url=excluded.booking_url,
+  office_name=excluded.office_name, office_address=excluded.office_address,
+  city_notes_md=excluded.city_notes_md, status=excluded.status, sources=excluded.sources,
+  last_verified_at=excluded.last_verified_at, generated_by=excluded.generated_by, reviewed_by=excluded.reviewed_by;
+
+insert into city_task_variants (city_id, task_id, appointment_required, booking_url, office_name, office_address, city_notes_md, status, sources, last_verified_at, generated_by, reviewed_by, locale)
+values ((select id from cities where slug='frankfurt'), (select id from tasks where slug='tax-id'), null, 'https://www.bzst.de/DE/Service/Behoerdenwegweiser/Finanzamtsuche/finanzamtsuche_node.html', 'Finanzämter Frankfurt am Main (district-based)', NULL, 'Frankfurt has **several district-based Finanzämter**; the responsible one depends on your address. Use the finder.', 'published', '[{"url": "https://www.bzst.de/DE/Service/Behoerdenwegweiser/Finanzamtsuche/finanzamtsuche_node.html", "title": "BZSt Finanzamtsuche — find your responsible Finanzamt", "accessed_at": "2026-07-05"}]'::jsonb, '2026-07-05', 'cycle2-builder', 'verifier-cycle2', 'en')
+on conflict (city_id, task_id, locale) do update set
+  appointment_required=excluded.appointment_required, booking_url=excluded.booking_url,
+  office_name=excluded.office_name, office_address=excluded.office_address,
+  city_notes_md=excluded.city_notes_md, status=excluded.status, sources=excluded.sources,
+  last_verified_at=excluded.last_verified_at, generated_by=excluded.generated_by, reviewed_by=excluded.reviewed_by;
+
+insert into city_task_variants (city_id, task_id, appointment_required, booking_url, office_name, office_address, city_notes_md, status, sources, last_verified_at, generated_by, reviewed_by, locale)
+values ((select id from cities where slug='hamburg'), (select id from tasks where slug='tax-id'), null, 'https://www.bzst.de/DE/Service/Behoerdenwegweiser/Finanzamtsuche/finanzamtsuche_node.html', 'Finanzämter Hamburg (district-based)', NULL, 'Hamburg has **several district-based Finanzämter**; the responsible one depends on your street. Use the finder.', 'published', '[{"url": "https://www.bzst.de/DE/Service/Behoerdenwegweiser/Finanzamtsuche/finanzamtsuche_node.html", "title": "BZSt Finanzamtsuche — find your responsible Finanzamt", "accessed_at": "2026-07-05"}]'::jsonb, '2026-07-05', 'cycle2-builder', 'verifier-cycle2', 'en')
+on conflict (city_id, task_id, locale) do update set
+  appointment_required=excluded.appointment_required, booking_url=excluded.booking_url,
+  office_name=excluded.office_name, office_address=excluded.office_address,
+  city_notes_md=excluded.city_notes_md, status=excluded.status, sources=excluded.sources,
+  last_verified_at=excluded.last_verified_at, generated_by=excluded.generated_by, reviewed_by=excluded.reviewed_by;
+
+insert into city_task_variants (city_id, task_id, appointment_required, booking_url, office_name, office_address, city_notes_md, status, sources, last_verified_at, generated_by, reviewed_by, locale)
+values ((select id from cities where slug='hannover'), (select id from tasks where slug='tax-id'), null, 'https://www.bzst.de/DE/Service/Behoerdenwegweiser/Finanzamtsuche/finanzamtsuche_node.html', 'Finanzämter Hannover (district-based)', NULL, 'Hannover has **several district-based Finanzämter**; the responsible one depends on your address. The surrounding Region/Landkreis has its own offices — not yours as a city resident. Use the finder.', 'published', '[{"url": "https://www.bzst.de/DE/Service/Behoerdenwegweiser/Finanzamtsuche/finanzamtsuche_node.html", "title": "BZSt Finanzamtsuche — find your responsible Finanzamt", "accessed_at": "2026-07-05"}]'::jsonb, '2026-07-05', 'cycle2-builder', 'verifier-cycle2', 'en')
+on conflict (city_id, task_id, locale) do update set
+  appointment_required=excluded.appointment_required, booking_url=excluded.booking_url,
+  office_name=excluded.office_name, office_address=excluded.office_address,
+  city_notes_md=excluded.city_notes_md, status=excluded.status, sources=excluded.sources,
+  last_verified_at=excluded.last_verified_at, generated_by=excluded.generated_by, reviewed_by=excluded.reviewed_by;
+
+insert into city_task_variants (city_id, task_id, appointment_required, booking_url, office_name, office_address, city_notes_md, status, sources, last_verified_at, generated_by, reviewed_by, locale)
+values ((select id from cities where slug='leipzig'), (select id from tasks where slug='tax-id'), null, 'https://www.bzst.de/DE/Service/Behoerdenwegweiser/Finanzamtsuche/finanzamtsuche_node.html', 'Finanzamt Leipzig I / II', 'Wilhelm-Liebknecht-Platz 3–4, 04105 Leipzig', 'Leipzig I and Leipzig II **share one building and reception** at this address; which one handles your file depends on your street — the shared reception will direct you.', 'published', '[{"url": "https://www.bzst.de/DE/Service/Behoerdenwegweiser/Finanzamtsuche/finanzamtsuche_node.html", "title": "BZSt Finanzamtsuche — find your responsible Finanzamt", "accessed_at": "2026-07-05"}]'::jsonb, '2026-07-05', 'cycle2-builder', 'verifier-cycle2', 'en')
+on conflict (city_id, task_id, locale) do update set
+  appointment_required=excluded.appointment_required, booking_url=excluded.booking_url,
+  office_name=excluded.office_name, office_address=excluded.office_address,
+  city_notes_md=excluded.city_notes_md, status=excluded.status, sources=excluded.sources,
+  last_verified_at=excluded.last_verified_at, generated_by=excluded.generated_by, reviewed_by=excluded.reviewed_by;
+
+insert into city_task_variants (city_id, task_id, appointment_required, booking_url, office_name, office_address, city_notes_md, status, sources, last_verified_at, generated_by, reviewed_by, locale)
+values ((select id from cities where slug='munich'), (select id from tasks where slug='tax-id'), null, 'https://www.bzst.de/DE/Service/Behoerdenwegweiser/Finanzamtsuche/finanzamtsuche_node.html', 'Finanzamt München', 'Servicezentrum, Deroystraße 12, 80335 München', '"Finanzamt München" is one legal entity spread across several buildings. For walk-in service use the central **Servicezentrum at Deroystraße 12**; use the finder to confirm which building holds your file.', 'published', '[{"url": "https://www.bzst.de/DE/Service/Behoerdenwegweiser/Finanzamtsuche/finanzamtsuche_node.html", "title": "BZSt Finanzamtsuche — find your responsible Finanzamt", "accessed_at": "2026-07-05"}]'::jsonb, '2026-07-05', 'cycle2-builder', 'verifier-cycle2', 'en')
+on conflict (city_id, task_id, locale) do update set
+  appointment_required=excluded.appointment_required, booking_url=excluded.booking_url,
+  office_name=excluded.office_name, office_address=excluded.office_address,
+  city_notes_md=excluded.city_notes_md, status=excluded.status, sources=excluded.sources,
+  last_verified_at=excluded.last_verified_at, generated_by=excluded.generated_by, reviewed_by=excluded.reviewed_by;
+
+insert into city_task_variants (city_id, task_id, appointment_required, booking_url, office_name, office_address, city_notes_md, status, sources, last_verified_at, generated_by, reviewed_by, locale)
+values ((select id from cities where slug='nuremberg'), (select id from tasks where slug='tax-id'), null, 'https://www.bzst.de/DE/Service/Behoerdenwegweiser/Finanzamtsuche/finanzamtsuche_node.html', 'Finanzamt Nürnberg', NULL, 'As of **1 January 2026**, the former Finanzämter Nürnberg-Nord, Nürnberg-Süd and the Zentralfinanzamt were **merged into a single "Finanzamt Nürnberg"** (part of a wider Mittelfranken restructuring). The old buildings remain as service points and phone numbers/jurisdictions are unchanged for the time being. Use the finder to confirm the current contact for your street.', 'published', '[{"url": "https://www.bzst.de/DE/Service/Behoerdenwegweiser/Finanzamtsuche/finanzamtsuche_node.html", "title": "BZSt Finanzamtsuche — find your responsible Finanzamt", "accessed_at": "2026-07-05"}]'::jsonb, '2026-07-05', 'cycle2-builder', 'verifier-cycle2', 'en')
+on conflict (city_id, task_id, locale) do update set
+  appointment_required=excluded.appointment_required, booking_url=excluded.booking_url,
+  office_name=excluded.office_name, office_address=excluded.office_address,
+  city_notes_md=excluded.city_notes_md, status=excluded.status, sources=excluded.sources,
+  last_verified_at=excluded.last_verified_at, generated_by=excluded.generated_by, reviewed_by=excluded.reviewed_by;
+
+insert into city_task_variants (city_id, task_id, appointment_required, booking_url, office_name, office_address, city_notes_md, status, sources, last_verified_at, generated_by, reviewed_by, locale)
+values ((select id from cities where slug='stuttgart'), (select id from tasks where slug='tax-id'), null, 'https://www.bzst.de/DE/Service/Behoerdenwegweiser/Finanzamtsuche/finanzamtsuche_node.html', 'Finanzämter Stuttgart (surname-based split)', NULL, 'Stuttgart splits its city Finanzämter (roughly I–IV) partly **by surname / district**. Use the Baden-Württemberg finder to identify the office responsible for you.', 'published', '[{"url": "https://www.bzst.de/DE/Service/Behoerdenwegweiser/Finanzamtsuche/finanzamtsuche_node.html", "title": "BZSt Finanzamtsuche — find your responsible Finanzamt", "accessed_at": "2026-07-05"}]'::jsonb, '2026-07-05', 'cycle2-builder', 'verifier-cycle2', 'en')
+on conflict (city_id, task_id, locale) do update set
+  appointment_required=excluded.appointment_required, booking_url=excluded.booking_url,
+  office_name=excluded.office_name, office_address=excluded.office_address,
+  city_notes_md=excluded.city_notes_md, status=excluded.status, sources=excluded.sources,
+  last_verified_at=excluded.last_verified_at, generated_by=excluded.generated_by, reviewed_by=excluded.reviewed_by;
+
+-- ---- Cycle 2: recognition glossary terms ----
+
+insert into glossary_terms (slug, term_de, term_en, definition_md, related_task_ids, status)
+values ('anabin', 'anabin', 'Database of foreign qualifications', 'A federal database (run by the KMK) that rates foreign higher-education institutions and degrees. Universities are graded H+ (recognised), H+/- (mixed), or H- (not recognised), which helps determine whether your degree is treated as equivalent in Germany.', array[(select id from tasks where slug='qualification-recognition')]::uuid[], 'published')
+on conflict (slug, locale) do update set
+  term_de=excluded.term_de, term_en=excluded.term_en, definition_md=excluded.definition_md,
+  related_task_ids=excluded.related_task_ids, status=excluded.status;
+
+insert into glossary_terms (slug, term_de, term_en, definition_md, related_task_ids, status)
+values ('anerkennungspartnerschaft', 'Anerkennungspartnerschaft', 'Recognition partnership', 'A residence route (§16d Abs. 3 AufenthG) that lets you come to Germany to complete recognition while working. Granted for an initial 12 months, extendable up to 3 years total; generally requires A2 German.', array[(select id from tasks where slug='qualification-recognition')]::uuid[], 'published')
+on conflict (slug, locale) do update set
+  term_de=excluded.term_de, term_en=excluded.term_en, definition_md=excluded.definition_md,
+  related_task_ids=excluded.related_task_ids, status=excluded.status;
+
+insert into glossary_terms (slug, term_de, term_en, definition_md, related_task_ids, status)
+values ('anerkennungszuschuss', 'Anerkennungszuschuss', 'Recognition grant', 'A grant offered in some regions to help cover the costs of the recognition procedure (fees, translations, travel). Eligibility and availability vary — check the current terms for your case.', array[(select id from tasks where slug='qualification-recognition')]::uuid[], 'published')
+on conflict (slug, locale) do update set
+  term_de=excluded.term_de, term_en=excluded.term_en, definition_md=excluded.definition_md,
+  related_task_ids=excluded.related_task_ids, status=excluded.status;
+
+insert into glossary_terms (slug, term_de, term_en, definition_md, related_task_ids, status)
+values ('defizitbescheid', 'Defizitbescheid', 'Notice of deficits', 'A decision issued when your qualification is only partially equivalent. It lists the gaps between your training and the German standard, which you close through an adaptation course or an examination to obtain full recognition.', array[(select id from tasks where slug='qualification-recognition')]::uuid[], 'published')
+on conflict (slug, locale) do update set
+  term_de=excluded.term_de, term_en=excluded.term_en, definition_md=excluded.definition_md,
+  related_task_ids=excluded.related_task_ids, status=excluded.status;
+
+insert into glossary_terms (slug, term_de, term_en, definition_md, related_task_ids, status)
+values ('ihk-fosa', 'IHK FOSA', 'Chamber body for recognising vocational qualifications', 'The national body (Foreign Skills Approval, run by the Chambers of Industry and Commerce) that assesses foreign commercial, industrial and service vocational qualifications. Fees run roughly €100–600; statutory processing is about 3 months.', array[(select id from tasks where slug='qualification-recognition')]::uuid[], 'published')
+on conflict (slug, locale) do update set
+  term_de=excluded.term_de, term_en=excluded.term_en, definition_md=excluded.definition_md,
+  related_task_ids=excluded.related_task_ids, status=excluded.status;
+
+insert into glossary_terms (slug, term_de, term_en, definition_md, related_task_ids, status)
+values ('statement-of-comparability', 'Zeugnisbewertung', 'Statement of Comparability', 'An official ZAB document comparing your foreign university degree to the German system. Useful for non-regulated jobs and visas. Costs €208 (duplicate €104); does not expire.', array[(select id from tasks where slug='qualification-recognition')]::uuid[], 'published')
+on conflict (slug, locale) do update set
+  term_de=excluded.term_de, term_en=excluded.term_en, definition_md=excluded.definition_md,
+  related_task_ids=excluded.related_task_ids, status=excluded.status;
+
+insert into glossary_terms (slug, term_de, term_en, definition_md, related_task_ids, status)
+values ('zab', 'ZAB (Zentralstelle für ausländisches Bildungswesen)', 'Central Office for Foreign Education', 'The national office that assesses foreign qualifications and issues the Statement of Comparability for university degrees. Part of the KMK; its assessments are valid Germany-wide.', array[(select id from tasks where slug='qualification-recognition')]::uuid[], 'published')
+on conflict (slug, locale) do update set
+  term_de=excluded.term_de, term_en=excluded.term_en, definition_md=excluded.definition_md,
+  related_task_ids=excluded.related_task_ids, status=excluded.status;
+
+-- ABH trio (visa-conversion, fiktionsbescheinigung, work-permit-change) reuse
+-- the residence-permit city office via an app-layer fallback in
+-- lib/queries/guide.ts (getVariant) — intentionally NO duplicate variant rows.

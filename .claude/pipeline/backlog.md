@@ -1,24 +1,30 @@
 # Pipeline backlog / batch (user-approved 2026-07-04)
 
-**MODE: BATCH.** A "task" = the whole set of items the user selects. Research them
-ALL, verify them ALL, then the Builder deploys them **once**. (Changed from
-one-item-per-cycle at the user's direction, 2026-07-04.)
+**MODE: BATCH, RESILIENT/SEQUENTIAL.** Research groups run ONE AT A TIME; each
+finished group is written to its own file + checkpointed in `state.json`. If
+tokens drain or an error hits, say **"resume"** — only the unfinished group reruns.
 
-**Standing user directive (every item):** deepen city-specific detail for the
-**15 cities already in the DB** before adding anything new. Honesty rules always
-apply: real ranges + verify-notes, no fabricated city differences (only Anmeldung
-+ residence-permit vary by city).
+**Standing directive:** deepen city-specific detail for the 15 existing cities.
+**Honesty gate:** only Anmeldung, residence-permit, and genuine local offices
+(Ausländerbehörde / Finanzamt / Führerscheinstelle) vary by city. Federally-uniform
+tasks get rich national how-to + official links + steps, NOT fake city variants.
 
-## Current batch
-| Item | Menu # | Status |
-|------|--------|--------|
-| Deepen **Anmeldung** city detail (15 cities) | #1 | ✅ researched (`research.md`) |
-| Deepen **residence-permit** city detail (15 cities) | #3 | 🔬 researching (`research-respermit.md`) |
-| **Commuter-town** detail: rent range, commute, own office | #2 | 🔬 researching (`research-commuter.md`) |
-| **City-to-city Anmeldung comparison** | #6 | 🧩 build-time synthesis over verified #1+#3 (no separate research) |
-| Expand to **new hub cities** | #4 | ⏸️ HELD (confirmed by user 2026-07-04) — its own future task, after existing-15 depth is done |
+## Current batch — "city detail for 11 more tasks" (cycle 2)
+Research groups (checkbox = done & saved):
 
-Next: once the two research files land, the **Verifier** checks the whole batch,
-then the **Builder** applies + deploys everything (incl. the comparison layer) once.
+- [ ] **A. National how-to** → `research-national-howto.md` — bank account, blocked
+      account, health insurance, Rundfunkbeitrag, SCHUFA. Official link + full
+      step-by-step + docs + cost + honest "same nationwide" note. *(no city data)*
+- [ ] **B. Tax ID & tax class** → `research-tax-finanzamt.md` — national process +
+      the local **Finanzamt** per city (address/booking where a single one exists).
+- [ ] **C. Driving-licence conversion** → `research-driving.md` — national rules
+      (country lists / test) + local **Führerscheinstelle** per city.
+- [ ] **D. Ausländerbehörde trio** → `research-abh-trio.md` — visa conversion,
+      Fiktionsbescheinigung, changing employer. Reuse the ABH office data we already
+      have; process how-to is largely federal.
+- [ ] **E. Qualification recognition** → `research-recognition.md` — varies by
+      **state + profession** (anabin / IHK-FOSA / ZAB); not per-city.
 
-_User may inject input at any planner checkpoint (edit `selection.md` or just say so)._
+After all groups saved → Verifier (Opus) over all files → Builder (Opus) deploys once.
+
+**HELD:** new hub cities (menu #4) — separate future task.
