@@ -124,4 +124,31 @@ deployed commit.
 
 ## 8. Live-verification evidence
 
-_(filled after push + ISR settle — see section below)_
+Pushed `e424e50..50026ba` to `main`; Vercel auto-deployed. Verified against
+https://germanyguide.net (2026-07-05, after build):
+
+- **`/germany/hannover/driving-license`** → CityFactsBox shows
+  **"Führerscheinstelle der Stadt Hannover"** + **"Appointment required"** badge
+  (Hannover HIGH-PRIORITY fix landed: Stadt, not Region). Guide shows the §29 FeV
+  6-month rule.
+- **`/germany/nuremberg/tax-id`** → shows **"Finanzamt Nürnberg"** + the
+  **"merged into"** (1 Jan 2026) note; guide shows Steuer-ID / Steuerklassen depth.
+- **`/germany/munich/work-permit-change`** (ABH-trio fallback) → CityFactsBox renders
+  the **borrowed residence-permit office (KVR)** with the prepended note
+  **"This is handled by the same immigration office (Ausländerbehörde) as your
+  residence permit."** and NO "not yet verified" — the `getVariant` fallback works
+  end-to-end. Guide shows §18g Blue Card day-one change / "keine Erlaubnis" / FEG 2.0.
+- **`/germany/berlin/qualification-recognition`** → guide shows ZAB **€208**,
+  **IHK-FOSA**, **Recognition Finder**, BAMF hotline **1815-1111**, and the new
+  **Anerkennungspartnerschaft / IHK-FOSA** glossary terms.
+
+**DB spot-check:** 11 guides `status='published'`, `last_verified_at='2026-07-05'`;
+Finanzamt variants = 15 (5 with address, 0 appointment_required); Führerscheinstelle
+variants = 15 (7 with address, all appointment_required=true); recognition glossary = 7.
+
+**Note (expected ISR lag):** `/germany/berlin/work-permit-change` was still serving a
+pre-deploy ISR cache ("not yet verified") at verification time; `revalidate=3600`, so it
+refreshes within the hour on next request. Munich (same trio task) already confirms the
+fallback + content are correct live.
+
+✅ Deploy confirmed. Planner can review and propose next steps.
