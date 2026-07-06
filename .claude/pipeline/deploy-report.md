@@ -1,154 +1,32 @@
-# Deploy report — Cycle 2 (national how-to + Finanzamt/Führerscheinstelle + ABH trio + recognition)
+# Deploy report — Add `family` audience tag (joining-family persona)
 
-- **Builder:** step ③. Deploy date: 2026-07-05.
-- **Supabase project:** ilfhjffpzvzphbvhdpup
-- **Input:** `.claude/pipeline/verified-cycle2.md` (Verifier packet, 2026-07-05).
-- **Pre-deploy HEAD (parent):** `e424e5053d290620ce1dad8fb3f6115cc37dbd69`
-- **Deployed commit:** `48a1c46e4acb181066f9bcc868ee46fcbc842a06`
+- **Builder:** applied in the main loop (pipeline subagents were unavailable — session limit). Date: 2026-07-06.
+- **Source packet:** `.claude/pipeline/verified.md` (consolidated Researcher + Verifier).
+- **Change:** appended `"family"` to `tasks.audience` for the 11 tasks that genuinely apply to someone joining family in Germany (Familiennachzug). Purely a tagging change — no task copy, no new tasks.
 
-This is the UNDO LOG. To reverse a change, run its "REVERSE SQL" and/or `git revert` the deployed commit (restores `lib/queries/guide.ts` + `supabase/seed.sql`).
+## What changed
+- **Live DB** (Supabase `ilfhjffpzvzphbvhdpup`, table `tasks`): `family` appended to `audience` on 11 rows (idempotent — the `UPDATE` skipped any row already carrying it).
+- **`supabase/seed.sql`**: mirrored — `family` added to the `audience` literal of the same 11 rows in the `insert into tasks … on conflict do update` block (idempotent on re-seed).
 
-No schema/DDL changed this cycle → **no migration file added**. All DB work was data-only via `execute_sql` and is mirrored idempotently into `supabase/seed.sql`.
+Tagged (11): `anmeldung, residence-permit, visa-conversion, fiktionsbescheinigung, bank-account, tax-id, health-insurance, rundfunkbeitrag, qualification-recognition, schufa, driving-license`
+Deliberately NOT tagged (2): `blocked-account` (Sperrkonto is a student/self-financing tool, not a family-reunion requirement), `work-permit-change` (employer-bound worker permits; family permits grant free labour-market access).
 
----
+## Verification
+- Post-update DB query confirms exactly those 11 rows carry `family`; `blocked-account` and `work-permit-change` unchanged.
+- `grep -c "family}" supabase/seed.sql` → 11; excluded rows verified unchanged.
 
-## 1. Code change (single file)
+## NOT done (out of scope for this branch)
+- **Presentation (step 3) — `lib/persona-copy.ts` + `/journey/[persona]` pages do not exist in this worktree.** The persona-path UI (explore-mode Increment 2) is not present in this repo state, so the joining-family copy entry and page render cannot be added/verified here. The `family` tag is now in place so that work can be done when the persona infra lands.
+- No git commit / push / deploy performed (not requested). The DB write is already live; `seed.sql` change is staged in the working tree.
 
-**`lib/queries/guide.ts`** — added an app-layer fallback in `getVariant(cityId, taskId)`:
-when the task is one of the ABH trio (`visa-conversion`, `fiktionsbescheinigung`,
-`work-permit-change`) and it has **no own** `city_task_variants` row, it borrows the
-`residence-permit` variant for the same city (task_id
-`4a9cd0bd-b800-4dd9-9c1f-69a5edc69354`), strips inherited `city_step_overrides` to `[]`,
-and prepends a "handled by the same immigration office" note to `city_notes_md`.
-No schema change. **REVERSE:** `git revert <deployed commit>` (or restore the file to
-its `e424e50` version). Verified `tsc --noEmit -p tsconfig.json` → 0 errors.
-
-## 2. Guides enriched (11 rows, data UPDATE — all `status` unchanged = 'published')
-
-Task slugs updated (each: `intro_md`, `documents_md`, `after_md`, `sources` appended,
-`last_verified_at`=2026-07-05, and `legal_basis` where noted):
-`bank-account`, `blocked-account`, `health-insurance`, `rundfunkbeitrag`, `schufa`,
-`tax-id` (legal_basis += §38b EStG, §355 AO), `driving-license` (legal_basis set: §29/§31/§28 FeV),
-`visa-conversion` (legal_basis set: §6(3)/§81 AufenthG, AufenthV),
-`fiktionsbescheinigung` (legal_basis kept §81 AufenthG), `work-permit-change`
-(legal_basis set: §18a/§18b/§18g AufenthG, FEG 2.0),
-`qualification-recognition` (legal_basis += §16d AufenthG).
-
-**Prior values (before this cycle):** `last_verified_at` was `2026-07-02` for all 11;
-`legal_basis` was NULL for `bank-account`, `blocked-account`, `driving-license`,
-`visa-conversion`, `work-permit-change`; the other six kept their existing legal_basis
-strings. Prior `intro_md`/`documents_md`/`after_md`/`sources` are those in
-`git show e424e5053d290620ce1dad8fb3f6115cc37dbd69:supabase/seed.sql` for the six guides
-that had seed rows (bank/blocked/health/rundfunkbeitrag/schufa/tax-id/driving-license);
-the ABH-trio and recognition guides' prior bodies were the pre-cycle DB rows.
-
-**REVERSE:** re-run the guide `update` statements from the parent commit's `seed.sql`
-(the six with seed rows) and reset `last_verified_at='2026-07-02'` + `legal_basis=NULL`
-for the five that were NULL:
+## UNDO path
+Live DB — remove the tag from all 11:
 ```sql
-update guides set last_verified_at='2026-07-02', legal_basis=null
- where task_id in (
-  '96ba38e2-66fd-479e-a84d-247a4d15f7ee', -- bank-account
-  '9849369a-e32c-4d1a-812b-05beaf410fdd', -- blocked-account
-  '410d4c2e-8f10-4b44-88d9-f92e08934129', -- driving-license  (legal_basis was NULL)
-  'c4f1d623-1614-4060-ab98-c54b8096f685', -- visa-conversion   (legal_basis was NULL)
-  '52ef1c0a-af8f-4868-b9ca-6109edf5e8f8'  -- work-permit-change(legal_basis was NULL)
- );
--- for the remaining 6, reset only the date:
-update guides set last_verified_at='2026-07-02'
- where task_id in (
-  '166e1e00-fd22-4767-a0dd-8e9690f1cf7b', -- health-insurance
-  '44450b2a-e90e-406a-b374-cc92680d5cf9', -- rundfunkbeitrag
-  '8d3fc15d-aedc-44c2-b3fd-27d17b8c1475', -- schufa
-  '6fe90ed7-f0d6-477b-9c50-31fd3719f9df', -- tax-id
-  'dec19bd6-842a-4768-93fc-ac0ae7c76c15', -- fiktionsbescheinigung
-  '3af82801-e0b4-4bcd-b2c1-42b0e769e66a'  -- qualification-recognition
- );
+update tasks
+set audience = array_remove(audience, 'family')
+where 'family' = any(audience);
 ```
-(Then restore the prior `intro_md/documents_md/after_md/sources` from the parent
-`seed.sql` blocks / DB backup if a full content rollback is wanted.)
-
-## 3. New `city_task_variants` — Finanzamt (tax-id), 15 rows (NET-NEW)
-
-task_id `6fe90ed7-f0d6-477b-9c50-31fd3719f9df`, all 15 cities. `appointment_required`
-left NULL; BZSt Finanzamtsuche as shared `booking_url`; concrete `office_address` only for
-Bremen, Aachen-Stadt, Leipzig, Dresden, Munich(Servicezentrum); Nuremberg = 1-Jan-2026
-merger note, null address; others null-address + finder pointer. Prior state: **no rows
-existed** for this task.
-
-**REVERSE SQL:**
-```sql
-delete from city_task_variants where task_id='6fe90ed7-f0d6-477b-9c50-31fd3719f9df';
+Source — revert the `supabase/seed.sql` edit:
 ```
-
-## 4. New `city_task_variants` — Führerscheinstelle (driving-license), 15 rows (NET-NEW)
-
-task_id `410d4c2e-8f10-4b44-88d9-f92e08934129`, all 15 cities. `appointment_required=true`
-for all (Bremen "walk-in" claim rejected per Verifier). Concrete `office_address` for
-Berlin, Munich(Garmischer 19–21), Stuttgart(Krailenshalden 32), Cologne, Düsseldorf,
-Aachen(Würselen), Essen(Altendorfer 101); Hannover = Stadt Hannover (NOT Region), null
-address; others null address + booking URL. Prior state: **no rows existed** for this task.
-
-**REVERSE SQL:**
-```sql
-delete from city_task_variants where task_id='410d4c2e-8f10-4b44-88d9-f92e08934129';
+git checkout -- supabase/seed.sql
 ```
-
-## 5. New `glossary_terms` — recognition set, 7 rows (NET-NEW)
-
-Slugs: `anabin`, `zab`, `statement-of-comparability`, `ihk-fosa`, `defizitbescheid`,
-`anerkennungspartnerschaft`, `anerkennungszuschuss` — all `status='published'`,
-`related_task_ids = {qualification-recognition}`. No prior rows (no slug collisions).
-
-**REVERSE SQL:**
-```sql
-delete from glossary_terms where slug in
- ('anabin','zab','statement-of-comparability','ihk-fosa','defizitbescheid',
-  'anerkennungspartnerschaft','anerkennungszuschuss');
-```
-
-## 6. ABH trio city offices — NO rows created (by design)
-
-`visa-conversion`, `fiktionsbescheinigung`, `work-permit-change` reuse the
-`residence-permit` office via the §1 code fallback. **Nothing to reverse in the DB.**
-
-## 7. seed.sql mirror
-
-Appended one idempotent block to `supabase/seed.sql` (11 guide `update`s, 30
-`city_task_variants` upserts, 7 `glossary_terms` upserts, all
-`on conflict … do update`), generated from the live DB via Postgres
-`format()`/`quote_literal` to avoid escaping errors. **REVERSE:** `git revert` the
-deployed commit.
-
----
-
-## 8. Live-verification evidence
-
-Pushed `e424e50..50026ba` to `main`; Vercel auto-deployed. Verified against
-https://germanyguide.net (2026-07-05, after build):
-
-- **`/germany/hannover/driving-license`** → CityFactsBox shows
-  **"Führerscheinstelle der Stadt Hannover"** + **"Appointment required"** badge
-  (Hannover HIGH-PRIORITY fix landed: Stadt, not Region). Guide shows the §29 FeV
-  6-month rule.
-- **`/germany/nuremberg/tax-id`** → shows **"Finanzamt Nürnberg"** + the
-  **"merged into"** (1 Jan 2026) note; guide shows Steuer-ID / Steuerklassen depth.
-- **`/germany/munich/work-permit-change`** (ABH-trio fallback) → CityFactsBox renders
-  the **borrowed residence-permit office (KVR)** with the prepended note
-  **"This is handled by the same immigration office (Ausländerbehörde) as your
-  residence permit."** and NO "not yet verified" — the `getVariant` fallback works
-  end-to-end. Guide shows §18g Blue Card day-one change / "keine Erlaubnis" / FEG 2.0.
-- **`/germany/berlin/qualification-recognition`** → guide shows ZAB **€208**,
-  **IHK-FOSA**, **Recognition Finder**, BAMF hotline **1815-1111**, and the new
-  **Anerkennungspartnerschaft / IHK-FOSA** glossary terms.
-
-**DB spot-check:** 11 guides `status='published'`, `last_verified_at='2026-07-05'`;
-Finanzamt variants = 15 (5 with address, 0 appointment_required); Führerscheinstelle
-variants = 15 (7 with address, all appointment_required=true); recognition glossary = 7.
-
-**Note (expected ISR lag):** `/germany/berlin/work-permit-change` was still serving a
-pre-deploy ISR cache ("not yet verified") at verification time; `revalidate=3600`, so it
-refreshes within the hour on next request. Munich (same trio task) already confirms the
-fallback + content are correct live.
-
-✅ Deploy confirmed. Planner can review and propose next steps.
