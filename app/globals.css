@@ -23,6 +23,28 @@
   --border: oklch(0.922 0 0);
   --input: oklch(0.922 0 0);
   --ring: oklch(0.708 0 0);
+
+  /* ── Germany Guide design system (Increment 0) ──────────────────────────
+     Additive only. Does NOT touch the shadcn tokens above, so existing
+     content pages render unchanged. New UI uses the gg-* tokens. Every
+     text/bg + action/bg pair below is WCAG-AA verified in light AND dark. */
+  --gg-surface: #f5f7fb;
+  --gg-card: #ffffff;
+  --gg-ink: #171e2e;
+  --gg-muted: #586074;
+  --gg-border: #e3e8f0;
+  --gg-brand: #2547cc;
+  --gg-brand-fg: #ffffff;
+  --gg-brand-soft: #e9eefc;
+  --gg-brand-ink: #1e3aad;
+  --gg-progress: #128a50;
+  --gg-progress-text: #177a4c;
+  --gg-progress-soft: #e1f3e9;
+  --gg-amber: #8a5a00;
+  --gg-amber-ui: #b7791f;
+  --gg-amber-soft: #fbf0d9;
+  --gg-teal: #0b7a73;
+  --gg-secondary: #eef1f7;
 }
 
 .dark {
@@ -44,6 +66,25 @@
   --border: oklch(1 0 0 / 10%);
   --input: oklch(1 0 0 / 15%);
   --ring: oklch(0.556 0 0);
+
+  /* ── Germany Guide design system — dark mode ── */
+  --gg-surface: #0e1421;
+  --gg-card: #161f30;
+  --gg-ink: #e7ecf5;
+  --gg-muted: #95a1b6;
+  --gg-border: #28324a;
+  --gg-brand: #3d62f0;
+  --gg-brand-fg: #ffffff;
+  --gg-brand-soft: #1b2540;
+  --gg-brand-ink: #93a9fb;
+  --gg-progress: #34c27e;
+  --gg-progress-text: #5fd79c;
+  --gg-progress-soft: #12301f;
+  --gg-amber: #f0c877;
+  --gg-amber-ui: #e8b44d;
+  --gg-amber-soft: #2a2210;
+  --gg-teal: #25b5ac;
+  --gg-secondary: #1e2840;
 }
 
 @theme inline {
@@ -71,6 +112,26 @@
   --color-ring: var(--ring);
   --font-sans: var(--font-geist-sans);
   --font-mono: var(--font-geist-mono);
+
+  /* ── Germany Guide design system — Tailwind utility mappings ── */
+  --font-display: var(--font-hanken);
+  --color-gg-surface: var(--gg-surface);
+  --color-gg-card: var(--gg-card);
+  --color-gg-ink: var(--gg-ink);
+  --color-gg-muted: var(--gg-muted);
+  --color-gg-border: var(--gg-border);
+  --color-gg-brand: var(--gg-brand);
+  --color-gg-brand-fg: var(--gg-brand-fg);
+  --color-gg-brand-soft: var(--gg-brand-soft);
+  --color-gg-brand-ink: var(--gg-brand-ink);
+  --color-gg-progress: var(--gg-progress);
+  --color-gg-progress-text: var(--gg-progress-text);
+  --color-gg-progress-soft: var(--gg-progress-soft);
+  --color-gg-amber: var(--gg-amber);
+  --color-gg-amber-ui: var(--gg-amber-ui);
+  --color-gg-amber-soft: var(--gg-amber-soft);
+  --color-gg-teal: var(--gg-teal);
+  --color-gg-secondary: var(--gg-secondary);
 }
 
 @layer base {
@@ -79,5 +140,54 @@
   }
   body {
     @apply bg-background text-foreground;
+  }
+}
+
+/* ── Germany Guide design system — type scale (Increment 0) ──────────────
+   One display face (Hanken Grotesk) for headings, one body face (Geist) for
+   text. 1.20 modular scale. Line-height tightens as size grows. */
+@layer components {
+  .gg-display {
+    font-family: var(--font-display), system-ui, sans-serif;
+    font-size: 2.5rem;      /* 40px */
+    line-height: 1.1;
+    font-weight: 600;
+    letter-spacing: -0.02em;
+  }
+  .gg-h1 {
+    font-family: var(--font-display), system-ui, sans-serif;
+    font-size: 2rem;        /* 32px */
+    line-height: 1.15;
+    font-weight: 600;
+    letter-spacing: -0.015em;
+  }
+  .gg-h2 {
+    font-family: var(--font-display), system-ui, sans-serif;
+    font-size: 1.625rem;    /* 26px */
+    line-height: 1.2;
+    font-weight: 600;
+    letter-spacing: -0.01em;
+  }
+  .gg-h3 {
+    font-family: var(--font-display), system-ui, sans-serif;
+    font-size: 1.3125rem;   /* 21px */
+    line-height: 1.25;
+    font-weight: 600;
+  }
+  .gg-body-lg {
+    font-size: 1.125rem;    /* 18px */
+    line-height: 1.6;
+  }
+  .gg-body {
+    font-size: 1rem;        /* 16px */
+    line-height: 1.6;
+  }
+  .gg-body-sm {
+    font-size: 0.875rem;    /* 14px */
+    line-height: 1.55;
+  }
+  .gg-caption {
+    font-size: 0.8125rem;   /* 13px */
+    line-height: 1.5;
   }
 }
