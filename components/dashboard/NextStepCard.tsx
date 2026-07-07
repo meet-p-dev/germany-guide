@@ -24,6 +24,8 @@ export function NextStepCard({
   citySlug,
   glossary,
   onMarkDone,
+  journeyNote,
+  parallelLabel,
 }: {
   index: number;
   titleDe: string;
@@ -33,6 +35,10 @@ export function NextStepCard({
   citySlug: string | null;
   glossary: GlossaryEntry[];
   onMarkDone: () => void;
+  /** Honest per-step journey note (e.g. nationality/embassy hint). */
+  journeyNote?: string | null;
+  /** "Can be done around the same time as …" hint, or undefined. */
+  parallelLabel?: string | null;
 }) {
   const [data, setData] = React.useState<GuidedStepData | null>(null);
   const [, startTransition] = React.useTransition();
@@ -59,7 +65,21 @@ export function NextStepCard({
     ? autoGloss(summary, glossary, { skipTerms: [titleDe] })
     : undefined;
 
-  const cityNote = renderCityNote(data);
+  const cityNote = (
+    <>
+      {parallelLabel && (
+        <p className="gg-body-sm mt-4 rounded-[12px] border border-gg-border bg-gg-surface p-3 text-gg-muted">
+          {parallelLabel}
+        </p>
+      )}
+      {journeyNote && (
+        <div className="gg-body-sm mt-3 rounded-[12px] border border-gg-border bg-gg-surface p-4 text-gg-muted">
+          <Markdown>{journeyNote}</Markdown>
+        </div>
+      )}
+      {renderCityNote(data)}
+    </>
+  );
 
   return (
     <StepCard
