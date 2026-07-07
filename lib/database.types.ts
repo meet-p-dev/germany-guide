@@ -635,6 +635,53 @@ export type Database = {
         }
         Relationships: []
       }
+      support_resources: {
+        Row: {
+          active: boolean
+          category: string
+          created_at: string
+          description: string
+          id: string
+          name: string
+          region: string | null
+          source: string
+          url: string
+          verified_at: string
+        }
+        Insert: {
+          active?: boolean
+          category: string
+          created_at?: string
+          description: string
+          id?: string
+          name: string
+          region?: string | null
+          source: string
+          url: string
+          verified_at: string
+        }
+        Update: {
+          active?: boolean
+          category?: string
+          created_at?: string
+          description?: string
+          id?: string
+          name?: string
+          region?: string | null
+          source?: string
+          url?: string
+          verified_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "support_resources_region_fk"
+            columns: ["region"]
+            isOneToOne: false
+            referencedRelation: "cities"
+            referencedColumns: ["slug"]
+          },
+        ]
+      }
       task_categories: {
         Row: {
           id: string

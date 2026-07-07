@@ -2,11 +2,12 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import type { Metadata } from "next";
 import { getTasksByCategory } from "@/lib/queries/guide";
-import { getGlossaryTerms } from "@/lib/queries/content";
+import { getGlossaryTerms, getSupportResources } from "@/lib/queries/content";
 import { STAGE_FRAMING } from "@/lib/journey-copy";
 import { PERSONAS, PERSONA_BY_SLUG } from "@/lib/persona-copy";
 import { StageCard } from "@/components/journey/StageCard";
 import { PersonaSwitcher } from "@/components/journey/PersonaSwitcher";
+import { SupportResources } from "@/components/journey/SupportResources";
 import { Button } from "@/components/ds";
 
 export const revalidate = 3600;
@@ -36,9 +37,11 @@ export default async function PersonaJourneyPage({
   const persona = PERSONA_BY_SLUG[slug];
   if (!persona) notFound();
 
-  const [categories, glossaryTerms] = await Promise.all([
+  const [categories, glossaryTerms, supportResources] = await Promise.all([
     getTasksByCategory(),
     getGlossaryTerms(),
+    // Only the supportive (refugee) path renders the verified resource list.
+    persona.supportive ? getSupportResources() : Promise.resolve([]),
   ]);
   const glossary = glossaryTerms.map((g) => ({
     term_de: g.term_de,
@@ -55,14 +58,14 @@ export default async function PersonaJourneyPage({
           <h1 className="gg-display mt-4 text-gg-ink">{persona.heading}</h1>
           <p className="gg-body-lg mt-3 text-gg-muted">{persona.intro}</p>
 
-          {/* Refugee: supportive, honest — no self-authored service links.
-              Real verified resources arrive via the content pipeline. */}
+          {/* Refugee: supportive, honest. Verified resources render below in
+              their own section (SupportResources), sourced from the DB. */}
           {persona.supportive && (
             <div className="mt-5 rounded-[14px] border border-gg-border bg-gg-card p-4">
               <p className="gg-body-sm text-gg-ink">
-                Verified local support resources for your situation are being
-                added — coming soon. Until then, this walks you through the same
-                stages, gently.
+                You&apos;ll find free, verified support services below, and the
+                same six stages walk you through the rest — gently, at your own
+                pace.
               </p>
             </div>
           )}
@@ -80,7 +83,9 @@ export default async function PersonaJourneyPage({
           </div>
         </header>
 
-        <ol className="relative space-y-3">
+        {persona.supportive && <SupportResources resources={supportResources} />}
+
+        <ol className="relative mt-10 space-y-3">
           <span
             className="absolute bottom-6 left-[17px] top-6 w-px bg-gg-border"
             aria-hidden="true"
