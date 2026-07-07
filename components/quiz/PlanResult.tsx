@@ -37,15 +37,6 @@ export function PlanResult({
   onStartOver: () => void;
 }) {
   const settled = stage >= 7;
-  // First task of the current stage, or the next stage that has one.
-  const nowIndex = plan.findIndex((s) => s.status === "now");
-  let nextTask: PlanTask | undefined;
-  for (let i = Math.max(0, nowIndex); i < plan.length; i++) {
-    if (plan[i].tasks.length) {
-      nextTask = plan[i].tasks[0];
-      break;
-    }
-  }
 
   return (
     <div className="mx-auto max-w-2xl">
@@ -113,15 +104,14 @@ export function PlanResult({
       </ol>
 
       <div className="mt-8 flex flex-col items-center gap-3">
-        {nextTask && !settled ? (
-          <Button asChild variant="primary">
-            <Link href={`/tasks/${nextTask.slug}`}>Start with your next step →</Link>
-          </Button>
-        ) : (
-          <p className="gg-body text-gg-muted">
-            You’ve worked through the map — nice.
-          </p>
-        )}
+        {/* The hinge → guided mode: the dashboard shows just the one next step
+            (and handles the "all caught up" case), so this is the single
+            primary action out of the plan preview. */}
+        <Button asChild variant="primary">
+          <Link href="/dashboard">
+            {settled ? "Open my guided plan →" : "Start guided mode →"}
+          </Link>
+        </Button>
         <button
           onClick={onStartOver}
           className="gg-body-sm font-medium text-gg-muted underline-offset-4 hover:text-gg-ink hover:underline"

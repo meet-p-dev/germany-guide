@@ -1,4 +1,5 @@
 import * as React from "react";
+import Link from "next/link";
 import { Check, Lock, Clock, Hourglass, FileText } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { Button } from "./Button";
@@ -51,20 +52,29 @@ export function StepCard({
   deadline,
   wait,
   docs,
+  cityNote,
   primaryLabel = "Show me how, step by step",
+  primaryHref,
   secondaryLabel,
+  onSecondaryClick,
   className,
 }: {
   state: StepState;
   index: number;
   title: string;
   gloss?: string;
-  why?: string;
+  /** ReactNode so callers can pass auto-glossed copy (Rule 3), not just text. */
+  why?: React.ReactNode;
   deadline?: string;
   wait?: string;
   docs?: string;
+  /** City-specific rule text injected into the current step (Increment 4). */
+  cityNote?: React.ReactNode;
   primaryLabel?: string;
+  /** When set, the primary action navigates (rendered as a Link). */
+  primaryHref?: string;
   secondaryLabel?: string;
+  onSecondaryClick?: () => void;
   className?: string;
 }) {
   // ── Completed: folded to one quiet row ────────────────────────────────
@@ -148,10 +158,23 @@ export function StepCard({
             </div>
           )}
 
+          {cityNote}
+
           <div className="mt-5 flex flex-wrap items-center gap-3">
-            <Button variant="primary">{primaryLabel}</Button>
+            {primaryHref ? (
+              <Button asChild variant="primary">
+                <Link href={primaryHref}>{primaryLabel}</Link>
+              </Button>
+            ) : (
+              <Button variant="primary">{primaryLabel}</Button>
+            )}
             {secondaryLabel && (
-              <Button variant="secondary" size="sm">
+              <Button
+                variant="secondary"
+                size="sm"
+                onClick={onSecondaryClick}
+                type="button"
+              >
                 {secondaryLabel}
               </Button>
             )}
