@@ -167,6 +167,23 @@ export async function getVariantsForTask(taskSlug: string) {
     .sort((a, b) => a.city.name_en.localeCompare(b.city.name_en));
 }
 
+export type SupportResource = Tables<"support_resources">;
+
+// Verified refugee/asylum support resources for the /journey/refugee page.
+// Anon reads are gated by RLS to active = true (see migration 0007), so this
+// query "just selects through" the policy — no inactive/unverified row can
+// reach the page. National rows (region = NULL) sort ahead of city-scoped ones.
+export async function getSupportResources() {
+  const supabase = createStaticClient();
+  const { data, error } = await supabase
+    .from("support_resources")
+    .select("*")
+    .order("region", { ascending: true, nullsFirst: true })
+    .order("name", { ascending: true });
+  if (error) throw error;
+  return (data ?? []) as SupportResource[];
+}
+
 export async function searchContent(q: string) {
   const supabase = createStaticClient();
   const { data, error } = await supabase.rpc("search_content", { q });
