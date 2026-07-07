@@ -1,6 +1,7 @@
 {
   "mode": "batch-resilient",
-  "next": "build",
+  "next": "plan",
+  "last_deploy": "48a1c46 (cycle-2: 11 tasks + Finanzamt/Führerscheinstelle variants + ABH-trio fallback; pre-deploy e424e50) — 2026-07-05",
   "status": "RESUMED 2026-07-05 — all 5 research groups DONE. Awaiting go for Verifier (Opus).",
   "cycle": 2,
   "updated": "2026-07-05",
@@ -9,7 +10,7 @@
   "researched": ["A national-howto ✅", "B tax-finanzamt ✅", "C driving ✅", "D abh-trio ✅", "E recognition ✅"],
   "verify_files": ["research-national-howto.md", "research-tax-finanzamt.md", "research-driving.md", "research-abh-trio.md", "research-recognition.md"],
   "verify_exclude": ["research.md", "research-respermit.md", "research-commuter.md — these are cycle-1/Round-15, already deployed; DO NOT re-verify or re-deploy"],
-  "in_flight": ["BUILDER (opus/high) — applying verified-cycle2.md, deploying"],
+  "in_flight": [],
   "verify_status": "VERIFY DONE 2026-07-05 -> verified-cycle2.md (173k). Builder reads verified-cycle2.md (NOT verified.md).",
   "held": ["new hub cities (menu #4) — confirmed held"],
   "note": "Verifier(opus) over the 5 verify_files only -> Builder(opus) deploys once."
