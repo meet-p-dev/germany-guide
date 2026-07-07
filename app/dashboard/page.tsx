@@ -1,5 +1,9 @@
 import type { Metadata } from "next";
-import { getStatesWithCities, getTasksByCategory } from "@/lib/queries/guide";
+import {
+  getStatesWithCities,
+  getStudentJourney,
+  getTasksByCategory,
+} from "@/lib/queries/guide";
 import { getGlossaryTerms } from "@/lib/queries/content";
 import { GuidedDashboard } from "@/components/dashboard/GuidedDashboard";
 
@@ -13,10 +17,11 @@ export const metadata: Metadata = {
 };
 
 export default async function DashboardPage() {
-  const [categories, states, glossaryTerms] = await Promise.all([
+  const [categories, states, glossaryTerms, journey] = await Promise.all([
     getTasksByCategory(),
     getStatesWithCities(),
     getGlossaryTerms(),
+    getStudentJourney("student", "en"),
   ]);
 
   const cats = categories.map((c) => ({
@@ -32,6 +37,36 @@ export default async function DashboardPage() {
     })),
   }));
 
+  // Build the chronological journey the client uses for the STUDENT persona.
+  // runs_parallel_with is stored as task ids; resolve to slugs here (server side)
+  // so the client can render honest "around the same time" hints by slug.
+  const taskIdToSlug = new Map<string, string>();
+  for (const c of categories)
+    for (const t of c.tasks) taskIdToSlug.set(t.id, t.slug);
+
+  const journeyPhases = journey.phases.map((p) => ({
+    slug: p.slug,
+    name_en: p.name_en,
+    sort_order: p.sort_order,
+  }));
+  const journeySteps = journey.steps.map((s) => ({
+    task: s.tasks
+      ? {
+          slug: s.tasks.slug,
+          title_en: s.tasks.title_en,
+          title_de: s.tasks.title_de,
+          summary: s.tasks.summary,
+          audience: s.tasks.audience,
+        }
+      : null,
+    phase: s.phase,
+    phase_order: s.phase_order,
+    note_md: s.note_md,
+    parallelSlugs: s.runs_parallel_with
+      .map((id) => taskIdToSlug.get(id))
+      .filter((v): v is string => !!v),
+  }));
+
   const cities = states
     .flatMap((s) => s.cities.filter((c) => c.is_published))
     .map((c) => ({ slug: c.slug, label: c.name_en }))
@@ -43,6 +78,12 @@ export default async function DashboardPage() {
   }));
 
   return (
-    <GuidedDashboard categories={cats} cities={cities} glossary={glossary} />
+    <GuidedDashboard
+      categories={cats}
+      cities={cities}
+      glossary={glossary}
+      journeyPhases={journeyPhases}
+      journeySteps={journeySteps}
+    />
   );
 }

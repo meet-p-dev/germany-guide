@@ -128,6 +128,44 @@ export async function getVariant(
   return null;
 }
 
+/**
+ * The chronological student journey: phases + per-task placement, distinct
+ * from the browsing `category`. Powers the guided dashboard for the student
+ * persona. Non-student personas have no rows yet and fall back to category
+ * order — callers degrade gracefully when this returns an empty step list.
+ */
+export type JourneyPhase = Tables<"journey_phases">;
+export type StudentJourneyStep = Tables<"student_journey_steps"> & {
+  tasks: Pick<
+    Tables<"tasks">,
+    "slug" | "title_en" | "title_de" | "summary" | "audience"
+  > | null;
+};
+
+export async function getStudentJourney(
+  persona = "student",
+  locale = "en"
+): Promise<{ phases: JourneyPhase[]; steps: StudentJourneyStep[] }> {
+  const supabase = createStaticClient();
+  const [phasesRes, stepsRes] = await Promise.all([
+    supabase.from("journey_phases").select("*").order("sort_order"),
+    supabase
+      .from("student_journey_steps")
+      .select(
+        "*, tasks(slug, title_en, title_de, summary, audience)"
+      )
+      .eq("persona", persona)
+      .eq("locale", locale)
+      .order("phase_order"),
+  ]);
+  if (phasesRes.error) throw phasesRes.error;
+  if (stepsRes.error) throw stepsRes.error;
+  return {
+    phases: phasesRes.data ?? [],
+    steps: (stepsRes.data ?? []) as StudentJourneyStep[],
+  };
+}
+
 /** Variants for a whole city keyed by task_id — powers the city dashboard badges. */
 export async function getVariantsForCity(cityId: string) {
   const supabase = createStaticClient();

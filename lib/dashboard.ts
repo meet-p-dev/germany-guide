@@ -17,6 +17,17 @@ export type FlatStep<T> = {
   stageIndex: number;
   stageSlug: string;
   stageName: string;
+  /**
+   * Honest per-step note (journey mode only): e.g. the nationality/embassy hint
+   * or the "runs alongside the others" context. Undefined in category mode.
+   */
+  note?: string | null;
+  /**
+   * Task slugs this step genuinely overlaps with in time (journey mode only) —
+   * lets the UI say "can be done around the same time" instead of implying a
+   * forced 1-2-3 chain. Empty/undefined when there is no real overlap.
+   */
+  parallelWith?: string[];
 };
 
 /** Flatten the six persona-filtered stages into one ordered task list. */
@@ -33,6 +44,52 @@ export function flattenPlan<T>(plan: PlanStage<T>[]): FlatStep<T>[] {
     }
   });
   return steps;
+}
+
+/**
+ * Journey mode (student persona): flatten the chronological journey rows into
+ * the same ordered FlatStep list the dashboard already renders — but ordered by
+ * the real `phase_order` (a strictly-increasing global rank) and grouped by
+ * `journey_phases`, NOT by browsing category. Each step carries its honest note
+ * and its genuine parallel-task slugs so the UI can show concurrency instead of
+ * a false chain.
+ *
+ * `stageIndex` is the phase's 1-based rank (so the existing "Stage X of N" and
+ * the ProgressBar keep working); `total` phases replaces the hard-coded 6.
+ */
+export type JourneyPhaseLike = { slug: string; name_en: string; sort_order: number };
+export type JourneyStepLike<T> = {
+  task: T | null;
+  phase: string;
+  phase_order: number;
+  note_md: string | null;
+  /** task ids; resolved to slugs by the caller into parallelSlugs */
+  parallelSlugs: string[];
+};
+
+export function flattenJourney<T extends { slug: string }>(
+  phases: JourneyPhaseLike[],
+  steps: JourneyStepLike<T>[]
+): FlatStep<T>[] {
+  const phaseRank = new Map(phases.map((p) => [p.slug, p.sort_order]));
+  const phaseName = new Map(phases.map((p) => [p.slug, p.name_en]));
+  return steps
+    .filter((s): s is JourneyStepLike<T> & { task: T } => s.task != null)
+    .slice()
+    .sort((a, b) => a.phase_order - b.phase_order)
+    .map((s) => ({
+      task: s.task,
+      stageIndex: phaseRank.get(s.phase) ?? 0,
+      stageSlug: s.phase,
+      stageName: phaseName.get(s.phase) ?? s.phase,
+      note: s.note_md,
+      parallelWith: s.parallelSlugs,
+    }));
+}
+
+/** Count of distinct phases actually present in a flattened step list. */
+export function phaseCount<T>(steps: FlatStep<T>[]): number {
+  return new Set(steps.map((s) => s.stageIndex)).size;
 }
 
 /**

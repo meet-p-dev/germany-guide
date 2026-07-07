@@ -280,7 +280,15 @@ export type Database = {
           status?: Database["public"]["Enums"]["content_status"]
           why_md?: string | null
         }
-        Relationships: []
+        Relationships: [
+          {
+            foreignKeyName: "commuter_areas_city_id_fkey"
+            columns: ["city_id"]
+            isOneToOne: false
+            referencedRelation: "cities"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       glossary_terms: {
         Row: {
@@ -367,6 +375,24 @@ export type Database = {
             referencedColumns: ["id"]
           },
         ]
+      }
+      journey_phases: {
+        Row: {
+          name_en: string
+          slug: string
+          sort_order: number
+        }
+        Insert: {
+          name_en: string
+          slug: string
+          sort_order: number
+        }
+        Update: {
+          name_en?: string
+          slug?: string
+          sort_order?: number
+        }
+        Relationships: []
       }
       letters: {
         Row: {
@@ -634,6 +660,54 @@ export type Database = {
           slug?: string
         }
         Relationships: []
+      }
+      student_journey_steps: {
+        Row: {
+          id: string
+          locale: string
+          note_md: string | null
+          persona: string
+          phase: string
+          phase_order: number
+          runs_parallel_with: string[]
+          task_id: string
+        }
+        Insert: {
+          id?: string
+          locale?: string
+          note_md?: string | null
+          persona?: string
+          phase: string
+          phase_order: number
+          runs_parallel_with?: string[]
+          task_id: string
+        }
+        Update: {
+          id?: string
+          locale?: string
+          note_md?: string | null
+          persona?: string
+          phase?: string
+          phase_order?: number
+          runs_parallel_with?: string[]
+          task_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "student_journey_steps_phase_fkey"
+            columns: ["phase"]
+            isOneToOne: false
+            referencedRelation: "journey_phases"
+            referencedColumns: ["slug"]
+          },
+          {
+            foreignKeyName: "student_journey_steps_task_id_fkey"
+            columns: ["task_id"]
+            isOneToOne: false
+            referencedRelation: "tasks"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       support_resources: {
         Row: {
