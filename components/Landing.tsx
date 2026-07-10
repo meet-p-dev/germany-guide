@@ -253,7 +253,7 @@ export function Landing({ featuredCities }: { featuredCities: FeaturedCity[] }) 
           </p>
           <Button asChild size="lg" variant="secondary" className="mt-8 gap-2 rounded-full text-base font-semibold">
             <Link href={BUILD_PLAN_HREF}>
-              Start my plan <ArrowRight className="h-4 w-4" />
+              Build my plan <ArrowRight className="h-4 w-4" />
             </Link>
           </Button>
         </div>

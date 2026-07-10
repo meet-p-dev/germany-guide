@@ -45,7 +45,7 @@ export default async function JourneyPage() {
           {/* The one primary action on the page (Rule 1) */}
           <div className="mt-6">
             <Button asChild variant="primary">
-              <Link href="/explore">Build my personal plan</Link>
+              <Link href="/explore">Build my plan</Link>
             </Button>
           </div>
         </header>
@@ -82,7 +82,7 @@ export default async function JourneyPage() {
           </p>
           <div className="mt-4 flex justify-center">
             <Button asChild variant="primary">
-              <Link href="/explore">Build my personal plan</Link>
+              <Link href="/explore">Build my plan</Link>
             </Button>
           </div>
         </div>

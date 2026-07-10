@@ -18,6 +18,8 @@ type PlanTask = {
 export function PlanResult({
   plan,
   glossary,
+  persona,
+  citySlug,
   personaLabel,
   cityLabel,
   familyLabel,
@@ -28,6 +30,8 @@ export function PlanResult({
 }: {
   plan: PlanStage<PlanTask>[];
   glossary: GlossaryEntry[];
+  persona?: string;
+  citySlug?: string | null;
   personaLabel: string;
   cityLabel: string | null;
   familyLabel?: string;
@@ -37,6 +41,11 @@ export function PlanResult({
   onStartOver: () => void;
 }) {
   const settled = stage >= 7;
+  // Into the single unified guided view of the shared plan — same destination
+  // the roadmap's "guided mode" reaches, so there's one plan, not two.
+  const guidedHref = persona
+    ? `/dashboard?persona=${persona}${citySlug ? `&city=${citySlug}` : ""}`
+    : "/explore";
 
   return (
     <div className="mx-auto max-w-2xl">
@@ -108,7 +117,7 @@ export function PlanResult({
             (and handles the "all caught up" case), so this is the single
             primary action out of the plan preview. */}
         <Button asChild variant="primary">
-          <Link href="/dashboard">
+          <Link href={guidedHref}>
             {settled ? "Open my guided plan →" : "Start guided mode →"}
           </Link>
         </Button>

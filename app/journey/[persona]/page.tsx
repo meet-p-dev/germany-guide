@@ -73,7 +73,7 @@ export default async function PersonaJourneyPage({
           <div className="mt-6">
             <Button asChild variant="primary">
               <Link href={`/explore?persona=${persona.slug}`}>
-                Build my personal plan
+                Build my plan
               </Link>
             </Button>
           </div>
@@ -121,7 +121,7 @@ export default async function PersonaJourneyPage({
           <div className="mt-4 flex justify-center">
             <Button asChild variant="primary">
               <Link href={`/explore?persona=${persona.slug}`}>
-                Build my personal plan
+                Build my plan
               </Link>
             </Button>
           </div>

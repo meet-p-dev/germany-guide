@@ -225,6 +225,8 @@ export function QuizFlow({
             })),
           }))}
           glossary={glossary}
+          persona={answers.persona}
+          citySlug={answers.city ?? null}
           personaLabel={
             Q1_PERSONA.find((o) => o.value === answers.persona)?.label ?? "newcomer"
           }

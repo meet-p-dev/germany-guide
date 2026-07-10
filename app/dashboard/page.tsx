@@ -1,31 +1,59 @@
+import Link from "next/link";
 import type { Metadata } from "next";
-import {
-  getStatesWithCities,
-  getStudentJourney,
-  getTasksByCategory,
-} from "@/lib/queries/guide";
+import { getCityBySlug, getTasksByCategory } from "@/lib/queries/guide";
 import { getGlossaryTerms } from "@/lib/queries/content";
-import { GuidedDashboard } from "@/components/dashboard/GuidedDashboard";
+import { PERSONA_BY_SLUG } from "@/lib/persona-copy";
+import { buildPersonaPhases } from "@/lib/plan";
+import { Button } from "@/components/ui/button";
+import { GuidedPlan } from "@/components/plan/GuidedPlan";
 
 export const revalidate = 3600;
 
 export const metadata: Metadata = {
-  title: "Your dashboard",
+  title: "Your plan — one step at a time",
   description:
-    "Your personal plan, one step at a time — the current step lit, done steps folded away, the rest waiting their turn.",
-  robots: { index: false, follow: false }, // personal, session-only view
+    "Your personal plan, guided: the current step lit, done steps folded away, the rest waiting their turn.",
+  robots: { index: false, follow: false }, // personal view
 };
 
-export default async function DashboardPage() {
-  const [categories, states, glossaryTerms, journey] = await Promise.all([
+export default async function DashboardPage({
+  searchParams,
+}: {
+  searchParams: Promise<{ persona?: string; city?: string }>;
+}) {
+  const { persona: personaSlug, city: citySlug } = await searchParams;
+
+  // No plan chosen yet → one calm invitation into the single funnel.
+  if (!personaSlug) {
+    return (
+      <div className="mx-auto max-w-xl py-16 text-center">
+        <h1 className="text-3xl font-extrabold tracking-tight">
+          Your guided plan lives here
+        </h1>
+        <p className="mt-3 text-muted-foreground">
+          Tell us your situation and city, and we’ll turn the whole
+          German-bureaucracy map into one next step at a time.
+        </p>
+        <Button asChild size="lg" className="mt-6 rounded-full font-semibold">
+          <Link href="/explore">Build my plan</Link>
+        </Button>
+      </div>
+    );
+  }
+
+  // Known persona → filter by its audience tag; unknown (e.g. "other") →
+  // unfiltered (show every step), same as the quiz's "not sure" path.
+  const persona = PERSONA_BY_SLUG[personaSlug];
+  const personaTag = persona ? persona.tag : null;
+  const personaLabel = persona ? persona.label : "newcomer";
+
+  const [categories, city, glossaryTerms] = await Promise.all([
     getTasksByCategory(),
-    getStatesWithCities(),
+    citySlug ? getCityBySlug(citySlug) : Promise.resolve(null),
     getGlossaryTerms(),
-    getStudentJourney("student", "en"),
   ]);
 
   const cats = categories.map((c) => ({
-    id: c.id,
     slug: c.slug,
     name_en: c.name_en,
     tasks: c.tasks.map((t) => ({
@@ -37,53 +65,20 @@ export default async function DashboardPage() {
     })),
   }));
 
-  // Build the chronological journey the client uses for the STUDENT persona.
-  // runs_parallel_with is stored as task ids; resolve to slugs here (server side)
-  // so the client can render honest "around the same time" hints by slug.
-  const taskIdToSlug = new Map<string, string>();
-  for (const c of categories)
-    for (const t of c.tasks) taskIdToSlug.set(t.id, t.slug);
-
-  const journeyPhases = journey.phases.map((p) => ({
-    slug: p.slug,
-    name_en: p.name_en,
-    sort_order: p.sort_order,
-  }));
-  const journeySteps = journey.steps.map((s) => ({
-    task: s.tasks
-      ? {
-          slug: s.tasks.slug,
-          title_en: s.tasks.title_en,
-          title_de: s.tasks.title_de,
-          summary: s.tasks.summary,
-          audience: s.tasks.audience,
-        }
-      : null,
-    phase: s.phase,
-    phase_order: s.phase_order,
-    note_md: s.note_md,
-    parallelSlugs: s.runs_parallel_with
-      .map((id) => taskIdToSlug.get(id))
-      .filter((v): v is string => !!v),
-  }));
-
-  const cities = states
-    .flatMap((s) => s.cities.filter((c) => c.is_published))
-    .map((c) => ({ slug: c.slug, label: c.name_en }))
-    .sort((a, b) => a.label.localeCompare(b.label));
-
+  const phases = buildPersonaPhases(cats, personaTag);
+  const guidedCity = city ? { slug: city.slug, name: city.name_en } : null;
   const glossary = glossaryTerms.map((g) => ({
     term_de: g.term_de,
     term_en: g.term_en,
   }));
 
   return (
-    <GuidedDashboard
-      categories={cats}
-      cities={cities}
+    <GuidedPlan
+      persona={personaSlug}
+      personaLabel={personaLabel}
+      city={guidedCity}
+      phases={phases}
       glossary={glossary}
-      journeyPhases={journeyPhases}
-      journeySteps={journeySteps}
     />
   );
 }
