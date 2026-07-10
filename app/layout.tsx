@@ -1,28 +1,22 @@
 import type { Metadata } from "next";
-import { Geist, Geist_Mono, Hanken_Grotesk } from "next/font/google";
-import Link from "next/link";
+import { DM_Sans, Geist_Mono } from "next/font/google";
 import { Analytics } from "@vercel/analytics/next";
 import "./globals.css";
-import { DISCLAIMER_TEXT } from "@/components/Disclaimer";
-import { AuthButton } from "@/components/AuthButton";
-import { LogoLockup } from "@/components/Logo";
+import { ThemeProvider } from "@/components/ThemeProvider";
+import { SiteHeader } from "@/components/SiteHeader";
+import { SiteFooter } from "@/components/SiteFooter";
 
-const geistSans = Geist({
-  variable: "--font-geist-sans",
+// Ankommen body face. Cabinet Grotesk (display) loads via Fontshare @import in
+// globals.css — it isn't on Google Fonts so it can't go through next/font.
+const dmSans = DM_Sans({
+  variable: "--font-dm-sans",
   subsets: ["latin"],
+  display: "swap",
 });
 
 const geistMono = Geist_Mono({
   variable: "--font-geist-mono",
   subsets: ["latin"],
-});
-
-// Display face for the design system (Increment 0). Calm, neutral grotesque —
-// legibility over character, for a bureaucracy tool aimed at anxious newcomers.
-const hankenGrotesk = Hanken_Grotesk({
-  variable: "--font-hanken",
-  subsets: ["latin"],
-  display: "swap",
 });
 
 export const metadata: Metadata = {
@@ -46,14 +40,6 @@ export const metadata: Metadata = {
   },
 };
 
-const NAV = [
-  { href: "/germany", label: "Cities" },
-  { href: "/compare", label: "Compare" },
-  { href: "/problems", label: "Problems & solutions" },
-  { href: "/letters", label: "Letter helper" },
-  { href: "/glossary", label: "Glossary" },
-];
-
 export default function RootLayout({
   children,
 }: Readonly<{
@@ -62,47 +48,19 @@ export default function RootLayout({
   return (
     <html
       lang="en"
-      className={`${geistSans.variable} ${geistMono.variable} ${hankenGrotesk.variable} h-full antialiased`}
+      suppressHydrationWarning
+      className={`${dmSans.variable} ${geistMono.variable} h-full antialiased`}
     >
       <body className="flex min-h-full flex-col">
-        <header className="border-b">
-          <div className="mx-auto flex max-w-5xl flex-wrap items-center gap-x-6 gap-y-2 px-4 py-3">
-            <Link href="/" aria-label="Germany Guide home">
-              <LogoLockup />
-            </Link>
-            <nav className="flex flex-wrap gap-x-4 gap-y-1 text-sm text-muted-foreground">
-              {NAV.map((item) => (
-                <Link
-                  key={item.href}
-                  href={item.href}
-                  className="hover:text-foreground"
-                >
-                  {item.label}
-                </Link>
-              ))}
-            </nav>
-            <div className="ml-auto">
-              <AuthButton />
-            </div>
-          </div>
-        </header>
-        <main className="mx-auto w-full max-w-5xl flex-1 px-4 py-8">
-          {children}
-        </main>
-        <footer className="border-t">
-          <div className="mx-auto max-w-5xl space-y-2 px-4 py-6 text-xs text-muted-foreground">
-            <p>{DISCLAIMER_TEXT}</p>
-            <p>
-              Made for internationals in Germany. Content is community-reviewed;
-              always double-check with the official source linked on each page.
-            </p>
-            <p>
-              Some pages link to partner services marked “Partner”; if you sign up
-              through them we may earn a commission, at no extra cost to you.
-            </p>
-          </div>
-        </footer>
-        <Analytics />
+        <ThemeProvider>
+          <div className="grain" aria-hidden="true" />
+          <SiteHeader />
+          <main className="relative z-10 mx-auto w-full max-w-6xl flex-1 px-4 py-10 md:px-6">
+            {children}
+          </main>
+          <SiteFooter />
+          <Analytics />
+        </ThemeProvider>
       </body>
     </html>
   );

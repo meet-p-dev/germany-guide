@@ -368,6 +368,108 @@ export type Database = {
           },
         ]
       }
+      journey_phases: {
+        Row: {
+          name_en: string
+          slug: string
+          sort_order: number
+          subtitle_en: string | null
+        }
+        Insert: {
+          name_en: string
+          slug: string
+          sort_order: number
+          subtitle_en?: string | null
+        }
+        Update: {
+          name_en?: string
+          slug?: string
+          sort_order?: number
+          subtitle_en?: string | null
+        }
+        Relationships: []
+      }
+      journey_steps: {
+        Row: {
+          applies_to: string[]
+          city_specific: boolean
+          details_md: string | null
+          documents: string[]
+          icon: string | null
+          id: string
+          locale: string
+          note_md: string | null
+          persona: string
+          phase: string
+          phase_order: number
+          runs_parallel_with: string[]
+          slug: string
+          status: Database["public"]["Enums"]["content_status"]
+          summary: string | null
+          task_id: string | null
+          tips: string[]
+          title_de: string | null
+          title_en: string | null
+        }
+        Insert: {
+          applies_to?: string[]
+          city_specific?: boolean
+          details_md?: string | null
+          documents?: string[]
+          icon?: string | null
+          id?: string
+          locale?: string
+          note_md?: string | null
+          persona?: string
+          phase: string
+          phase_order: number
+          runs_parallel_with?: string[]
+          slug: string
+          status?: Database["public"]["Enums"]["content_status"]
+          summary?: string | null
+          task_id?: string | null
+          tips?: string[]
+          title_de?: string | null
+          title_en?: string | null
+        }
+        Update: {
+          applies_to?: string[]
+          city_specific?: boolean
+          details_md?: string | null
+          documents?: string[]
+          icon?: string | null
+          id?: string
+          locale?: string
+          note_md?: string | null
+          persona?: string
+          phase?: string
+          phase_order?: number
+          runs_parallel_with?: string[]
+          slug?: string
+          status?: Database["public"]["Enums"]["content_status"]
+          summary?: string | null
+          task_id?: string | null
+          tips?: string[]
+          title_de?: string | null
+          title_en?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "journey_steps_phase_fkey"
+            columns: ["phase"]
+            isOneToOne: false
+            referencedRelation: "journey_phases"
+            referencedColumns: ["slug"]
+          },
+          {
+            foreignKeyName: "journey_steps_task_id_fkey"
+            columns: ["task_id"]
+            isOneToOne: false
+            referencedRelation: "tasks"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       letters: {
         Row: {
           deadline_note: string | null

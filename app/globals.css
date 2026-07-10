@@ -1,42 +1,50 @@
+/* Cabinet Grotesk (display) — not on Google Fonts, loaded from Fontshare.
+   DM Sans (body) is self-hosted via next/font in app/layout.tsx. */
+@import url('https://api.fontshare.com/v2/css?f[]=cabinet-grotesk@500,700,800,900&display=swap');
 @import "tailwindcss";
 @import "tw-animate-css";
 
 @custom-variant dark (&:is(.dark *));
 
 :root {
-  --radius: 0.625rem;
-  --background: oklch(1 0 0);
-  --foreground: oklch(0.145 0 0);
-  --card: oklch(1 0 0);
-  --card-foreground: oklch(0.145 0 0);
-  --popover: oklch(1 0 0);
-  --popover-foreground: oklch(0.145 0 0);
-  --primary: oklch(0.205 0 0);
-  --primary-foreground: oklch(0.985 0 0);
-  --secondary: oklch(0.97 0 0);
-  --secondary-foreground: oklch(0.205 0 0);
-  --muted: oklch(0.97 0 0);
-  --muted-foreground: oklch(0.556 0 0);
-  --accent: oklch(0.97 0 0);
-  --accent-foreground: oklch(0.205 0 0);
-  --destructive: oklch(0.577 0.245 27.325);
-  --border: oklch(0.922 0 0);
-  --input: oklch(0.922 0 0);
-  --ring: oklch(0.708 0 0);
+  /* ── Ankommen design system — warm German-flag palette (light) ──────────
+     Ported from emergent_website/ankommen_source/frontend/src/index.css.
+     Cream background, deep German red primary, gold/mustard accent. Stored as
+     full hsl() so the existing `--color-*: var(--token)` mappings stay valid
+     and Tailwind opacity modifiers keep working via color-mix. */
+  --radius: 0.5rem;
+  --background: hsl(43 38% 97%);
+  --foreground: hsl(20 12% 11%);
+  --card: hsl(40 40% 99%);
+  --card-foreground: hsl(20 12% 11%);
+  --popover: hsl(40 40% 99%);
+  --popover-foreground: hsl(20 12% 11%);
+  --primary: hsl(353 68% 42%);
+  --primary-foreground: hsl(40 40% 98%);
+  --secondary: hsl(38 30% 92%);
+  --secondary-foreground: hsl(20 12% 14%);
+  --muted: hsl(38 26% 93%);
+  --muted-foreground: hsl(28 8% 40%);
+  --accent: hsl(40 68% 44%);
+  --accent-foreground: hsl(20 12% 11%);
+  --destructive: hsl(0 74% 44%);
+  --border: hsl(34 20% 86%);
+  --input: hsl(34 20% 86%);
+  --ring: hsl(353 68% 42%);
 
-  /* ── Germany Guide design system (Increment 0) ──────────────────────────
-     Additive only. Does NOT touch the shadcn tokens above, so existing
-     content pages render unchanged. New UI uses the gg-* tokens. Every
-     text/bg + action/bg pair below is WCAG-AA verified in light AND dark. */
-  --gg-surface: #f5f7fb;
-  --gg-card: #ffffff;
-  --gg-ink: #171e2e;
-  --gg-muted: #586074;
-  --gg-border: #e3e8f0;
-  --gg-brand: #2547cc;
-  --gg-brand-fg: #ffffff;
-  --gg-brand-soft: #e9eefc;
-  --gg-brand-ink: #1e3aad;
+  /* ── gg-* design system, repointed onto the Ankommen palette ─────────────
+     journey / quiz / dashboard and components/ds/* read these. Surfaces are
+     now warm cream; the brand family is the German red. Progress (green),
+     amber (gold), and teal stay as semantic status colors. */
+  --gg-surface: #f8f4ec;
+  --gg-card: #fffdf9;
+  --gg-ink: #201a16;
+  --gg-muted: #6e665c;
+  --gg-border: #e4ddce;
+  --gg-brand: #b42233;
+  --gg-brand-fg: #fff9f2;
+  --gg-brand-soft: #f6e5e3;
+  --gg-brand-ink: #8f1b29;
   --gg-progress: #128a50;
   --gg-progress-text: #177a4c;
   --gg-progress-soft: #e1f3e9;
@@ -44,39 +52,40 @@
   --gg-amber-ui: #b7791f;
   --gg-amber-soft: #fbf0d9;
   --gg-teal: #0b7a73;
-  --gg-secondary: #eef1f7;
+  --gg-secondary: #ede6da;
 }
 
 .dark {
-  --background: oklch(0.145 0 0);
-  --foreground: oklch(0.985 0 0);
-  --card: oklch(0.205 0 0);
-  --card-foreground: oklch(0.985 0 0);
-  --popover: oklch(0.205 0 0);
-  --popover-foreground: oklch(0.985 0 0);
-  --primary: oklch(0.922 0 0);
-  --primary-foreground: oklch(0.205 0 0);
-  --secondary: oklch(0.269 0 0);
-  --secondary-foreground: oklch(0.985 0 0);
-  --muted: oklch(0.269 0 0);
-  --muted-foreground: oklch(0.708 0 0);
-  --accent: oklch(0.269 0 0);
-  --accent-foreground: oklch(0.985 0 0);
-  --destructive: oklch(0.704 0.191 22.216);
-  --border: oklch(1 0 0 / 10%);
-  --input: oklch(1 0 0 / 15%);
-  --ring: oklch(0.556 0 0);
+  /* ── Ankommen design system — warm near-black + brighter red/gold (dark) ── */
+  --background: hsl(20 9% 6%);
+  --foreground: hsl(40 30% 93%);
+  --card: hsl(20 8% 10%);
+  --card-foreground: hsl(40 30% 93%);
+  --popover: hsl(20 8% 10%);
+  --popover-foreground: hsl(40 30% 93%);
+  --primary: hsl(353 74% 53%);
+  --primary-foreground: hsl(40 40% 98%);
+  --secondary: hsl(20 6% 15%);
+  --secondary-foreground: hsl(40 30% 93%);
+  --muted: hsl(20 6% 15%);
+  --muted-foreground: hsl(34 10% 62%);
+  --accent: hsl(41 72% 53%);
+  --accent-foreground: hsl(20 12% 8%);
+  --destructive: hsl(0 66% 46%);
+  --border: hsl(24 8% 18%);
+  --input: hsl(24 8% 18%);
+  --ring: hsl(353 74% 53%);
 
-  /* ── Germany Guide design system — dark mode ── */
-  --gg-surface: #0e1421;
-  --gg-card: #161f30;
-  --gg-ink: #e7ecf5;
-  --gg-muted: #95a1b6;
-  --gg-border: #28324a;
-  --gg-brand: #3d62f0;
-  --gg-brand-fg: #ffffff;
-  --gg-brand-soft: #1b2540;
-  --gg-brand-ink: #93a9fb;
+  /* ── gg-* dark, repointed onto the Ankommen palette ── */
+  --gg-surface: #14100e;
+  --gg-card: #1c1815;
+  --gg-ink: #efe7d8;
+  --gg-muted: #a89e8e;
+  --gg-border: #2e2822;
+  --gg-brand: #d43f52;
+  --gg-brand-fg: #fff9f2;
+  --gg-brand-soft: #3a1f22;
+  --gg-brand-ink: #f0a9b2;
   --gg-progress: #34c27e;
   --gg-progress-text: #5fd79c;
   --gg-progress-soft: #12301f;
@@ -84,7 +93,7 @@
   --gg-amber-ui: #e8b44d;
   --gg-amber-soft: #2a2210;
   --gg-teal: #25b5ac;
-  --gg-secondary: #1e2840;
+  --gg-secondary: #282320;
 }
 
 @theme inline {
@@ -110,11 +119,11 @@
   --color-border: var(--border);
   --color-input: var(--input);
   --color-ring: var(--ring);
-  --font-sans: var(--font-geist-sans);
+  --font-sans: var(--font-dm-sans), ui-sans-serif, system-ui, sans-serif;
   --font-mono: var(--font-geist-mono);
 
-  /* ── Germany Guide design system — Tailwind utility mappings ── */
-  --font-display: var(--font-hanken);
+  /* ── Ankommen: Cabinet Grotesk display face (loaded via Fontshare @import) ── */
+  --font-display: "Cabinet Grotesk", var(--font-dm-sans), system-ui, sans-serif;
   --color-gg-surface: var(--gg-surface);
   --color-gg-card: var(--gg-card);
   --color-gg-ink: var(--gg-ink);
@@ -140,12 +149,51 @@
   }
   body {
     @apply bg-background text-foreground;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+  }
+  /* Ankommen: all headings use the Cabinet Grotesk display face. */
+  h1, h2, h3, h4, .font-display {
+    font-family: var(--font-display);
+  }
+  ::selection {
+    background: hsl(353 68% 42% / 0.16);
   }
 }
 
-/* ── Germany Guide design system — type scale (Increment 0) ──────────────
-   One display face (Hanken Grotesk) for headings, one body face (Geist) for
-   text. 1.20 modular scale. Line-height tightens as size grows. */
+/* ── Ankommen signature texture & chrome utilities ──────────────────────────
+   .grain  — fixed fractal-noise overlay (place once per page, pointer-none).
+   .glass  — frosted translucent surface for the sticky navbar.
+   .flag-stripe — 4px black/red/gold bar (fill the three <span>s in markup). */
+.grain {
+  position: fixed;
+  inset: 0;
+  z-index: 1;
+  pointer-events: none;
+  opacity: 0.035;
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+}
+
+.glass {
+  backdrop-filter: blur(16px);
+  background: hsl(43 38% 97% / 0.72);
+}
+.dark .glass {
+  background: hsl(20 9% 7% / 0.72);
+}
+
+.flag-stripe {
+  display: flex;
+  height: 4px;
+  width: 100%;
+}
+.flag-stripe > span {
+  flex: 1 1 0%;
+}
+
+/* ── Type scale ──────────────────────────────────────────────────────────
+   One display face (Cabinet Grotesk) for headings, one body face (DM Sans)
+   for text. 1.20 modular scale. Line-height tightens as size grows. */
 @layer components {
   .gg-display {
     font-family: var(--font-display), system-ui, sans-serif;

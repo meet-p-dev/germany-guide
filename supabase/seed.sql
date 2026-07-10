@@ -2472,3 +2472,48 @@ insert into support_resources (name, url, category, description, region, source,
 ('Malteser — Medizin für Menschen ohne Krankenversicherung', 'https://www.malteser.de/menschen-ohne-krankenversicherung.html', 'health', 'Malteser (welfare NGO) medical care for people without health insurance. Treatment is provided while preserving anonymity, and an initial examination generally incurs no cost. A locator lists local branches in several German cities.', null, 'Malteser Deutschland — "Medizin für Menschen ohne Krankenversicherung"', '2026-07-06', true),
 ('Hilfetelefon "Gewalt gegen Frauen" — federal 24/7 multilingual helpline', 'https://www.hilfetelefon.de/das-hilfetelefon/', 'family_safety', 'Federal helpline for women experiencing violence — free, anonymous, available 365 days a year around the clock on 116 016, with counselling in 18 languages plus sign language and easy-to-understand German; also chat and email. Operated by the BAFzA (funded by BMFSFJ).', null, 'hilfetelefon.de — "Das Hilfetelefon Gewalt gegen Frauen"', '2026-07-06', true),
 ('Berlin.de — Einwanderung Service hub (Berlin immigration authority)', 'https://www.berlin.de/einwanderung/service/', 'emergency_orientation', 'Official Berlin immigration authority (Landesamt für Einwanderung) service hub — links to newcomer counselling via the LIGA der Wohlfahrtsverbände, IOM return counselling, business immigration service, FAQ and downloadable forms. Free, official.', 'berlin', 'Berlin.de — "Service" (Einwanderung)', '2026-07-06', true);
+
+-- ---------------------------------------------------------------- journey_phases (Increment H)
+insert into journey_phases (slug, name_en, subtitle_en, sort_order) values
+  ('pre-arrival', 'Before You Arrive', 'Paperwork to sort out before the flight', 1),
+  ('arrival', 'Arrival', 'Your first days on the ground', 2),
+  ('first-weeks', 'Your First Weeks', 'The critical foundation once you land', 3),
+  ('settling-in', 'Settling In', 'Build your everyday life in Germany', 4),
+  ('ongoing', 'Ongoing & Long-term', 'Later steps and staying settled', 5)
+on conflict (slug) do update set
+  name_en = excluded.name_en, subtitle_en = excluded.subtitle_en, sort_order = excluded.sort_order;
+
+-- ---------------------------------------------------------------- journey_steps (student; Increment H)
+-- Task-backed steps (status='published') pull verified guide + variant content
+-- at render; standalone "life" steps (status='draft') are skeletons filled
+-- later via the content pipeline. Ordering follows the researched student flow.
+insert into journey_steps
+  (persona, phase, phase_order, task_id, slug, title_en, title_de, summary, icon, city_specific, applies_to, note_md, status, locale)
+select 'student', s.phase, s.phase_order,
+  (select id from tasks where slug = s.task_slug and locale='en'),
+  s.slug, s.title_en, s.title_de, s.summary, s.icon, s.city_specific, s.applies_to::text[], s.note_md, s.status::content_status, 'en'
+from (values
+  ('entry-visa','pre-arrival',1,null,'Visa & Entry Permit','Nationales Visum (D)','Get the correct national (D) visa at the German embassy before you travel.','plane',false,array['student','worker','non-eu','family'],'Which documents you need depends on your nationality and the specific German mission responsible for your country — check the Federal Foreign Office mission finder.','draft'),
+  ('blocked-account','pre-arrival',2,'blocked-account',null,null,null,'banknote',false,array[]::text[],'Usually bundled with your provisional health insurance through the same provider (e.g. Expatrio, Fintiba) — done together, not sequentially.','published'),
+  ('health-insurance-provisional','pre-arrival',3,'health-insurance-provisional',null,null,null,'stethoscope',false,array[]::text[],'Bundled with the blocked account for most students — set them up together before you fly.','published'),
+  ('accommodation','arrival',4,null,'Find Accommodation','Wohnungssuche','Secure somewhere to live — you need a registered address before almost anything else works.','home',false,array['student','worker','refugee','eu','non-eu','family'],'Even a temporary registered address lets you do your Anmeldung and unlock everything downstream.','draft'),
+  ('anmeldung','arrival',5,'anmeldung',null,null,null,'map-pin',true,array[]::text[],'Do this first — your registered address determines your Ausländerbehörde and gates almost every later step.','published'),
+  ('bank-account','first-weeks',6,'bank-account',null,null,null,'landmark',false,array[]::text[],'Once you have a registered address, the next few steps unlock and can be done in roughly any order / in parallel — not a forced chain.','published'),
+  ('tax-id','first-weeks',7,'tax-id',null,null,null,'file-digit',false,array[]::text[],'Arrives automatically by post 2–4 weeks after your Anmeldung — largely passive, runs alongside the others.','published'),
+  ('health-insurance','first-weeks',8,'health-insurance',null,null,null,'stethoscope',false,array[]::text[],'Time-sensitive if you arrived on provisional cover — see the guide''s "From provisional to statutory" section.','published'),
+  ('visa-conversion','first-weeks',9,'visa-conversion',null,null,null,'id-card',true,array[]::text[],'Convert your national (D) visa into a residence permit at the local Ausländerbehörde before it expires.','published'),
+  ('rundfunkbeitrag','first-weeks',10,'rundfunkbeitrag',null,null,null,'tv',false,array[]::text[],'A Rundfunkbeitrag account is triggered around now; low urgency but genuinely starts here.','published'),
+  ('sim-card','first-weeks',11,null,'Mobile / SIM Card','SIM-Karte','Get a German number for verifications, banking and everyday contracts.','smartphone',false,array['student','worker','refugee','eu','non-eu','family'],'A German number smooths bank onboarding and two-factor logins — worth sorting early.','draft'),
+  ('schufa','settling-in',12,'schufa',null,null,null,'shield',false,array[]::text[],'Builds up over your first months; useful once you''re hunting for an apartment or signing contracts beyond your first place.','published'),
+  ('driving-license','settling-in',13,'driving-license',null,null,null,'car',false,array[]::text[],'Time-sensitive only if you drove in on a foreign licence (rules vary by country) — otherwise it can wait.','published'),
+  ('university-enrolment','settling-in',14,null,'Enrol at Your University','Immatrikulation','Complete your matriculation to become an officially enrolled student.','graduation-cap',false,array['student'],'Your Immatrikulationsbescheinigung proves student status for your visa, insurance and discounts.','draft'),
+  ('learn-german','settling-in',15,null,'Learn German','Deutsch lernen','Start learning German — it unlocks jobs, friendships and permanent residency.','languages',false,array['student','worker','refugee','eu','non-eu','family'],'Integration and A1–B1 courses are widely available; even basic German makes daily bureaucracy far easier.','draft'),
+  ('daily-life','settling-in',16,null,'Everyday Life & Essentials','Alltag in Deutschland','The everyday basics — groceries, bottle deposit (Pfand), Sunday closures and quiet hours (Ruhezeit).','store',false,array['student','worker','refugee','eu','non-eu','family'],'Small customs that trip up newcomers: shops shut on Sundays, cash is still king in many places, and quiet hours are taken seriously.','draft'),
+  ('fiktionsbescheinigung','ongoing',17,'fiktionsbescheinigung',null,null,null,'file-digit',true,array[]::text[],'Only relevant if your residence-permit decision is delayed — a bridging certificate that keeps your stay legal in the meantime.','published'),
+  ('pr-outlook','ongoing',18,null,'Permanent Residency Outlook','Niederlassungserlaubnis','Understand your path to permanent residency and, later, citizenship.','flag',false,array['student','worker','refugee','eu','non-eu','family'],'After several years of legal residence, secure income and language proficiency you can apply to settle permanently.','draft')
+) as s(slug, phase, phase_order, task_slug, title_en, title_de, summary, icon, city_specific, applies_to, note_md, status)
+on conflict (persona, slug, locale) do update set
+  phase=excluded.phase, phase_order=excluded.phase_order, task_id=excluded.task_id,
+  title_en=excluded.title_en, title_de=excluded.title_de, summary=excluded.summary,
+  icon=excluded.icon, city_specific=excluded.city_specific, applies_to=excluded.applies_to,
+  note_md=excluded.note_md, status=excluded.status;

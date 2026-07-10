@@ -119,7 +119,7 @@ export default function DesignSystemPage() {
         </Section>
 
         {/* Type scale */}
-        <Section title="Type scale — Hanken Grotesk display · Geist body">
+        <Section title="Type scale — Cabinet Grotesk display · DM Sans body">
           <div className="space-y-4 rounded-[14px] border border-gg-border bg-gg-card p-6">
             {TYPE_SCALE.map((t) => (
               <div key={t.cls} className="flex items-baseline gap-4">
