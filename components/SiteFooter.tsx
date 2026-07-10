@@ -6,6 +6,8 @@ const COLUMNS: { heading: string; links: { href: string; label: string }[] }[] =
   {
     heading: "Guides",
     links: [
+      { href: "/process", label: "The process" },
+      { href: "/journey", label: "The journey" },
       { href: "/germany", label: "Cities" },
       { href: "/compare", label: "Compare" },
       { href: "/glossary", label: "Glossary" },
@@ -16,7 +18,7 @@ const COLUMNS: { heading: string; links: { href: string; label: string }[] }[] =
     links: [
       { href: "/problems", label: "Problems & solutions" },
       { href: "/letters", label: "Letter helper" },
-      { href: "/quiz", label: "Build my plan" },
+      { href: "/explore", label: "Build my plan" },
     ],
   },
 ];

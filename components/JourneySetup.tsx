@@ -29,13 +29,21 @@ const STEPS = ["Your situation", "Your city"] as const;
 export function JourneySetup({
   cities,
   initialCity,
+  initialPersona,
 }: {
   cities: WizardCity[];
   initialCity?: string;
+  initialPersona?: string;
 }) {
   const router = useRouter();
-  const [step, setStep] = useState<0 | 1>(0);
-  const [persona, setPersona] = useState<string | null>(null);
+  // If we arrive with a known situation (e.g. from a persona journey page),
+  // preselect it and open straight on the city step.
+  const presetPersona =
+    initialPersona && PERSONAS.some((p) => p.slug === initialPersona)
+      ? initialPersona
+      : null;
+  const [step, setStep] = useState<0 | 1>(presetPersona ? 1 : 0);
+  const [persona, setPersona] = useState<string | null>(presetPersona);
   const [city, setCity] = useState<string | null>(
     initialCity && cities.some((c) => c.slug === initialCity) ? initialCity : null
   );

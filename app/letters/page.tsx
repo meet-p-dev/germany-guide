@@ -1,6 +1,7 @@
 import Link from "next/link";
 import type { Metadata } from "next";
 import { getLetters } from "@/lib/queries/content";
+import { StatusBadge, type StatusTone } from "@/components/ui/StatusBadge";
 
 export const revalidate = 3600;
 
@@ -10,29 +11,33 @@ export const metadata: Metadata = {
     "Got a German letter you can't read? Find out what it means, whether it's urgent, and exactly what to do — Rundfunkbeitrag, Finanzamt, Krankenkasse and more.",
 };
 
-const URGENCY_STYLE: Record<string, string> = {
-  urgent: "bg-red-100 text-red-800 dark:bg-red-950 dark:text-red-300",
-  "action-needed":
-    "bg-amber-100 text-amber-800 dark:bg-amber-950 dark:text-amber-300",
-  info: "bg-slate-100 text-slate-700 dark:bg-slate-800 dark:text-slate-300",
+const URGENCY_TONE: Record<string, StatusTone> = {
+  urgent: "danger",
+  "action-needed": "warning",
+  info: "neutral",
 };
 
 export default async function LettersPage() {
   const letters = await getLetters();
 
   return (
-    <div className="space-y-6">
-      <div className="space-y-2">
-        <h1 className="text-3xl font-bold">Letter helper</h1>
-        <p className="max-w-2xl text-muted-foreground">
+    <div className="space-y-8">
+      <header className="space-y-2">
+        <span className="text-xs font-semibold uppercase tracking-[0.2em] text-muted-foreground">
+          Letter helper
+        </span>
+        <h1 className="text-3xl font-extrabold tracking-tight md:text-4xl">
+          German letters, decoded
+        </h1>
+        <p className="max-w-2xl text-lg text-muted-foreground">
           German offices communicate by post, in German, with deadlines. Find
           your letter below to see what it means and what to do — before the
           deadline passes.
         </p>
-      </div>
+      </header>
 
       {letters.length === 0 ? (
-        <p className="rounded-md border bg-muted/40 p-6 text-sm text-muted-foreground">
+        <p className="rounded-2xl border border-border bg-secondary/40 p-6 text-sm text-muted-foreground">
           Letter explainers are being reviewed and will appear here shortly.
         </p>
       ) : (
@@ -41,17 +46,15 @@ export default async function LettersPage() {
             <li key={letter.id}>
               <Link
                 href={`/letters/${letter.slug}`}
-                className="block rounded-lg border bg-card p-4 hover:bg-accent"
+                className="block rounded-2xl border border-border bg-card p-5 transition-colors hover:border-primary/40 hover:bg-secondary/40"
               >
                 <div className="mb-1 flex flex-wrap items-center gap-2">
-                  <span className="font-medium">{letter.title_de}</span>
-                  <span
-                    className={`rounded-full px-2 py-0.5 text-xs ${URGENCY_STYLE[letter.urgency] ?? ""}`}
-                  >
+                  <span className="font-semibold">{letter.title_de}</span>
+                  <StatusBadge tone={URGENCY_TONE[letter.urgency] ?? "neutral"}>
                     {letter.urgency === "action-needed"
                       ? "action needed"
                       : letter.urgency}
-                  </span>
+                  </StatusBadge>
                 </div>
                 <p className="text-sm text-muted-foreground">
                   {letter.title_en}

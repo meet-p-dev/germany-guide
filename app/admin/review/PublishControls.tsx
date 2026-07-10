@@ -17,7 +17,7 @@ export function PublishControls({
 
   if (done) {
     return (
-      <p className="flex items-center gap-1.5 text-sm font-medium text-green-700">
+      <p className="flex items-center gap-1.5 text-sm font-medium text-gg-progress-text">
         {done === "Published" && <Check className="h-4 w-4" aria-hidden="true" />}
         {done}
       </p>

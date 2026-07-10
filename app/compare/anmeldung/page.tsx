@@ -16,7 +16,7 @@ export const metadata: Metadata = {
 function Cell({ value }: { value: boolean | null }) {
   if (value === true)
     return (
-      <span className="inline-flex items-center gap-1 text-green-700">
+      <span className="inline-flex items-center gap-1 text-gg-progress-text">
         <Check className="h-4 w-4" aria-hidden="true" /> Yes
       </span>
     );

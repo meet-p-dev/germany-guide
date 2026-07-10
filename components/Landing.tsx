@@ -111,7 +111,7 @@ export function Landing({ featuredCities }: { featuredCities: FeaturedCity[] }) 
               />
             </div>
             <div className="absolute -bottom-5 -left-3 flex items-center gap-3 rounded-2xl border border-border bg-card p-4 shadow-lg md:-left-6">
-              <span className="grid h-10 w-10 place-items-center rounded-xl bg-emerald-100 text-emerald-700 dark:bg-emerald-950 dark:text-emerald-300">
+              <span className="grid h-10 w-10 place-items-center rounded-xl bg-gg-progress-soft text-gg-progress-text">
                 <Footprints className="h-5 w-5" />
               </span>
               <div className="text-sm">

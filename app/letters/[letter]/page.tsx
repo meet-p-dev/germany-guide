@@ -4,6 +4,7 @@ import type { Metadata } from "next";
 import { TriangleAlert } from "lucide-react";
 import { Disclaimer, FreshnessNote } from "@/components/Disclaimer";
 import { Markdown } from "@/components/Markdown";
+import { StatusBadge } from "@/components/ui/StatusBadge";
 import { getLetterBySlug, getLetters } from "@/lib/queries/content";
 
 export const revalidate = 3600;
@@ -40,29 +41,37 @@ export default async function LetterPage({
   return (
     <div className="mx-auto max-w-3xl space-y-8">
       <div className="space-y-2">
-        <p className="text-sm text-muted-foreground">
-          <Link href="/letters" className="hover:underline">
-            Letter helper
+        <p className="text-sm">
+          <Link
+            href="/letters"
+            className="font-medium text-muted-foreground transition-colors hover:text-primary"
+          >
+            ← Letter helper
           </Link>
         </p>
-        <h1 className="text-3xl font-bold">{letter.title_de}</h1>
+        <h1 className="text-3xl font-extrabold tracking-tight md:text-4xl">
+          {letter.title_de}
+        </h1>
         <p className="text-lg text-muted-foreground">
           {letter.title_en}
           {letter.sender ? ` · sent by ${letter.sender}` : ""}
         </p>
         {letter.urgency !== "info" && (
-          <p className="inline-flex items-center gap-1.5 rounded-md bg-amber-100 px-3 py-1 text-sm font-medium text-amber-900 dark:bg-amber-950 dark:text-amber-200">
+          <StatusBadge
+            tone={letter.urgency === "urgent" ? "danger" : "warning"}
+            className="mt-1 px-3 py-1 text-sm"
+          >
             {letter.urgency === "urgent" && (
               <TriangleAlert className="h-4 w-4" aria-hidden="true" />
             )}
             {letter.urgency === "urgent" ? "Urgent — act quickly" : "Action needed"}
             {letter.deadline_note ? ` — ${letter.deadline_note}` : ""}
-          </p>
+          </StatusBadge>
         )}
       </div>
 
       {letter.looks_like_md && (
-        <section className="space-y-2 rounded-lg border bg-muted/40 p-4 text-sm">
+        <section className="space-y-2 rounded-2xl border border-border bg-secondary/40 p-5 text-sm">
           <h2 className="font-medium">How to recognize it</h2>
           <Markdown>{letter.looks_like_md}</Markdown>
         </section>

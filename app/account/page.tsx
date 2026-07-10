@@ -24,14 +24,19 @@ export default async function AccountPage() {
     <div className="mx-auto max-w-2xl space-y-8">
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-2xl font-bold">Your progress</h1>
+          <span className="text-xs font-semibold uppercase tracking-[0.2em] text-muted-foreground">
+            Your account
+          </span>
+          <h1 className="text-3xl font-extrabold tracking-tight">
+            Your progress
+          </h1>
           <p className="text-sm text-muted-foreground">{user.email}</p>
         </div>
         <SignOutButton />
       </div>
 
       {!progress?.length ? (
-        <p className="rounded-md border bg-muted/40 p-6 text-center text-sm text-muted-foreground">
+        <p className="rounded-2xl border border-border bg-secondary/40 p-6 text-center text-sm text-muted-foreground">
           No synced checklists yet. Open any task guide in your city and start
           ticking steps — progress saves automatically while you are signed in.
         </p>
@@ -44,7 +49,7 @@ export default async function AccountPage() {
               <li key={row.id}>
                 <Link
                   href={`/germany/${row.cities?.slug}/${row.tasks?.slug}`}
-                  className="flex items-center justify-between rounded-lg border bg-card p-4 hover:bg-accent"
+                  className="flex items-center justify-between rounded-2xl border border-border bg-card p-5 transition-colors hover:border-primary/40 hover:bg-secondary/40"
                 >
                   <span>
                     <span className="font-medium">{row.tasks?.title_en}</span>{" "}

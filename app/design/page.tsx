@@ -15,13 +15,13 @@ import {
    and dark, so we can judge the system before building real screens. */
 
 const SWATCHES: { name: string; cls: string; light: string; dark: string }[] = [
-  { name: "surface", cls: "bg-gg-surface", light: "#F5F7FB", dark: "#0E1421" },
-  { name: "card", cls: "bg-gg-card", light: "#FFFFFF", dark: "#161F30" },
-  { name: "ink", cls: "bg-gg-ink", light: "#171E2E", dark: "#E7ECF5" },
-  { name: "muted", cls: "bg-gg-muted", light: "#586074", dark: "#95A1B6" },
-  { name: "border", cls: "bg-gg-border", light: "#E3E8F0", dark: "#28324A" },
-  { name: "brand", cls: "bg-gg-brand", light: "#2547CC", dark: "#3D62F0" },
-  { name: "brand-soft", cls: "bg-gg-brand-soft", light: "#E9EEFC", dark: "#1B2540" },
+  { name: "surface", cls: "bg-gg-surface", light: "#F8F4EC", dark: "#14100E" },
+  { name: "card", cls: "bg-gg-card", light: "#FFFDF9", dark: "#1C1815" },
+  { name: "ink", cls: "bg-gg-ink", light: "#201A16", dark: "#EFE7D8" },
+  { name: "muted", cls: "bg-gg-muted", light: "#6E665C", dark: "#A89E8E" },
+  { name: "border", cls: "bg-gg-border", light: "#E4DDCE", dark: "#2E2822" },
+  { name: "brand", cls: "bg-gg-brand", light: "#B42233", dark: "#D43F52" },
+  { name: "brand-soft", cls: "bg-gg-brand-soft", light: "#F6E5E3", dark: "#3A1F22" },
   { name: "progress", cls: "bg-gg-progress", light: "#128A50", dark: "#34C27E" },
   { name: "amber-ui", cls: "bg-gg-amber-ui", light: "#B7791F", dark: "#E8B44D" },
   { name: "teal", cls: "bg-gg-teal", light: "#0B7A73", dark: "#25B5AC" },

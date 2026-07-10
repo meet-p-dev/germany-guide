@@ -59,25 +59,32 @@ export default async function TaskPage({
   return (
     <div className="space-y-8">
       <div className="space-y-2">
-        <p className="text-sm text-muted-foreground">
-          <Link href="/" className="hover:underline">
+        <p className="text-sm">
+          <Link
+            href="/"
+            className="font-medium text-muted-foreground transition-colors hover:text-primary"
+          >
             Home
           </Link>{" "}
-          / {task.task_categories?.name_en}
+          <span className="text-muted-foreground">
+            / {task.task_categories?.name_en}
+          </span>
         </p>
-        <h1 className="text-3xl font-bold">
+        <h1 className="text-3xl font-extrabold tracking-tight md:text-4xl">
           {task.title_en}{" "}
           <span className="text-xl font-normal text-muted-foreground">
             ({task.title_de})
           </span>
         </h1>
         {task.summary && (
-          <p className="max-w-2xl text-muted-foreground">{task.summary}</p>
+          <p className="max-w-2xl text-lg text-muted-foreground">
+            {task.summary}
+          </p>
         )}
       </div>
 
-      <div className="rounded-lg border bg-muted/40 p-4 text-sm">
-        <p className="mb-2 font-medium">
+      <div className="rounded-2xl border border-border bg-secondary/40 p-5 text-sm">
+        <p className="mb-2 font-semibold">
           Rules differ by city — see your local version:
         </p>
         <div className="flex flex-wrap gap-2">
@@ -85,7 +92,7 @@ export default async function TaskPage({
             <Link
               key={city.slug}
               href={`/germany/${city.slug}/${task.slug}`}
-              className="rounded-full border bg-background px-3 py-1 hover:bg-accent"
+              className="rounded-full border border-border bg-card px-3 py-1 font-medium transition-colors hover:border-primary/40 hover:bg-secondary/60"
             >
               {city.name_en}
             </Link>
@@ -98,10 +105,11 @@ export default async function TaskPage({
       {task.slug === "anmeldung" && (
         <Link
           href="/tools/anmeldung-deadline"
-          className="block rounded-lg border bg-muted/40 p-4 text-sm hover:bg-accent"
+          className="flex items-center justify-between gap-3 rounded-2xl border border-border bg-card p-5 text-sm font-semibold transition-colors hover:border-primary/40 hover:bg-secondary/40"
         >
-          <span className="font-medium underline">
-            Anmeldung deadline calculator — when must you register? →
+          <span>Anmeldung deadline calculator — when must you register?</span>
+          <span className="text-primary" aria-hidden="true">
+            →
           </span>
         </Link>
       )}
@@ -109,10 +117,11 @@ export default async function TaskPage({
       {getCompareTopic(task.slug) && (
         <Link
           href={`/compare/${task.slug}`}
-          className="block rounded-lg border bg-muted/40 p-4 text-sm hover:bg-accent"
+          className="flex items-center justify-between gap-3 rounded-2xl border border-border bg-card p-5 text-sm font-semibold transition-colors hover:border-primary/40 hover:bg-secondary/40"
         >
-          <span className="font-medium underline">
-            Compare providers for {task.title_en.toLowerCase()} →
+          <span>Compare providers for {task.title_en.toLowerCase()}</span>
+          <span className="text-primary" aria-hidden="true">
+            →
           </span>
         </Link>
       )}

@@ -37,7 +37,7 @@ export async function RelatedContent({ taskId }: { taskId: string }) {
               <Link
                 key={g.slug}
                 href={`/glossary/${g.slug}`}
-                className="rounded-full border px-3 py-1 text-sm text-muted-foreground hover:bg-accent hover:text-foreground"
+                className="rounded-full border border-border px-3 py-1 text-sm text-muted-foreground transition-colors hover:border-primary/40 hover:bg-secondary/60 hover:text-foreground"
                 title={g.term_en}
               >
                 {g.term_de}
