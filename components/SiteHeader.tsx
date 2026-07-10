@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { Search } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { ModeToggle } from "@/components/ModeToggle";
 import { MobileNav } from "@/components/MobileNav";
@@ -43,6 +44,17 @@ export function SiteHeader() {
         </div>
 
         <div className="flex items-center gap-1.5 md:gap-2">
+          <Button
+            asChild
+            variant="ghost"
+            size="icon"
+            className="rounded-full"
+            aria-label="Search"
+          >
+            <Link href="/search">
+              <Search className="h-4 w-4" />
+            </Link>
+          </Button>
           <ModeToggle />
           <div className="hidden items-center gap-2 md:flex">
             <AuthButton />

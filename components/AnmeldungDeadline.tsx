@@ -31,7 +31,7 @@ export function AnmeldungDeadline() {
   }
 
   return (
-    <div className="space-y-4 rounded-lg border p-5">
+    <div className="space-y-4 rounded-2xl border border-border bg-card p-5">
       <label className="block space-y-1.5">
         <span className="text-sm font-medium">
           When did you move into your German home?
@@ -45,7 +45,7 @@ export function AnmeldungDeadline() {
       </label>
 
       {deadline && (
-        <div className="space-y-2 rounded-md bg-muted/50 p-4">
+        <div className="space-y-2 rounded-xl bg-secondary/50 p-4">
           <p className="flex items-center gap-2 text-sm text-muted-foreground">
             <CalendarClock className="h-4 w-4" aria-hidden="true" />
             Register (Anmeldung) by:
@@ -55,9 +55,9 @@ export function AnmeldungDeadline() {
             <p
               className={
                 daysLeft < 0
-                  ? "flex items-center gap-1.5 text-sm font-medium text-red-600"
+                  ? "flex items-center gap-1.5 text-sm font-medium text-gg-brand"
                   : daysLeft <= 3
-                    ? "flex items-center gap-1.5 text-sm font-medium text-amber-600"
+                    ? "flex items-center gap-1.5 text-sm font-medium text-gg-amber-ui"
                     : "text-sm text-muted-foreground"
               }
             >

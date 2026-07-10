@@ -13,9 +13,9 @@ export const metadata: Metadata = {
 export default async function ExplorePage({
   searchParams,
 }: {
-  searchParams: Promise<{ city?: string }>;
+  searchParams: Promise<{ city?: string; persona?: string }>;
 }) {
-  const { city: initialCity } = await searchParams;
+  const { city: initialCity, persona: initialPersona } = await searchParams;
   const states = await getStatesWithCities();
 
   const cities: WizardCity[] = states
@@ -41,7 +41,11 @@ export default async function ExplorePage({
         </p>
       </div>
       <div className="mt-10">
-        <JourneySetup cities={cities} initialCity={initialCity} />
+        <JourneySetup
+          cities={cities}
+          initialCity={initialCity}
+          initialPersona={initialPersona}
+        />
       </div>
     </div>
   );

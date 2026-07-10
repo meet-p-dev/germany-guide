@@ -18,7 +18,7 @@ const MODE_STYLES = {
   "walk-in": {
     icon: Footprints,
     label: "Walk-in possible",
-    cls: "bg-emerald-100 text-emerald-800 border-emerald-300 dark:bg-emerald-950 dark:text-emerald-300 dark:border-emerald-800",
+    cls: "bg-gg-progress-soft text-gg-progress-text border-transparent",
   },
   appointment: {
     icon: CalendarClock,

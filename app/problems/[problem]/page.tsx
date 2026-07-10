@@ -2,6 +2,7 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import type { Metadata } from "next";
 import { Badge } from "@/components/ui/badge";
+import { StatusBadge, type StatusTone } from "@/components/ui/StatusBadge";
 import { Disclaimer, FreshnessNote } from "@/components/Disclaimer";
 import { Markdown } from "@/components/Markdown";
 import {
@@ -12,20 +13,11 @@ import {
 
 export const revalidate = 3600;
 
-const EFFECTIVENESS_LABEL: Record<string, { label: string; className: string }> =
+const EFFECTIVENESS_LABEL: Record<string, { label: string; tone: StatusTone }> =
   {
-    official: {
-      label: "Official route",
-      className: "bg-green-100 text-green-800 dark:bg-green-950 dark:text-green-300",
-    },
-    workaround: {
-      label: "Workaround",
-      className: "bg-amber-100 text-amber-800 dark:bg-amber-950 dark:text-amber-300",
-    },
-    "last-resort": {
-      label: "Last resort",
-      className: "bg-red-100 text-red-800 dark:bg-red-950 dark:text-red-300",
-    },
+    official: { label: "Official route", tone: "success" },
+    workaround: { label: "Workaround", tone: "warning" },
+    "last-resort": { label: "Last resort", tone: "danger" },
   };
 
 export async function generateStaticParams() {
@@ -84,19 +76,24 @@ export default async function ProblemPage({
         dangerouslySetInnerHTML={{ __html: JSON.stringify(faqJsonLd) }}
       />
       <div className="space-y-2">
-        <p className="text-sm text-muted-foreground">
-          <Link href="/problems" className="hover:underline">
-            Problems &amp; solutions
+        <p className="text-sm">
+          <Link
+            href="/problems"
+            className="font-medium text-muted-foreground transition-colors hover:text-primary"
+          >
+            ← Problems &amp; solutions
           </Link>
         </p>
-        <h1 className="text-3xl font-bold">{problem.title_en}</h1>
+        <h1 className="text-3xl font-extrabold tracking-tight md:text-4xl">
+          {problem.title_en}
+        </h1>
         {relatedTasks.length > 0 && (
-          <div className="flex flex-wrap gap-2 text-sm">
+          <div className="flex flex-wrap gap-2 pt-1 text-sm">
             {relatedTasks.map((t) => (
               <Link
                 key={t.slug}
                 href={`/tasks/${t.slug}`}
-                className="rounded-full border px-3 py-1 hover:bg-accent"
+                className="rounded-full border border-border px-3 py-1 font-medium transition-colors hover:border-primary/40 hover:bg-secondary/60"
               >
                 {t.title_en} ({t.title_de})
               </Link>
@@ -116,17 +113,11 @@ export default async function ProblemPage({
           return (
             <div
               key={solution.id}
-              className="space-y-2 rounded-lg border bg-card p-4"
+              className="space-y-2 rounded-2xl border border-border bg-card p-5"
             >
               <div className="flex flex-wrap items-center gap-2">
-                <h3 className="font-medium">{solution.title_en}</h3>
-                {eff && (
-                  <span
-                    className={`rounded-full px-2 py-0.5 text-xs ${eff.className}`}
-                  >
-                    {eff.label}
-                  </span>
-                )}
+                <h3 className="font-semibold">{solution.title_en}</h3>
+                {eff && <StatusBadge tone={eff.tone}>{eff.label}</StatusBadge>}
                 {solution.cities && (
                   <Badge variant="secondary">
                     {solution.cities.name_en} only

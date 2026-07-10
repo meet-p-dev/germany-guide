@@ -43,19 +43,24 @@ export default async function GlossaryTermPage({
 
   return (
     <div className="mx-auto max-w-2xl space-y-6">
-      <p className="text-sm text-muted-foreground">
-        <Link href="/glossary" className="hover:underline">
-          Glossary
+      <p className="text-sm">
+        <Link
+          href="/glossary"
+          className="font-medium text-muted-foreground transition-colors hover:text-primary"
+        >
+          ← Glossary
         </Link>
       </p>
       <div className="space-y-1">
-        <h1 className="text-3xl font-bold">{term.term_de}</h1>
+        <h1 className="text-3xl font-extrabold tracking-tight md:text-4xl">
+          {term.term_de}
+        </h1>
         <p className="text-lg text-muted-foreground">{term.term_en}</p>
       </div>
       <Markdown>{term.definition_md}</Markdown>
       {relatedTasks.length > 0 && (
         <div className="space-y-2">
-          <h2 className="text-sm font-medium text-muted-foreground">
+          <h2 className="text-xs font-semibold uppercase tracking-[0.2em] text-muted-foreground">
             Related guides
           </h2>
           <div className="flex flex-wrap gap-2">
@@ -63,7 +68,7 @@ export default async function GlossaryTermPage({
               <Link
                 key={t.slug}
                 href={`/tasks/${t.slug}`}
-                className="rounded-full border px-3 py-1 text-sm hover:bg-accent"
+                className="rounded-full border border-border px-3 py-1 text-sm font-medium transition-colors hover:border-primary/40 hover:bg-secondary/60"
               >
                 {t.title_en} ({t.title_de})
               </Link>

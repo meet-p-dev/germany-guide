@@ -21,13 +21,18 @@ const CITY_COMPARISONS = [
 export default function CompareIndexPage() {
   return (
     <div className="space-y-8">
-      <div className="space-y-2">
-        <h1 className="text-3xl font-bold">Compare</h1>
-        <p className="max-w-2xl text-muted-foreground">
+      <header className="space-y-2">
+        <span className="text-xs font-semibold uppercase tracking-[0.2em] text-muted-foreground">
+          Compare
+        </span>
+        <h1 className="text-3xl font-extrabold tracking-tight md:text-4xl">
+          Decide faster, side by side
+        </h1>
+        <p className="max-w-2xl text-lg text-muted-foreground">
           Side-by-side comparisons to help you decide faster — how the same task
           differs from city to city, and which services newcomers actually use.
         </p>
-      </div>
+      </header>
 
       <section className="space-y-3">
         <h2 className="text-xl font-semibold">City by city</h2>
@@ -36,9 +41,9 @@ export default function CompareIndexPage() {
             <Link
               key={c.href}
               href={c.href}
-              className="rounded-lg border bg-card p-4 transition-colors hover:bg-accent"
+              className="rounded-2xl border border-border bg-card p-5 transition-colors hover:border-primary/40 hover:bg-secondary/40"
             >
-              <p className="font-medium">{c.title}</p>
+              <p className="font-semibold">{c.title}</p>
               <p className="mt-1 text-sm text-muted-foreground">{c.blurb}</p>
             </Link>
           ))}
@@ -52,9 +57,9 @@ export default function CompareIndexPage() {
             <Link
               key={t.slug}
               href={`/compare/${t.slug}`}
-              className="rounded-lg border bg-card p-4 transition-colors hover:bg-accent"
+              className="rounded-2xl border border-border bg-card p-5 transition-colors hover:border-primary/40 hover:bg-secondary/40"
             >
-              <p className="font-medium">{t.h1}</p>
+              <p className="font-semibold">{t.h1}</p>
               <p className="mt-1 text-sm text-muted-foreground">
                 {t.description}
               </p>

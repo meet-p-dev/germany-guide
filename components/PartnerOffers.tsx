@@ -27,7 +27,7 @@ export async function PartnerOffers({ taskSlug }: { taskSlug: string }) {
                 ? "sponsored nofollow noopener noreferrer"
                 : "noopener noreferrer"
             }
-            className="group flex flex-col rounded-lg border p-4 transition-colors hover:bg-accent"
+            className="group flex flex-col rounded-2xl border border-border bg-card p-5 transition-colors hover:border-primary/40 hover:bg-secondary/40"
           >
             <div className="flex items-center gap-2">
               <span className="font-medium">{offer.name}</span>

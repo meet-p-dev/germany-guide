@@ -3,7 +3,7 @@
 import { useEffect, useMemo, useState } from "react";
 import Link from "next/link";
 import { motion } from "framer-motion";
-import { Check, ArrowRight, MapPin, Pencil } from "lucide-react";
+import { Check, ArrowRight, MapPin, Pencil, Compass } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 
@@ -113,6 +113,23 @@ export function RoadmapView({
           >
             <Link href="/explore">
               <Pencil className="h-4 w-4" /> Change situation / city
+            </Link>
+          </Button>
+        </div>
+
+        {/* Bridge into the guided engine: one step at a time (the /quiz →
+            /dashboard flow). Keeps both plan views connected — no dead-ends. */}
+        <div className="mt-4 rounded-2xl border border-border bg-secondary/40 p-5">
+          <p className="text-sm font-semibold">Prefer one step at a time?</p>
+          <p className="mt-1 text-sm text-muted-foreground">
+            Guided mode folds the whole plan away and shows just your next step.
+          </p>
+          <Button
+            asChild
+            className="mt-4 w-full gap-2 rounded-full font-semibold"
+          >
+            <Link href={`/quiz?persona=${persona}`}>
+              <Compass className="h-4 w-4" /> Switch to guided mode
             </Link>
           </Button>
         </div>

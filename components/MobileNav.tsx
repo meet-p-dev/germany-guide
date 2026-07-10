@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import Link from "next/link";
-import { Menu, X } from "lucide-react";
+import { Menu, X, Search } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { NAV } from "@/lib/nav";
 
@@ -47,6 +47,13 @@ export function MobileNav() {
                   <Icon className="h-4 w-4 text-muted-foreground" /> {label}
                 </Link>
               ))}
+              <Link
+                href="/search"
+                onClick={() => setOpen(false)}
+                className="flex items-center gap-3 rounded-xl px-3 py-2.5 font-semibold hover:bg-secondary"
+              >
+                <Search className="h-4 w-4 text-muted-foreground" /> Search
+              </Link>
               <div className="mt-2 flex flex-col gap-2 border-t border-border/60 pt-3">
                 <Button
                   asChild

@@ -61,7 +61,7 @@ export default async function ComparePage({
           {t.criteria.map((c) => (
             <li key={c} className="flex gap-2 text-sm">
               <Check
-                className="mt-0.5 h-4 w-4 shrink-0 text-green-600"
+                className="mt-0.5 h-4 w-4 shrink-0 text-gg-progress"
                 aria-hidden="true"
               />
               <span>{c}</span>
