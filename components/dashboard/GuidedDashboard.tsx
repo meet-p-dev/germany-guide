@@ -13,8 +13,10 @@ import {
 } from "@/lib/quiz";
 import {
   clampCursor,
+  flattenJourney,
   flattenPlan,
   percentSettled,
+  phaseCount,
   progressKey,
   seedCursor,
   type FlatStep,
@@ -29,6 +31,14 @@ type Task = {
   audience: string[] | null;
 };
 type Category = { id: string; slug: string; name_en: string; tasks: Task[] };
+type JourneyPhase = { slug: string; name_en: string; sort_order: number };
+type JourneyStep = {
+  task: Task | null;
+  phase: string;
+  phase_order: number;
+  note_md: string | null;
+  parallelSlugs: string[];
+};
 
 const QUIZ_KEY = "gg-quiz-v1"; // written by the quiz (Increment 3)
 const PROGRESS_KEY = "gg-progress-v1"; // guided-mode cursor (Increment 4)
@@ -41,14 +51,31 @@ export function GuidedDashboard({
   categories,
   cities,
   glossary,
+  journeyPhases = [],
+  journeySteps = [],
 }: {
   categories: Category[];
   cities: { slug: string; label: string }[];
   glossary: GlossaryEntry[];
+  journeyPhases?: JourneyPhase[];
+  journeySteps?: JourneyStep[];
 }) {
   const [answers, setAnswers] = React.useState<QuizAnswers | null>(null);
   const [cursor, setCursor] = React.useState(0);
   const [hydrated, setHydrated] = React.useState(false);
+
+  // Journey ordering exists only for the STUDENT persona today; every other
+  // persona has no journey rows and keeps the category-based path (degrade
+  // gracefully). buildSteps chooses the source per the current answers.
+  const buildSteps = React.useCallback(
+    (a: QuizAnswers): FlatStep<Task>[] => {
+      if (a.persona === "student" && journeySteps.length > 0) {
+        return flattenJourney<Task>(journeyPhases, journeySteps);
+      }
+      return flattenPlan(assemblePlan(categories, a));
+    },
+    [categories, journeyPhases, journeySteps]
+  );
 
   // Read the plan the quiz saved (session-only), then restore any saved
   // guided-mode progress; otherwise seed the cursor from "where are you now".
@@ -61,7 +88,7 @@ export function GuidedDashboard({
     } catch {}
 
     if (a) {
-      const steps = flattenPlan(assemblePlan(categories, a));
+      const steps = buildSteps(a);
       let c = seedCursor(steps, a.stage ?? 1);
       try {
         const rawP = localStorage.getItem(PROGRESS_KEY);
@@ -90,8 +117,8 @@ export function GuidedDashboard({
   }, [cursor, hydrated, answers]);
 
   const steps = React.useMemo<FlatStep<Task>[]>(
-    () => (answers ? flattenPlan(assemblePlan(categories, answers)) : []),
-    [answers, categories]
+    () => (answers ? buildSteps(answers) : []),
+    [answers, buildSteps]
   );
 
   // Avoid a flash of the empty state before sessionStorage is read.
@@ -104,12 +131,25 @@ export function GuidedDashboard({
     return <NoPlan />;
   }
 
+  const journeyMode = answers.persona === "student" && journeySteps.length > 0;
   const total = steps.length;
   const clamped = clampCursor(cursor, total);
   const done = steps.slice(0, clamped);
   const current = clamped < total ? steps[clamped] : null;
   const locked = steps.slice(clamped + 1);
-  const stageNow = current?.stageIndex ?? 6;
+  // Stage count: real phase count in journey mode, else the fixed six stages.
+  const totalStages = journeyMode ? phaseCount(steps) || 5 : 6;
+  const stageNow = current?.stageIndex ?? totalStages;
+
+  // Honest "around the same time" hint for the current journey step: name the
+  // parallel tasks the user can tackle concurrently (title lookup by slug).
+  const titleBySlug = new Map(steps.map((s) => [s.task.slug, s.task.title_en]));
+  const parallelLabel =
+    current?.parallelWith && current.parallelWith.length > 0
+      ? `Can be done around the same time as ${current.parallelWith
+          .map((slug) => titleBySlug.get(slug) ?? slug)
+          .join(", ")} — not a strict order.`
+      : null;
 
   const personaLabel =
     Q1_PERSONA.find((o) => o.value === answers.persona)?.label ?? "newcomer";
@@ -138,7 +178,7 @@ export function GuidedDashboard({
       <div className="mb-7">
         <ProgressBar
           stage={stageNow}
-          total={6}
+          total={totalStages}
           percent={percentSettled(clamped, total)}
         />
       </div>
@@ -183,6 +223,8 @@ export function GuidedDashboard({
             citySlug={answers.city ?? null}
             glossary={glossary}
             onMarkDone={markDone}
+            journeyNote={journeyMode ? current.note : null}
+            parallelLabel={journeyMode ? parallelLabel : null}
           />
         </section>
       ) : (

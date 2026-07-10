@@ -62,6 +62,7 @@ insert into tasks (category_id, slug, title_en, title_de, summary, audience, sor
   ((select id from task_categories where slug = 'money'), 'bank-account', 'Opening a bank account', 'Girokonto eröffnen', 'Open a current account (Girokonto) — needed for rent, salary and insurance payments.', '{student,worker,refugee,eu,non-eu,family}', 1),
   ((select id from task_categories where slug = 'money'), 'blocked-account', 'Blocked account', 'Sperrkonto', 'The blocked account many students and jobseekers need as proof of financial means, and how to access the money.', '{student,non-eu}', 2),
   ((select id from task_categories where slug = 'money'), 'tax-id', 'Tax ID & tax class', 'Steuer-ID & Steuerklasse', 'Your tax identification number arrives automatically after Anmeldung; your tax class decides your monthly net salary.', '{student,worker,eu,non-eu,family}', 3),
+  ((select id from task_categories where slug = 'health'), 'health-insurance-provisional', 'Provisional health insurance (incoming/travel cover)', 'Vorläufige Krankenversicherung (Incoming-Versicherung)', 'The temporary travel/incoming health policy most non-EU students buy before their visa — often bundled with the blocked account — and what happens to it after you arrive.', '{student,non-eu}', 0),
   ((select id from task_categories where slug = 'health'), 'health-insurance', 'Health insurance', 'Krankenversicherung', 'Health insurance is mandatory. Understand public (gesetzlich) vs private (privat) before you sign anything.', '{student,worker,refugee,eu,non-eu,family}', 1),
   ((select id from task_categories where slug = 'daily-life'), 'rundfunkbeitrag', 'Broadcasting fee', 'Rundfunkbeitrag', 'Every household pays the broadcasting fee (formerly "GEZ") — one payment per flat, not per person.', '{student,worker,refugee,eu,non-eu,family}', 1),
   ((select id from task_categories where slug = 'daily-life'), 'schufa', 'SCHUFA credit record', 'SCHUFA', 'Germany''s credit score. Landlords ask for it; you can get a free copy once a year.', '{student,worker,eu,non-eu,family}', 2),
@@ -360,22 +361,29 @@ on conflict (guide_id, step_no) do update set title_en=excluded.title_en, body_m
 insert into guides (task_id, intro_md, documents_md, after_md, legal_basis, status, sources, last_verified_at, generated_by, reviewed_by)
 values (
   (select id from tasks where slug = 'visa-conversion'),
-  $$If you entered Germany with a national **entry visa (nationales Visum, Kategorie D)** for work, study or family reasons, that visa is itself a temporary residence title — but it usually expires within a few months to a year. Before it runs out, you must apply at your local **Ausländerbehörde** to convert it into a full residence permit for your registered address.
+  $$If you entered Germany on a **national D-visa** (for study, work, family, etc.), that visa is only the entry document. Before it expires you must **convert it into a residence permit (Aufenthaltstitel)** — an electronic card (eAT) — at your local **Ausländerbehörde**. This is the **same immigration office** that handles your later extensions, so the process and the office are the same across all four immigration tasks.
 
-This step is often confused with the visa application itself, but it happens **inside Germany**, after you've moved and completed your Anmeldung — not at a consulate abroad.
+**The sequence:**
+1. **Register your address (Anmeldung)** first — your address determines which Ausländerbehörde is responsible for you.
+2. **Apply for the residence permit before your D-visa expires.** Your visa **sticker states its own expiry date** — apply before that date.
+3. If you apply on time but the office cannot decide immediately, **§81 AufenthG** protects you: you typically receive a **Fiktionsbescheinigung** that bridges your legal stay until the decision.
 
-Start the process well before your visa expires; appointment availability is the main bottleneck in most cities.$$,
-  $$- Passport with the entry visa
-- Anmeldebestätigung for your current address
-- Proof of health insurance
-- Proof of financial means for your purpose (employment contract, blocked account, scholarship)
+**Timing reality:** the bottleneck is almost always **appointment backlogs**, not the paperwork. **Start looking for an appointment as soon as you register.** D-visa validity and processing times vary by consulate and office, so do not rely on a fixed lead-time — book the earliest appointment you can and apply before your visa's printed expiry.$$,
+  $$- Valid passport with your **D-visa**
+- **Anmeldebestätigung** (proof of registered address)
 - Biometric passport photo
-- Completed application form$$,
-  $$Once approved, your visa sticker is replaced by an **eAT card** valid for your permit's specific duration and purpose. From here on, renewals follow the same process as any other residence permit.$$,
-  null,
+- Proof for your specific purpose (enrolment certificate, employment contract + Blue Card/skilled-worker criteria, marriage certificate, etc.)
+- Proof of health insurance
+- Proof of financial means where required (e.g. blocked account for students)
+- The application form (Antrag auf Erteilung eines Aufenthaltstitels)
+- The fee (varies by permit type under the AufenthV)
+
+*Which documents you need for your national (D) visa application depends on your nationality and is decided by the specific German embassy or consulate responsible for your country — look yours up on the [Federal Foreign Office's official mission finder](https://www.auswaertiges-amt.de/en/about-us/auslandsvertretungen/deutsche-auslandsvertretungen) and follow that mission's own document checklist, since requirements are not the same for every country.*$$,
+  $$If the office cannot issue the eAT card on the spot, you usually get a **Fiktionsbescheinigung** confirming your stay remains legal while they decide — check which paragraph is ticked, as it governs whether you may keep working and travelling. The **eAT card** itself is produced centrally and arrives within a few weeks; you collect it at the office. Keep an eye on your Fiktionsbescheinigung's expiry and contact the office proactively if a decision is running late.$$,
+  '§6 Abs. 3, §81 Aufenthaltsgesetz (AufenthG); Aufenthaltsverordnung (AufenthV) — fees',
   'published',
-  '[{"url": "https://www.make-it-in-germany.com", "title": "Make it in Germany — official skilled worker portal", "accessed_at": "2026-07-02"}, {"url": "https://www.auswaertiges-amt.de", "title": "Federal Foreign Office — visa information", "accessed_at": "2026-07-02"}]'::jsonb,
-  '2026-07-02', 'hand-written', 'patelmeet.2905@gmail.com'
+  '[{"url": "https://www.gesetze-im-internet.de/aufenthg_2004/__81.html", "title": "§81 AufenthG — application for a residence title (Fiktion protection)", "accessed_at": "2026-07-05"}, {"url": "https://www.make-it-in-germany.com/en/visa-residence/types/residence-permit", "title": "Make it in Germany — from national visa to residence permit", "accessed_at": "2026-07-05"}]'::jsonb,
+  '2026-07-05', 'hand-written', 'patelmeet.2905@gmail.com'
 ) on conflict (task_id, locale) do update set intro_md=excluded.intro_md, documents_md=excluded.documents_md, after_md=excluded.after_md, legal_basis=excluded.legal_basis, status=excluded.status, sources=excluded.sources, last_verified_at=excluded.last_verified_at;
 
 insert into checklist_steps (guide_id, step_no, title_en, body_md, doc_names, is_optional)
@@ -521,20 +529,37 @@ on conflict (guide_id, step_no) do update set title_en=excluded.title_en, body_m
 insert into guides (task_id, intro_md, documents_md, after_md, legal_basis, status, sources, last_verified_at, generated_by, reviewed_by)
 values (
   (select id from tasks where slug = 'health-insurance'),
-  $$Health insurance is **mandatory** for everyone living in Germany, from day one. You choose between **public insurance (gesetzliche Krankenversicherung / GKV)** — income-based contributions, standardized benefits, open to almost everyone — and **private insurance (private Krankenversicherung / PKV)** — risk-based pricing, available mainly to high earners, the self-employed, and civil servants.
+  $$Health insurance is **mandatory** for everyone living in Germany, and the framework is **federal (SGB V) — the same nationwide**, so there are no city-specific rules here. There are two systems:
 
-Most employees, students and job seekers are best served by public insurance. Private insurance is cheaper when young and healthy but gets significantly more expensive with age, and switching back to public later is often difficult or impossible — think carefully before choosing private, especially as a student.
+- **Statutory / public (GKV — gesetzliche Krankenversicherung):** the default for most employees and all students. Contributions are income-based; family members can often be co-insured for free. Examples: TK, AOK, Barmer, DAK. **TK** is popular with internationals for its English-language app and service.
+- **Private (PKV — private Krankenversicherung):** available to the self-employed, civil servants, and employees earning **above the compulsory-insurance threshold (Versicherungspflichtgrenze / JAEG)**, which for **2026 is €77,400 per year (€6,450 per month)** — up from €73,800 in 2025. Below that line, employees are in the GKV.
 
-Major public insurers include TK, AOK, Barmer and DAK — benefits are nearly identical by law; differences are mainly in service and optional extras.$$,
-  $$- Passport
-- Anmeldebestätigung
-- Enrollment letter (students) or employment contract (workers)
-- Proof of income, for self-employed applicants$$,
-  $$You receive a **Krankenversicherungskarte** (insurance card) by post, and a membership certificate (Mitgliedsbescheinigung) that your employer or university will ask for. Keep the certificate — you'll need to show it repeatedly.$$,
+**About "regional" insurers:** AOK is a federation of about a dozen **independent regional (state-level) insurers**, each with its own additional contribution (Zusatzbeitrag). This is a **state-level** difference, **not** a reason to expect city-by-city variation — you can join a GKV insurer regardless of where in Germany you live.
+
+**Students:** if you are under 30 / within the standard study period, you pay the reduced **student GKV rate — roughly €120–140 per month** (revised annually; the exact figure and each insurer's Zusatzbeitrag change over time). Over 30 or beyond the standard period, you may need a voluntary or private plan.$$,
+  $$- Valid passport / ID and your Anmeldebestätigung
+- Your **Steuer-ID** (add it as soon as you have it)
+- Enrolment certificate (students) or employment contract (employees)
+- German bank account (IBAN) for the contribution direct debit
+- Your insurer will issue a membership confirmation for your employer/university and, later, an **electronic health card (eGK)**$$,
+  $$Your insurer sends a **membership confirmation** — give it to your employer (they register you and split the contribution) or your university (needed to enrol). Your **electronic health card (elektronische Gesundheitskarte / eGK)** arrives by post within a couple of weeks; carry it to every doctor's appointment. You can switch GKV insurers later (usually after a minimum membership period), so it is fine to start with whichever accepts you fastest.
+
+## From provisional to statutory: what actually happens
+
+**If you arrived on a student visa, you likely already have a provisional "incoming" or "travel" policy** — often bundled with your blocked account (see the separate "Provisional health insurance" guide). Based on current 2026 documentation from Expatrio, Fintiba, TK's incoming-insurance partner, and the Krankenkassen themselves (AOK, DAK, BARMER, TK), moving from that provisional cover to statutory (public) insurance is a **switch, not a conversion**: you separately choose and enrol with a public Krankenkasse (TK, AOK, BARMER, DAK, or another) — your provisional policy does not automatically turn into your new one.
+
+**When this happens:** typically triggered by the **start of your studies / university enrolment**, not simply by arriving in Germany — your provisional cover is designed to bridge exactly that gap (often a fixed term of around 90 days; confirm with your provider).
+
+**What to actually do:**
+1. Choose a statutory insurer (see above) — many blocked-account providers have a named partner (e.g. TK via Expatrio, BARMER via Fintiba) that makes this step faster, but you are not obliged to use it.
+2. Register with that insurer, giving your university's details so it can send the required electronic enrolment confirmation directly to the university — most universities need this sent by the insurer, not a paper certificate from you.
+3. Confirm with your provider whether your provisional policy needs anything from you to end it, or simply expires on its own fixed term — check their FAQ or support directly, as this detail is not stated on the public pages we could access.
+
+**Don't leave a gap:** start this before your provisional policy's term runs out — being without valid cover, even briefly, can mean backdated contributions once you do join a Krankenkasse.$$,
   'SGB V (Sozialgesetzbuch V) — gesetzliche Krankenversicherung',
   'published',
-  '[{"url": "https://www.gkv-spitzenverband.de", "title": "GKV-Spitzenverband — umbrella association of public health insurers", "accessed_at": "2026-07-02"}]'::jsonb,
-  '2026-07-02', 'hand-written', 'patelmeet.2905@gmail.com'
+  '[{"url": "https://www.gkv-spitzenverband.de", "title": "GKV-Spitzenverband — statutory health insurance framework", "accessed_at": "2026-07-02"}, {"url": "https://www.tk.de/en", "title": "Techniker Krankenkasse (TK) — English service", "accessed_at": "2026-07-05"}, {"url": "https://www.check24.de/gesetzliche-krankenversicherung/versicherungspflichtgrenze", "title": "Versicherungspflichtgrenze / JAEG 2026 = €77,400", "accessed_at": "2026-07-05"}]'::jsonb,
+  '2026-07-05', 'hand-written', 'patelmeet.2905@gmail.com'
 ) on conflict (task_id, locale) do update set intro_md=excluded.intro_md, documents_md=excluded.documents_md, after_md=excluded.after_md, legal_basis=excluded.legal_basis, status=excluded.status, sources=excluded.sources, last_verified_at=excluded.last_verified_at;
 
 insert into checklist_steps (guide_id, step_no, title_en, body_md, doc_names, is_optional)
@@ -546,6 +571,39 @@ lateral (values
   (3, 'Register with your chosen Krankenkasse', 'Online or in person, using your passport and Anmeldebestätigung.', '{}'::text[], false),
   (4, 'Give your membership certificate to your employer/university', 'Required before your first paycheck or semester enrollment can be finalized.', '{}'::text[], false),
   (5, 'Collect your insurance card', 'Arrives by post; carry it to all doctor and hospital visits.', '{}'::text[], false)
+) as s(step_no, title_en, body_md, doc_names, is_optional)
+on conflict (guide_id, step_no) do update set title_en=excluded.title_en, body_md=excluded.body_md, doc_names=excluded.doc_names, is_optional=excluded.is_optional;
+
+-- health-insurance-provisional (pre-visa incoming/travel cover; verb discipline: SWITCH, not convert)
+insert into guides (task_id, intro_md, documents_md, after_md, legal_basis, status, sources, last_verified_at, generated_by, reviewed_by)
+values (
+  (select id from tasks where slug = 'health-insurance-provisional'),
+  $$Before you can apply for your student visa, you usually need proof of health cover for the trip and the first weeks in Germany. Most non-EU students buy this as a **provisional "incoming" or "travel" health insurance** — frequently bundled together with the blocked account (Sperrkonto) from the same provider (for example Expatrio or Fintiba). It typically covers a fixed window of **around 90 days** (confirm the exact number with your provider — it can vary) from your entry into Germany.
+
+**This is not the same thing as the statutory (public) health insurance you'll need once your studies start.** It exists to satisfy the visa requirement and to cover you before your long-term insurance begins — it is a genuinely temporary product, not a long-term plan. Current provider documentation describes moving on from it as a **separate, new enrolment in a public Krankenkasse (statutory insurer)**, not an automatic upgrade of the same policy — see the "Health insurance" guide's "From provisional to statutory" section for exactly what to do next and when.
+
+**Most universities will not accept this provisional policy as proof of insurance for enrolment (Immatrikulation)** — check your university's own requirement; it usually wants an electronic confirmation sent directly by a statutory insurer instead.$$,
+  $$- Passport (valid, matching your visa application)
+- Your blocked-account provider's onboarding form, if bundled (Expatrio, Fintiba, and others offer this combined)
+- Proof of admission / enrolment offer, if your provider or the embassy asks for it
+- The insurance confirmation certificate the provider issues once you sign up — this is what you submit with your visa application
+
+*Which specific documents your embassy/consulate wants alongside this varies by nationality — check the mission responsible for your country via the [Federal Foreign Office's official mission finder](https://www.auswaertiges-amt.de/en/about-us/auslandsvertretungen/deutsche-auslandsvertretungen).*$$,
+  $$Keep the confirmation certificate with your visa documents. Once you arrive and get closer to enrolling at your university, you'll need to separately register with a statutory (public) Krankenkasse — see the "Health insurance" guide's "From provisional to statutory" section. Don't assume the provisional policy "becomes" your real insurance; budget time to actively complete that separate step before your provisional cover's fixed term (often ~90 days) runs out.$$,
+  $$No dedicated statute for the product itself (it is a private insurance contract); the downstream statutory requirement is **SGB V** (same as `health-insurance`), and the visa health-cover requirement flows from German missions' own visa checklists (which vary by nationality).$$,
+  'published',
+  '[{"url": "https://www.expatrio.com/health-insurance-plus", "title": "Expatrio — Health Insurance Plus", "accessed_at": "2026-07-07"}, {"url": "https://fintiba.com/solutions/plus-blocked-account-health-insurance/", "title": "Fintiba — Plus (blocked account + health insurance)", "accessed_at": "2026-07-07"}, {"url": "https://www.provisit.com/en/provisit-student-tk", "title": "Provisit / DR-WALTER — Provisit Student TK", "accessed_at": "2026-07-07"}, {"url": "https://www.how-to-germany.com/health-insurance/statutory-health-insurance/students/", "title": "How to Germany — statutory health insurance for students", "accessed_at": "2026-07-07"}, {"url": "https://www.aok.de/pk/leistungen/studium-beruf/information-for-international-students/", "title": "AOK — information for international students", "accessed_at": "2026-07-07"}, {"url": "https://www.dak.de/health-insurance-germany-en/international-students_79036", "title": "DAK — health insurance for international students", "accessed_at": "2026-07-07"}]'::jsonb,
+  '2026-07-07', 'content-loop', 'patelmeet.2905@gmail.com'
+) on conflict (task_id, locale) do update set intro_md=excluded.intro_md, documents_md=excluded.documents_md, after_md=excluded.after_md, legal_basis=excluded.legal_basis, status=excluded.status, sources=excluded.sources, last_verified_at=excluded.last_verified_at;
+
+insert into checklist_steps (guide_id, step_no, title_en, body_md, doc_names, is_optional)
+select g.id, s.step_no, s.title_en, s.body_md, s.doc_names, s.is_optional
+from guides g join tasks t on t.id = g.task_id and t.slug = 'health-insurance-provisional',
+lateral (values
+  (1, 'Compare provisional/incoming insurance options', 'Often bundled with your blocked-account provider (e.g. Expatrio, Fintiba) — check what''s included and for how many days.', '{}'::text[], false),
+  (2, 'Buy the policy and get your confirmation certificate', 'Needed for your visa application, alongside your blocked-account confirmation.', '{}'::text[], false),
+  (3, 'Use it for your visa application and the first weeks after arrival', 'This covers you from entry until your statutory insurance begins — it is not meant to last your whole stay.', '{}'::text[], false),
+  (4, 'Start your statutory (public) insurance enrolment before it runs out', 'See the Health insurance guide''s ''From provisional to statutory'' section — this is a separate enrolment, not automatic.', '{}'::text[], false)
 ) as s(step_no, title_en, body_md, doc_names, is_optional)
 on conflict (guide_id, step_no) do update set title_en=excluded.title_en, body_md=excluded.body_md, doc_names=excluded.doc_names, is_optional=excluded.is_optional;
 
@@ -2472,6 +2530,64 @@ insert into support_resources (name, url, category, description, region, source,
 ('Malteser — Medizin für Menschen ohne Krankenversicherung', 'https://www.malteser.de/menschen-ohne-krankenversicherung.html', 'health', 'Malteser (welfare NGO) medical care for people without health insurance. Treatment is provided while preserving anonymity, and an initial examination generally incurs no cost. A locator lists local branches in several German cities.', null, 'Malteser Deutschland — "Medizin für Menschen ohne Krankenversicherung"', '2026-07-06', true),
 ('Hilfetelefon "Gewalt gegen Frauen" — federal 24/7 multilingual helpline', 'https://www.hilfetelefon.de/das-hilfetelefon/', 'family_safety', 'Federal helpline for women experiencing violence — free, anonymous, available 365 days a year around the clock on 116 016, with counselling in 18 languages plus sign language and easy-to-understand German; also chat and email. Operated by the BAFzA (funded by BMFSFJ).', null, 'hilfetelefon.de — "Das Hilfetelefon Gewalt gegen Frauen"', '2026-07-06', true),
 ('Berlin.de — Einwanderung Service hub (Berlin immigration authority)', 'https://www.berlin.de/einwanderung/service/', 'emergency_orientation', 'Official Berlin immigration authority (Landesamt für Einwanderung) service hub — links to newcomer counselling via the LIGA der Wohlfahrtsverbände, IOM return counselling, business immigration service, FAQ and downloadable forms. Free, official.', 'berlin', 'Berlin.de — "Service" (Einwanderung)', '2026-07-06', true);
+
+-- ================================================================
+-- Student chronological journey (migration 0008_student_journey).
+-- Real per-persona time-ordering, distinct from browsing `category`.
+-- `phase_order` is a strictly-increasing GLOBAL rank (1..N) per
+-- (persona, locale) — a total linear order the dashboard cursor walks.
+-- `phase` is only the display grouping; genuinely-parallel tasks get
+-- distinct consecutive phase_order values AND are linked via
+-- runs_parallel_with (slug-subselects here, for portability).
+-- ================================================================
+
+-- ---------------------------------------------------------------- journey_phases
+insert into journey_phases (slug, name_en, sort_order) values
+  ('pre-arrival', 'Before you arrive', 1),
+  ('arrival', 'Arrival', 2),
+  ('first-weeks', 'Your first weeks', 3),
+  ('settling-in', 'Settling in', 4),
+  ('ongoing', 'Ongoing', 5)
+on conflict (slug) do update set name_en = excluded.name_en, sort_order = excluded.sort_order;
+
+-- ---------------------------------------------------------------- student_journey_steps
+-- runs_parallel_with resolved from slugs → task ids at load time (portable).
+insert into student_journey_steps (persona, task_id, phase, phase_order, runs_parallel_with, note_md, locale)
+select
+  'student',
+  (select id from tasks where slug = s.task_slug),
+  s.phase,
+  s.phase_order,
+  coalesce((select array_agg(t2.id) from tasks t2 where t2.slug = any(s.parallel_slugs)), '{}'::uuid[]),
+  s.note_md,
+  'en'
+from (values
+  ('blocked-account', 'pre-arrival', 1, array['health-insurance-provisional'],
+    'Usually bundled with the same provider (e.g. Expatrio, Fintiba) — done together, not sequentially.'),
+  ('health-insurance-provisional', 'pre-arrival', 2, array['blocked-account'],
+    'Bundled with the blocked account for most students — see that guide too.'),
+  ('anmeldung', 'arrival', 3, array[]::text[],
+    'Do this first — your address determines your Ausländerbehörde and gates almost every later step.'),
+  ('bank-account', 'first-weeks', 4, array['tax-id','health-insurance','visa-conversion','rundfunkbeitrag'],
+    'These typically unlock once you have a registered address and can be done in roughly any order / in parallel — not a forced chain.'),
+  ('tax-id', 'first-weeks', 5, array['bank-account','health-insurance','visa-conversion','rundfunkbeitrag'],
+    'Arrives automatically by post 2–4 weeks after Anmeldung — largely passive, runs alongside the others.'),
+  ('health-insurance', 'first-weeks', 6, array['bank-account','tax-id','visa-conversion','rundfunkbeitrag'],
+    'See this guide''s new "From provisional to statutory" section — time-sensitive if you had provisional cover.'),
+  ('visa-conversion', 'first-weeks', 7, array['bank-account','tax-id','health-insurance','rundfunkbeitrag'],
+    'Which documents you need for your national (D) visa application depends on your nationality and is decided by the specific German embassy or consulate responsible for your country — look yours up on the [Federal Foreign Office''s official mission finder](https://www.auswaertiges-amt.de/en/about-us/auslandsvertretungen/deutsche-auslandsvertretungen) and follow that mission''s own document checklist, since requirements are not the same for every country.'),
+  ('rundfunkbeitrag', 'first-weeks', 8, array['bank-account','tax-id','health-insurance','visa-conversion'],
+    'A Rundfunkbeitrag account is triggered around now; low urgency but genuinely starts here.'),
+  ('schufa', 'settling-in', 9, array['driving-license'],
+    'Builds up over the first months; useful once you''re apartment/contract hunting beyond your first place.'),
+  ('driving-license', 'settling-in', 10, array['schufa'],
+    'Time-sensitive only if you drove in on a foreign licence (varies by country) — otherwise can wait.'),
+  ('fiktionsbescheinigung', 'ongoing', 11, array[]::text[],
+    'Only relevant IF your residence-permit decision is delayed — not a universal step, included because the task exists and applies conditionally.')
+) as s(task_slug, phase, phase_order, parallel_slugs, note_md)
+on conflict (persona, task_id, locale) do update set
+  phase = excluded.phase, phase_order = excluded.phase_order,
+  runs_parallel_with = excluded.runs_parallel_with, note_md = excluded.note_md;
 
 -- ---------------------------------------------------------------- journey_phases (Increment H)
 insert into journey_phases (slug, name_en, subtitle_en, sort_order) values
