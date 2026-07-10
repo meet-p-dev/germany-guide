@@ -56,6 +56,7 @@ on conflict (slug) do update set name_en = excluded.name_en, sort_order = exclud
 -- ---------------------------------------------------------------- tasks
 insert into tasks (category_id, slug, title_en, title_de, summary, audience, sort_order) values
   ((select id from task_categories where slug = 'registration'), 'anmeldung', 'City registration', 'Anmeldung', 'Register your address within two weeks of moving in. Almost everything else — tax ID, bank account, residence permit — depends on it.', '{student,worker,refugee,eu,non-eu,family}', 1),
+  ((select id from task_categories where slug = 'residence'), 'entry-visa', 'Visa & Entry Permit', 'Nationales Visum (D)', 'Get the correct national (D) visa at the German mission responsible for you before you travel — or check whether your nationality is exempt.', '{student,worker,non-eu,family}', 0),
   ((select id from task_categories where slug = 'residence'), 'residence-permit', 'Residence permit', 'Aufenthaltstitel', 'Apply for or extend your residence permit at the local immigration office (Ausländerbehörde).', '{student,worker,non-eu,family}', 1),
   ((select id from task_categories where slug = 'residence'), 'visa-conversion', 'Converting an entry visa', 'Visum umwandeln', 'Convert your national entry visa into a full residence permit before it expires.', '{student,worker,non-eu,family}', 2),
   ((select id from task_categories where slug = 'residence'), 'fiktionsbescheinigung', 'Bridging certificate', 'Fiktionsbescheinigung', 'A temporary certificate that keeps your stay legal while your permit application is being processed.', '{student,worker,non-eu,family}', 3),
@@ -522,6 +523,139 @@ lateral (values
   (4, 'Check your assigned tax class on your first payslip', 'Class I is the default for singles; married couples can request a change.', '{}'::text[], false),
   (5, 'File a tax-class change if needed', 'Available at your Finanzamt, e.g. after marriage.', '{}'::text[], true),
   (6, 'File an annual tax return if you overpaid', 'Especially relevant if you were taxed at the maximum rate before your Steuer-ID arrived.', '{}'::text[], true)
+) as s(step_no, title_en, body_md, doc_names, is_optional)
+on conflict (guide_id, step_no) do update set title_en=excluded.title_en, body_md=excluded.body_md, doc_names=excluded.doc_names, is_optional=excluded.is_optional;
+
+-- entry-visa (national D-visa) — cycle-3 (verifier skipped; sourced from researcher packet, honesty hedges preserved)
+-- Per-nationality (§4) + persona (§3) notes live as headed Markdown subsections inside documents_md (zero-schema-change placement; renders via react-markdown).
+insert into guides (task_id, intro_md, documents_md, after_md, legal_basis, status, sources, last_verified_at, generated_by, reviewed_by, locale)
+values (
+  (select id from tasks where slug = 'entry-visa' and locale='en'),
+$intro$Before you can register an address, open a bank account, or do almost anything else in Germany, most non-EU/EEA/Swiss nationals need a **national visa — the "D-visa"** — issued by the German embassy or consulate responsible for their place of residence, **before travelling**. EU, EEA and Swiss citizens do not need any visa (freedom of movement) and are out of scope for this guide.
+
+**Do you actually need one?** A small but important group of nationalities is **exempt even for long stays** (work, study, family reunion — not just tourism) and can enter Germany visa-free and apply for the residence permit *after* arriving, at the local Ausländerbehörde, within **90 days** of entry. Per **§41 Aufenthaltsverordnung (AufenthV)**:
+
+- **Fully exempt, no extra restriction:** nationals of **Australia, Canada, Israel, Japan, New Zealand, the Republic of Korea, the United Kingdom, and the United States** (§41 Abs. 1 AufenthV).
+- **Exempt, but may not take up employment before the permit is granted** (except a narrow list of activities under §17 Abs. 2 AufenthV): nationals of **Andorra, Brazil, El Salvador, Honduras, Monaco, and San Marino** (§41 Abs. 2 AufenthV). The practical day-to-day effect of this employment restriction is not something we could confirm from an official mission walk-through — confirm how it is handled with your responsible mission.
+- **Everyone else** applies for the D-visa before travelling. Your exact document checklist is decided by the **specific German mission responsible for your country of residence** — look yours up on the [Federal Foreign Office mission finder](https://www.auswaertiges-amt.de/en/about-us/auslandsvertretungen/deutsche-auslandsvertretungen) and follow that mission's own checklist. See the nationality notes further down for real, sourced differences we found for several major nationalities — and which ones we could **not** confirm.
+
+**How the application works, generally:** fill in the harmonised **VIDEX** online form (videx.diplo.de — 12 languages), print it, then **book an appointment** with your specific mission (the booking system itself varies a lot by country — VFS Global, iDATA, the mission's own RK-Termin system, or a waiting list). You must apply **in person**; VIDEX only prepares the paperwork, it does not submit the application. At the appointment you submit your documents and originals, give biometric data, and pay the fee (**€75 standard, €37.50 for minors**).
+
+**Processing takes weeks to months** depending on your visa category and mission — the Federal Foreign Office's own guidance says explicitly not to expect a status update within roughly the first 3 months. Do not rely on a fixed timeline; ask your specific mission.
+
+**Validity:** national visas are usually issued for **up to 90 days** (sometimes longer, rarely up to a year, for people who have already been to Germany/Schengen several times before). **Your visa sticker states its own expiry date — that date, not a rule of thumb, governs when you must apply to convert it into a residence permit** at your local Ausländerbehörde (see the "Converting an entry visa" task, which covers that step in detail).$intro$,
+$docs$General document categories needed by almost everyone applying for a D-visa (your mission's own checklist is still authoritative — this is the shape, not a substitute):
+
+- Valid **passport** (check your mission's minimum validity requirement)
+- Two completed, signed **VIDEX application form printouts**
+- **One biometric passport photo**, not older than 6 months. The usual biometric/Schengen spec is 35×45 mm, neutral grey background, neutral expression, no head covering except for continuous religious/medical reasons — but photo rules are enforced strictly, so **check your mission's current official photo sheet** rather than relying on this summary.
+- **Proof of health insurance.** Travel insurance and another EU country's EHIC card are **not** sufficient. You need either unconditional enrolment confirmation from a German insurer valid from your entry date, or an "incoming" policy with no cancelling conditions for a long-term stay. Practically, the visa can only become *valid* once you present this proof — sometimes accepted at the end of the procedure rather than at the appointment itself.
+- **Proof of financial means** — via a blocked account (Sperrkonto; see the "Blocked account" task for the current amount and providers — around €992/month for students as of 2026), a declaration of commitment (Verpflichtungserklärung) from someone in Germany, parental income/financial circumstances, or an annually renewable bank guarantee.
+- **Purpose-specific documents** — admission letter (students), employment contract (workers), marriage/birth certificate (family reunion). See the persona notes below for how these differ.
+- The **application fee**: €75 (€37.50 for minors). You **may** qualify for a fee waiver — family reunification with a German citizen is a commonly cited case — but confirm the current waiver conditions with your responsible mission, as we could not verify the exact conditions from a first-party source.
+
+*Nationality-specific additions (APS certificates, translation/apostille/legalisation rules, which office handles your case, appointment systems) are NOT generic — see the dedicated nationality notes below. If your nationality isn't listed there, it does not mean nothing differs for you: it means we could not verify anything both real and official for it, and you must use the mission finder.*
+
+## Notes by who you are
+
+### Students
+- **Admission-dependent document:** an unconditional university/Studienkolleg admission letter, or — for a prospective-student ("Studienbewerber") visa applied for before admission is final — proof of application/entrance-exam registration. These are two different visa sub-categories with different validity windows (we could not confirm the exact validity length of the Studienbewerber sub-type this round — check with your mission).
+- **APS certificate:** a mandatory prerequisite for university applicants whose qualification is Chinese, Indian, Mongolian or Vietnamese (needed for admission itself, not just the visa). See the nationality notes below.
+- **Financial proof:** a blocked account (around €992/month, 2026 figure) is standard — see the "Blocked account" task for the current figure.
+- **Health insurance:** an incoming/travel policy is typically enough to get the visa, but must be converted to full statutory or private German health insurance once you enrol (see the provisional and full health-insurance steps).
+
+### Skilled workers / job-seekers
+- **Core document:** a concrete employment contract or binding job offer (skilled-worker / EU Blue Card routes), or — for the points-based Opportunity Card (Chancenkarte), introduced 2024 — proof of a partially/fully recognised qualification plus meeting a points threshold. Blue Card salary thresholds and Chancenkarte point values change regularly, so **check the current figures** on make-it-in-germany.com rather than relying on a number here.
+- **Qualification recognition:** for regulated professions this can be its own separate, months-long process — see the "Recognition of foreign qualifications" task.
+- **Financial proof:** for the Chancenkarte specifically, the required amount is higher than the student figure — confirm it with your mission (see the "Blocked account" task).
+- **Language:** we found no source imposing a blanket German-language test for the skilled-worker/job-seeker visa document set itself (unlike family reunion, below) — but this is an absence-of-evidence finding, so confirm with your mission if in doubt.
+
+### Family reunion (joining a spouse/partner in Germany)
+- **Core documents:** marriage certificate (often needing translation + apostille/legalisation — genuinely nationality-dependent, see the nationality notes), proof of the sponsor's status in Germany (residence permit or citizenship), and proof of adequate housing/income of the sponsor.
+- **A1 German language certificate is required for spouses joining a partner**, under §30 AufenthG — a real, persona-specific hurdle the student and worker paths do not have. The Federal Foreign Office FAQ states directly: *"All family reunion applicants desiring to join their spouse residing in Germany have to provide proof that they possess a sufficient basic knowledge of the German language"* (A1, CEFR), via a standardised ALTE-compliant exam (e.g. the Goethe-Institut "Start Deutsch 1").
+  - **Documented exemptions:** physical/mental illness or disability preventing language acquisition; the sponsoring spouse holds an EU Blue Card, is a recognised skilled worker, researcher, self-employed permit holder, or ICT-card holder; the sponsor holds a settlement permit obtained via one of those routes; certain refugee-sponsor marriages that pre-date the sponsor's move to Germany. Missions examine other cases individually.
+  - Source: Federal Foreign Office FAQ, https://dhaka.diplo.de/bd-en/service/2685180-2685180 (stating the general federal policy under §30 AufenthG, accessed 2026-07-10).
+
+## Notes by nationality
+
+Legend: **confirmed** = seen on an official source · **likely** = strong secondary corroboration, first-party page not directly loaded · **unverified** = flagged, still to be chased. If your nationality is not here, use the mission finder — we only list a country where we found a genuine, sourced, official-channel fact.
+
+### 🇮🇳 India
+- **Appointment booking:** national-visa appointments run through **VFS Global**'s online system; the mission's own RK-Termin portal is still used for some consulates (Bangalore/Chennai noted for booking glitches). *(confirmed)*
+- **APS certificate:** mandatory since **October 2022** for applicants to German bachelor's/master's programmes (and for scholarship holders and some PhD/postdoc cases). *(confirmed)*
+- **Document authentication quirk:** the Indian mission's own FAQ states that **"attestation or apostille of Indian documents is not recognised by German authorities"** for the visa file — even though India has been a Hague Apostille Convention member since 2005. This is counter-intuitive (the mission appears to want originals or its own document verification, not an Indian apostille stamp), so treat it as *likely* and reconfirm current policy with the mission before you rely on it.
+- **Financial proof:** the blocked-account figure quoted on india.diplo.de matches the ~€992/month figure used on this site. *(confirmed)*
+- **English-proficiency proof:** a recognised English test certificate is required for English-taught programmes; a university's own exemption letter is explicitly **not** accepted. *(confirmed)*
+- Sources: https://india.diplo.de/in-en/service/2546328-2546328 (National Visa FAQs, accessed 2026-07-10); https://india.diplo.de/in-en/ueber-uns/mumbai/visa-newsletter-04oct2022/2566330 (APS introduction, accessed 2026-07-10); https://www.hcch.net/en/instruments/conventions/status-table/?cid=41 (Apostille status table, accessed 2026-07-10).
+
+### 🇨🇳 China
+- **APS certificate:** a mandatory prerequisite for most applicants with Chinese academic qualifications, run by the **Akademische Prüfstelle (APS)** — an official joint institution of the German Embassy Beijing's Culture Department and the DAAD, not a private company. Without the APS seal, German universities generally will not admit the applicant and the embassy will not issue the study visa. *(confirmed)*
+- **Apostille Convention:** China (Mainland) has been a Hague Apostille Convention member **in force from 7 November 2023** — Chinese public documents can now be apostilled instead of going through the older full consular-legalisation chain. This does **not** apply to Hong Kong/Macau; if you are a Hong Kong/Macau resident, check separately. *(confirmed)*
+- **Visa application centres:** processing for the German mission in China runs through VFS Global centres in Beijing, Shanghai, Guangzhou, Chengdu and Shenyang. *(likely — secondary-sourced; the china.diplo.de page could not be loaded directly this round)*
+- Sources: https://www.aps.org.cn/uber-uns and https://www.aps.org.cn/verfahren-und-services-deutschland/chinaverfahren (APS official site, accessed 2026-07-10); https://www.hcch.net/en/instruments/conventions/status-table/?cid=41 (accessed 2026-07-10).
+
+### 🇺🇸 United States
+- US citizens are **fully exempt from the D-visa** under **§41 Abs. 1 AufenthV** — they can enter Germany with just their passport for work, study, or family reasons and apply for the residence permit **after arrival**, at the local Ausländerbehörde, within 90 days. *(confirmed from the law text)*
+- **One real exception:** if employment is meant to start **immediately upon arrival**, the work-permit-carrying visa must still be obtained in advance, because you cannot legally start work in Germany before the work permit exists. germany.info states: *"in cases where an employment is intended to begin directly after arrival in Germany, a visa (which includes the work permit) has to be issued in advance."* *(confirmed)*
+- Sources: https://www.gesetze-im-internet.de/aufenthv/__41.html (accessed 2026-07-10); https://www.germany.info/us-en/service/visa/employment-visa-922292 and https://www.germany.info/us-en/service/visa/study-visa/916776 (accessed 2026-07-10).
+
+### 🇧🇷 Brazil
+- Brazil is in the **second tier** of §41 AufenthV (Abs. 2, with Andorra, El Salvador, Honduras, Monaco, San Marino): Brazilians can also enter visa-free and apply for the residence permit inside Germany within 90 days. *(confirmed from the law text)*
+- **The real difference from the US/Canada tier:** Abs. 2 nationals **may not take up employment** during the visa-free window (except a narrow set of activities under §17 Abs. 2 AufenthV) until the residence/work permit is actually granted. The restriction is in the statute; how strictly it is applied in practice we could not confirm from an official mission walk-through — confirm with a Brazil-based German mission before assuming you can start work. *(restriction confirmed; practical application unverified)*
+- Source: https://www.gesetze-im-internet.de/aufenthv/__41.html (accessed 2026-07-10).
+
+### 🇳🇬 Nigeria
+- **Office split:** German Embassy **Abuja** processes only a limited set of national-visa categories (depending on your state of residence); the **Consulate General Lagos** handles the rest. *(likely — this rests on WebSearch snippets of nigeria.diplo.de; the specific pages returned 404 on direct fetch this round, so confirm on nigeria.diplo.de directly)*
+- **Apostille Convention:** Nigeria is **not** a contracting party, so Nigerian public documents (birth/marriage/police-clearance certificates) need the older **full consular legalisation chain** (Nigerian federal authentication + German Embassy legalisation), not a simple apostille stamp. *(confirmed via the treaty registry)*
+- No APS requirement was found for Nigeria (an absence-of-evidence finding, not a confirmation).
+- Sources: https://www.hcch.net/en/instruments/conventions/status-table/?cid=41 (accessed 2026-07-10); nigeria.diplo.de content via WebSearch snippets only — see caveat above.
+
+### 🇹🇷 Turkey
+- **For Turkish citizens:** national-visa applications can be handled by the **Embassy in Ankara**, the **Consulates General in Istanbul and Izmir**, and the **Consulate in Antalya** — not centralised the way applications from non-Turkish residents of Turkey are (those go through Istanbul only). *(confirmed)*
+- **Appointment system:** exclusively through the external provider **iDATA** (not VFS Global) — a booking fee of about €12 plus a separate service fee of about €39.92, both payable in Turkish Lira, on top of the official €75 visa fee. *(confirmed)*
+- We deliberately do **not** quote processing-time figures for Turkish citizens: the figures we found applied to non-Turkish residents of Turkey, a different population, and we could not confirm they carry over. Ask the mission for current processing times. *(unverified for Turkish citizens)*
+- Sources: https://tuerkei.diplo.de/tr-de/service/05-visaeinreise/2703120-2703120 (Turkish citizens, accessed 2026-07-10); https://tuerkei.diplo.de/tr-de/service/05-visaeinreise/2170670-2170670 (non-Turkish residents, cited for contrast only, accessed 2026-07-10).
+
+### 🇵🇰 Pakistan
+- **Apostille Convention:** Pakistan became a member **in force from 9 March 2023** — Pakistani applicants can now use an apostille rather than full legalisation. This is recent enough that older secondary guides may still describe the pre-2023 legalisation process, so cross-check. *(confirmed via the treaty registry)*
+- **Appointment system:** a **waiting-list model** (register online, get placed on a list, and be invited once a slot exists) for both the Islamabad Embassy and Karachi Consulate General, with an official fraud warning that if you are asked for money at this stage of the visa process, the person asking is a fraudster. *(likely — sourced via WebSearch snippets; the first-party page loaded but did not itself surface this waiting-list detail this round)*
+- We could **not** confirm any Pakistan-specific document/checklist differences beyond the generic categories above — saying so honestly rather than guessing. Use the mission finder.
+- Sources: https://www.hcch.net/en/instruments/conventions/status-table/?cid=41 (accessed 2026-07-10); https://pakistan.diplo.de/pk-en/service/visa-longterm-1676102 (accessed 2026-07-10, thin result — see caveat).
+
+### 🇻🇳 Vietnam
+- **APS certificate:** mandatory for Vietnamese applicants with Vietnamese academic qualifications applying to German bachelor's/master's programmes (school graduates without a Vietnamese university degree, Cao Đẳng graduates, second-bachelor's/master's applicants, and applicants to purely artistic programmes). **Exempt:** applicants pre-selected for a DAAD or MOET public scholarship, and doctoral candidates. Without a valid APS certificate the German Embassy Hanoi and Consulate General Ho Chi Minh City will not even accept the application. Since 1 November 2023, APS issues a digitally signed "DigZert" certificate rather than paper. *(confirmed)*
+- **Apostille Convention — time-sensitive:** Vietnam deposited its instrument of accession on **31 December 2025**, but the Convention only **enters into force for Vietnam on 11 September 2026**. **As of 10 July 2026, Vietnam is NOT yet a member** — Vietnamese public documents still need the traditional full consular legalisation chain right now. **If you are reading this on or after 11 September 2026, check whether the apostille route has taken effect** and use it if so. *(confirmed)*
+- Sources: https://vietnam.diplo.de/vn-de/willkommen/aktuelles/aps-1236800 (APS official page, accessed 2026-07-10); https://www.hcch.net/en/instruments/conventions/status-table/?cid=41 (accessed 2026-07-10).$docs$,
+$after$Once approved, your D-visa is stuck into your passport as a sticker showing its own validity window. Travel to Germany within that window. After arrival: **register your address (Anmeldung)** — this determines which Ausländerbehörde is responsible for you — and then apply to **convert your visa into a residence permit before its printed expiry date** (the "Converting an entry visa" task covers that step in full; this task's job ends at "you have a valid D-visa and can travel"). If you are one of the §41 AufenthV-exempt nationalities and travelled without a visa, your first formal step in Germany is applying directly for the residence permit within 90 days of entry — no visa-conversion step applies to you.$after$,
+  '§6 Aufenthaltsgesetz (AufenthG) — national visa; §41 Aufenthaltsverordnung (AufenthV) — exemption for nationals of certain third countries; §17 Abs. 2 AufenthV — narrow employment exception referenced by §41 Abs. 2',
+  'published',
+  '[{"url": "https://www.auswaertiges-amt.de/en/visa-service/215870-215870", "title": "Federal Foreign Office — Visas for Germany (overview, fee, processing time)", "accessed_at": "2026-07-10"}, {"url": "https://www.gesetze-im-internet.de/aufenthv/__41.html", "title": "§41 AufenthV — exemption for nationals of certain states (official law text)", "accessed_at": "2026-07-10"}, {"url": "https://daressalam.diplo.de/tz-en/service/2644764-2644764", "title": "Federal Foreign Office — health insurance in the national visa procedure", "accessed_at": "2026-07-10"}, {"url": "https://rangun.diplo.de/mm-en/service/2296512-2296512", "title": "Federal Foreign Office — national visas for long-term stays (purposes, blocked account reference)", "accessed_at": "2026-07-10"}, {"url": "https://kuala-lumpur.diplo.de/my-en/service/05-visaeinreise/2261780-2261780", "title": "Federal Foreign Office — VIDEX online application for national visas", "accessed_at": "2026-07-10"}, {"url": "https://www.auswaertiges-amt.de/en/sperrkonto-388600", "title": "Federal Foreign Office — blocked account mechanics (cross-referenced, not restated)", "accessed_at": "2026-07-05"}]'::jsonb,
+  '2026-07-10',
+  'researcher-visa-entry',
+  'verifier-skipped-by-user',
+  'en'
+)
+on conflict (task_id, locale) do update set
+  intro_md=excluded.intro_md, documents_md=excluded.documents_md, after_md=excluded.after_md,
+  legal_basis=excluded.legal_basis, status=excluded.status, sources=excluded.sources,
+  last_verified_at=excluded.last_verified_at, generated_by=excluded.generated_by, reviewed_by=excluded.reviewed_by;
+
+insert into checklist_steps (guide_id, step_no, title_en, body_md, doc_names, is_optional)
+select g.id, s.step_no, s.title_en, s.body_md, s.doc_names, s.is_optional
+from guides g join tasks t on t.id = g.task_id and t.slug = 'entry-visa' and t.locale='en',
+lateral (values
+  (1, $t$Check whether you're exempt under §41 AufenthV$t$, $b$Nationals of Australia, Canada, Israel, Japan, New Zealand, South Korea, the UK and the USA — and, with an employment restriction, Andorra, Brazil, El Salvador, Honduras, Monaco and San Marino — can skip the D-visa entirely and apply for the residence permit after arrival. Everyone else needs the D-visa below.$b$, '{}'::text[], false),
+  (2, $t$Find your responsible German mission$t$, $b$Use the Federal Foreign Office mission finder — the mission tied to your place of residence, not your nationality, is the one whose checklist governs you.$b$, '{}'::text[], false),
+  (3, $t$Identify your visa category / purpose$t$, $b$Study, skilled work, job-seeker (Chancenkarte), or family reunion — each has a different core document set (see the persona notes in the guide).$b$, '{}'::text[], false),
+  (4, $t$Complete any required pre-checks$t$, $b$Some nationalities need extra steps before they can even apply — e.g. an APS certificate for university applicants with Chinese, Indian, Mongolian or Vietnamese qualifications. Check the nationality notes for your country.$b$, '{"APS certificate (if applicable)"}'::text[], true),
+  (5, $t$Arrange your financial-means proof$t$, $b$Usually a blocked account; see the "Blocked account" task for current amounts and providers.$b$, '{"Blocked account confirmation letter"}'::text[], false),
+  (6, $t$Arrange health insurance for the visa$t$, $b$Travel insurance is not enough for the visa itself — get an "incoming" policy or an unconditional-enrolment confirmation letter.$b$, '{"Health insurance confirmation letter"}'::text[], false),
+  (7, $t$Fill in and print the VIDEX application form$t$, $b$videx.diplo.de — available in 12 languages; you cannot submit it online, only print it for your appointment.$b$, '{"VIDEX printout"}'::text[], false),
+  (8, $t$Get a biometric passport photo$t$, $b$Not older than 6 months; check your mission's exact photo spec sheet.$b$, '{"Biometric photo"}'::text[], false),
+  (9, $t$Book your appointment$t$, $b$The booking system differs by country (VFS Global, iDATA, RK-Termin, a waiting list, or the mission's own portal) — see the nationality notes for what we found per country.$b$, '{}'::text[], false),
+  (10, $t$Attend the appointment$t$, $b$Bring all originals plus copies plus certified German translations where required; biometric data is captured here; pay the fee.$b$, '{"Passport","VIDEX printout","Purpose-specific documents"}'::text[], false),
+  (11, $t$Wait for processing$t$, $b$Weeks to months; do not expect a status update in roughly the first 3 months.$b$, '{}'::text[], false),
+  (12, $t$Collect your visa and check its printed expiry$t$, $b$Travel before that date; your next step in Germany is Anmeldung, then visa-conversion (or, if exempt, apply for the residence permit directly).$b$, '{}'::text[], false)
 ) as s(step_no, title_en, body_md, doc_names, is_optional)
 on conflict (guide_id, step_no) do update set title_en=excluded.title_en, body_md=excluded.body_md, doc_names=excluded.doc_names, is_optional=excluded.is_optional;
 
@@ -2609,7 +2743,7 @@ select 'student', s.phase, s.phase_order,
   (select id from tasks where slug = s.task_slug and locale='en'),
   s.slug, s.title_en, s.title_de, s.summary, s.icon, s.city_specific, s.applies_to::text[], s.note_md, s.status::content_status, 'en'
 from (values
-  ('entry-visa','pre-arrival',1,null,'Visa & Entry Permit','Nationales Visum (D)','Get the correct national (D) visa at the German embassy before you travel.','plane',false,array['student','worker','non-eu','family'],'Which documents you need depends on your nationality and the specific German mission responsible for your country — check the Federal Foreign Office mission finder.','draft'),
+  ('entry-visa','pre-arrival',1,'entry-visa','Visa & Entry Permit','Nationales Visum (D)','Get the correct national (D) visa at the German embassy before you travel.','plane',false,array['student','worker','non-eu','family'],'Which documents you need depends on your nationality and the specific German mission responsible for your country — check the Federal Foreign Office mission finder.','published'),
   ('blocked-account','pre-arrival',2,'blocked-account',null,null,null,'banknote',false,array[]::text[],'Usually bundled with your provisional health insurance through the same provider (e.g. Expatrio, Fintiba) — done together, not sequentially.','published'),
   ('health-insurance-provisional','pre-arrival',3,'health-insurance-provisional',null,null,null,'stethoscope',false,array[]::text[],'Bundled with the blocked account for most students — set them up together before you fly.','published'),
   ('accommodation','arrival',4,null,'Find Accommodation','Wohnungssuche','Secure somewhere to live — you need a registered address before almost anything else works.','home',false,array['student','worker','refugee','eu','non-eu','family'],'Even a temporary registered address lets you do your Anmeldung and unlock everything downstream.','draft'),
