@@ -1,10 +1,12 @@
 "use client";
 
-import { useEffect, useMemo, useState } from "react";
+import { useMemo } from "react";
 import Link from "next/link";
 import { motion } from "framer-motion";
 import { Check, ArrowRight, MapPin, Pencil, Compass } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { usePlanProgress } from "@/components/plan/usePlanProgress";
+import { planKey } from "@/lib/plan-progress";
 import { cn } from "@/lib/utils";
 
 export type RoadmapStep = {
@@ -22,60 +24,33 @@ export type RoadmapPhase = {
 export type RoadmapCity = { slug: string; name: string; state: string } | null;
 
 /**
- * Interactive relocation roadmap (Ankommen funnel). Renders the persona's
- * tasks grouped by phase as checkable steps with a live progress bar.
- * Completion is stored in localStorage keyed by persona+city — guest-friendly,
- * no account required (server-side per-account persistence is a later step).
+ * Full-list view of the shared plan: every step as a checkable row grouped by
+ * phase, with a live progress bar. Progress lives in the shared plan-progress
+ * store (localStorage), so it's identical to what the guided view (/dashboard)
+ * shows and survives a refresh. Toggling between the two views never re-asks.
  */
 export function RoadmapView({
   persona,
-  personaLabel,
   city,
   phases,
 }: {
   persona: string;
-  personaLabel: string;
+  personaLabel?: string;
   city: RoadmapCity;
   phases: RoadmapPhase[];
 }) {
-  const storageKey = `gg:roadmap:${persona}:${city?.slug ?? "generic"}`;
+  const key = planKey(persona, city?.slug);
   const allSlugs = useMemo(
     () => phases.flatMap((p) => p.steps.map((s) => s.slug)),
     [phases]
   );
-
-  const [done, setDone] = useState<Set<string>>(new Set());
-  const [hydrated, setHydrated] = useState(false);
-
-  // Load saved progress once on mount.
-  useEffect(() => {
-    try {
-      const raw = localStorage.getItem(storageKey);
-      if (raw) setDone(new Set(JSON.parse(raw) as string[]));
-    } catch {
-      /* ignore corrupt/unavailable storage */
-    }
-    setHydrated(true);
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [storageKey]);
-
-  const toggle = (slug: string) => {
-    setDone((prev) => {
-      const next = new Set(prev);
-      if (next.has(slug)) next.delete(slug);
-      else next.add(slug);
-      try {
-        localStorage.setItem(storageKey, JSON.stringify([...next]));
-      } catch {
-        /* ignore */
-      }
-      return next;
-    });
-  };
+  const { completed: done, hydrated, toggle } = usePlanProgress(key);
 
   const total = allSlugs.length;
   const completed = allSlugs.filter((s) => done.has(s)).length;
   const pct = total ? Math.round((completed / total) * 100) : 0;
+
+  const guidedHref = `/dashboard?persona=${persona}${city ? `&city=${city.slug}` : ""}`;
 
   // City-aware guide link: full city guide when a city is chosen, else the
   // generic nationwide task guide.
@@ -117,18 +92,19 @@ export function RoadmapView({
           </Button>
         </div>
 
-        {/* Bridge into the guided engine: one step at a time (the /quiz →
-            /dashboard flow). Keeps both plan views connected — no dead-ends. */}
+        {/* Same plan, other view: one step at a time. Progress carries over,
+            nothing is re-asked. */}
         <div className="mt-4 rounded-2xl border border-border bg-secondary/40 p-5">
           <p className="text-sm font-semibold">Prefer one step at a time?</p>
           <p className="mt-1 text-sm text-muted-foreground">
-            Guided mode folds the whole plan away and shows just your next step.
+            Guided mode folds the whole plan away and shows just your next step —
+            same plan, same progress.
           </p>
           <Button
             asChild
             className="mt-4 w-full gap-2 rounded-full font-semibold"
           >
-            <Link href={`/quiz?persona=${persona}`}>
+            <Link href={guidedHref}>
               <Compass className="h-4 w-4" /> Switch to guided mode
             </Link>
           </Button>
@@ -165,9 +141,7 @@ export function RoadmapView({
                         type="button"
                         onClick={() => toggle(step.slug)}
                         aria-pressed={isDone}
-                        aria-label={
-                          isDone ? "Mark as not done" : "Mark as done"
-                        }
+                        aria-label={`Mark ${step.titleEn} as ${isDone ? "not done" : "done"}`}
                         className={cn(
                           "mt-0.5 grid h-6 w-6 shrink-0 place-items-center rounded-full border transition-colors",
                           isDone
@@ -196,6 +170,7 @@ export function RoadmapView({
                         )}
                         <Link
                           href={stepHref(step.slug)}
+                          aria-label={`${step.titleEn} — how to do this${city ? ` in ${city.name}` : ""}`}
                           className="mt-2 inline-flex items-center gap-1 text-sm font-medium text-primary hover:underline"
                         >
                           {city ? (

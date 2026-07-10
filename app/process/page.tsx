@@ -54,7 +54,7 @@ export default async function ProcessPage() {
         <div className="mt-7 flex flex-wrap gap-3">
           <Button asChild size="lg" className="gap-2 rounded-full font-semibold">
             <Link href="/explore">
-              Build my personal plan <ArrowRight className="h-4 w-4" />
+              Build my plan <ArrowRight className="h-4 w-4" />
             </Link>
           </Button>
           <Button

@@ -1,15 +1,11 @@
 import Link from "next/link";
 import type { Metadata } from "next";
 import { getTasksByCategory, getCityBySlug } from "@/lib/queries/guide";
-import { STAGE_FRAMING } from "@/lib/journey-copy";
 import { PERSONA_BY_SLUG } from "@/lib/persona-copy";
 import { PERSONA_UI, FALLBACK_PERSONA_ICON } from "@/lib/persona-ui";
+import { buildPersonaPhases } from "@/lib/plan";
 import { Button } from "@/components/ui/button";
-import {
-  RoadmapView,
-  type RoadmapPhase,
-  type RoadmapCity,
-} from "@/components/RoadmapView";
+import { RoadmapView, type RoadmapCity } from "@/components/RoadmapView";
 
 // Personalised tool, not a content page — keep it out of the index.
 export const metadata: Metadata = {
@@ -48,21 +44,18 @@ export default async function RoadmapPage({
     citySlug ? getCityBySlug(citySlug) : Promise.resolve(null),
   ]);
 
-  const phases: RoadmapPhase[] = categories
-    .map((c) => ({
-      slug: c.slug,
-      name: c.name_en,
-      framing: STAGE_FRAMING[c.slug] ?? "",
-      steps: c.tasks
-        .filter((t) => (t.audience ?? []).includes(persona.tag))
-        .map((t) => ({
-          slug: t.slug,
-          titleEn: t.title_en,
-          titleDe: t.title_de,
-          summary: t.summary,
-        })),
-    }))
-    .filter((p) => p.steps.length > 0);
+  const cats = categories.map((c) => ({
+    slug: c.slug,
+    name_en: c.name_en,
+    tasks: c.tasks.map((t) => ({
+      slug: t.slug,
+      title_en: t.title_en,
+      title_de: t.title_de,
+      summary: t.summary,
+      audience: t.audience,
+    })),
+  }));
+  const phases = buildPersonaPhases(cats, persona.tag);
 
   const roadmapCity: RoadmapCity = city
     ? { slug: city.slug, name: city.name_en, state: city.states?.name_en ?? "" }
