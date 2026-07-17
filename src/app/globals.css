@@ -1,0 +1,90 @@
+@import "tailwindcss";
+@plugin "@tailwindcss/typography";
+
+@custom-variant dark (&:where(.dark, .dark *));
+
+:root {
+  --background: #faf9f4;
+  --foreground: #1f1b19;
+  --muted: #6d655e;
+  --card: #ffffff;
+  --card-muted: #f3f1e9;
+  --border: #e7e3d8;
+  --primary: #b42233;
+  --primary-hover: #9c1d2c;
+  --primary-foreground: #ffffff;
+  --primary-soft: #f8e9ea;
+  --gold: #bc8a24;
+  --gold-soft: #f5edd8;
+  --success: #2e7d4f;
+  --success-soft: #e6f2ea;
+  --flag-black: #1a1a1a;
+  --flag-red: #dd0000;
+  --flag-gold: #ffce00;
+}
+
+.dark {
+  --background: #110f0e;
+  --foreground: #f3efe8;
+  --muted: #a49c93;
+  --card: #1c1917;
+  --card-muted: #211d1a;
+  --border: #2e2a25;
+  --primary: #e02e43;
+  --primary-hover: #e8505f;
+  --primary-foreground: #ffffff;
+  --primary-soft: #34181b;
+  --gold: #dda731;
+  --gold-soft: #2e2512;
+  --success: #4db07c;
+  --success-soft: #152a1e;
+}
+
+@theme inline {
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --color-muted: var(--muted);
+  --color-card: var(--card);
+  --color-card-muted: var(--card-muted);
+  --color-border: var(--border);
+  --color-primary: var(--primary);
+  --color-primary-hover: var(--primary-hover);
+  --color-primary-foreground: var(--primary-foreground);
+  --color-primary-soft: var(--primary-soft);
+  --color-gold: var(--gold);
+  --color-gold-soft: var(--gold-soft);
+  --color-success: var(--success);
+  --color-success-soft: var(--success-soft);
+  --color-flag-black: var(--flag-black);
+  --color-flag-red: var(--flag-red);
+  --color-flag-gold: var(--flag-gold);
+  --font-sans: var(--font-dm-sans), ui-sans-serif, system-ui, sans-serif;
+  --font-display: var(--font-cabinet), var(--font-dm-sans), system-ui, sans-serif;
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: auto;
+  }
+}
+
+body {
+  background: var(--background);
+  color: var(--foreground);
+  font-family: var(--font-dm-sans), ui-sans-serif, system-ui, sans-serif;
+  -webkit-font-smoothing: antialiased;
+}
+
+::selection {
+  background: var(--primary);
+  color: var(--primary-foreground);
+}
+
+/* Headline font utility applied via font-display token */
+.font-display {
+  letter-spacing: -0.02em;
+}
