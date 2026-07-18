@@ -6,6 +6,7 @@ import { MotionProvider } from "@/components/motion/motion-provider";
 import { SiteHeader } from "@/components/layout/site-header";
 import { SiteFooter } from "@/components/layout/site-footer";
 import { FlagStripe } from "@/components/layout/flag-stripe";
+import { ChatWidget } from "@/components/chat/chat-widget";
 import "./globals.css";
 
 // Self-hosted variable font (weights 100–1000) — no build-time network
@@ -74,6 +75,7 @@ export default function RootLayout({
               <SiteHeader />
               <main className="flex-1">{children}</main>
               <SiteFooter />
+              <ChatWidget />
             </MotionProvider>
           </ProfileProvider>
         </ThemeProvider>
