@@ -4,6 +4,14 @@ import { notFound } from "next/navigation";
 import { LifeBuoy, Lightbulb } from "lucide-react";
 import { getProblemBySlug, getProblems } from "@/lib/content";
 import { Markdown } from "@/components/markdown";
+import { markdownToText } from "@/lib/utils";
+import {
+  JsonLd,
+  faqPageJsonLd,
+  breadcrumbJsonLd,
+} from "@/components/seo/json-ld";
+
+const BASE_URL = "https://germanyguide.net";
 
 export const revalidate = 3600;
 export const dynamicParams = true;
@@ -21,7 +29,16 @@ export async function generateMetadata({
   const { slug } = await params;
   const problem = await getProblemBySlug(slug);
   if (!problem) return {};
-  return { title: problem.title };
+  const description = markdownToText(problem.problem_md, 155);
+  return {
+    title: problem.title,
+    description,
+    openGraph: {
+      title: `${problem.title} · Germany Guide`,
+      description,
+      url: `${BASE_URL}/problems/${problem.slug}`,
+    },
+  };
 }
 
 export default async function ProblemPage({
@@ -33,8 +50,24 @@ export default async function ProblemPage({
   const problem = await getProblemBySlug(slug);
   if (!problem) notFound();
 
+  const answer = markdownToText(
+    `${problem.problem_md} ${problem.solution_md}`,
+  );
+
   return (
     <article className="mx-auto max-w-3xl px-4 py-14 sm:px-6">
+      <JsonLd
+        data={breadcrumbJsonLd([
+          { name: "Problems & solutions", url: `${BASE_URL}/problems` },
+          {
+            name: problem.title,
+            url: `${BASE_URL}/problems/${problem.slug}`,
+          },
+        ])}
+      />
+      <JsonLd
+        data={faqPageJsonLd([{ question: problem.title, answer }])}
+      />
       <nav aria-label="Breadcrumb" className="text-sm text-muted">
         <Link href="/problems" className="hover:text-foreground">
           Problems &amp; solutions

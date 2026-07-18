@@ -14,7 +14,10 @@ import type { LucideIcon } from "lucide-react";
 import { getCities, getCityBySlug } from "@/lib/content";
 import { CITIES as CITY_CARDS } from "@/lib/site-config";
 import { CityPhoto } from "@/components/city/city-photo";
+import { JsonLd, breadcrumbJsonLd } from "@/components/seo/json-ld";
 import { Kicker } from "@/components/ui/kicker";
+
+const BASE_URL = "https://germanyguide.net";
 import { SetCityButton } from "@/components/city/set-city-button";
 import { Reveal, Stagger, StaggerItem } from "@/components/motion/reveal";
 
@@ -74,6 +77,12 @@ export default async function CityHubPage({
 
   return (
     <div className="mx-auto max-w-6xl px-4 py-14 sm:px-6">
+      <JsonLd
+        data={breadcrumbJsonLd([
+          { name: "Cities", url: `${BASE_URL}/cities` },
+          { name: city.name, url: `${BASE_URL}/cities/${city.slug}` },
+        ])}
+      />
       {/* Header */}
       <div className="relative overflow-hidden rounded-[2.5rem]">
         <div className="relative h-72 sm:h-96">
