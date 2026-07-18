@@ -45,6 +45,30 @@ export const CITIES: CityCard[] = [
     image: "/images/city-nuremberg.jpg",
     status: "live",
   },
+  {
+    slug: "berlin",
+    name: "Berlin",
+    state: "Berlin",
+    tagline: "The capital, forever reinventing itself.",
+    image: "/images/city-berlin.jpg",
+    status: "live",
+  },
+  {
+    slug: "frankfurt",
+    name: "Frankfurt",
+    state: "Hesse",
+    tagline: "Germany's skyline and banking heart.",
+    image: "/images/city-frankfurt.jpg",
+    status: "live",
+  },
+  {
+    slug: "cologne",
+    name: "Cologne",
+    state: "North Rhine-Westphalia",
+    tagline: "The Rhineland's easygoing cathedral city.",
+    image: "/images/city-cologne.jpg",
+    status: "live",
+  },
 
   // Coming soon — cards are live, but the city-specific step data (Anmeldung,
   // residence permit, extension) is verified and added in batches. Until a
@@ -52,34 +76,10 @@ export const CITIES: CityCard[] = [
   // the branded placeholder (image: null). Never ship an unverified photo or
   // an unverified city claim — see the image-licensing rule and CLAUDE.md.
   {
-    slug: "berlin",
-    name: "Berlin",
-    state: "Berlin",
-    tagline: "The capital, forever reinventing itself.",
-    image: null,
-    status: "coming_soon",
-  },
-  {
     slug: "hamburg",
     name: "Hamburg",
     state: "Hamburg",
     tagline: "Germany's harbour gateway to the world.",
-    image: null,
-    status: "coming_soon",
-  },
-  {
-    slug: "cologne",
-    name: "Cologne",
-    state: "North Rhine-Westphalia",
-    tagline: "The Rhineland's easygoing cathedral city.",
-    image: null,
-    status: "coming_soon",
-  },
-  {
-    slug: "frankfurt",
-    name: "Frankfurt",
-    state: "Hesse",
-    tagline: "Germany's skyline and banking heart.",
     image: null,
     status: "coming_soon",
   },
@@ -96,7 +96,7 @@ export const CITIES: CityCard[] = [
     name: "Düsseldorf",
     state: "North Rhine-Westphalia",
     tagline: "The Rhine's stylish state capital.",
-    image: null,
+    image: "/images/city-dusseldorf.jpg",
     status: "coming_soon",
   },
   {
@@ -112,7 +112,7 @@ export const CITIES: CityCard[] = [
     name: "Dresden",
     state: "Saxony",
     tagline: "Baroque splendour on the Elbe.",
-    image: null,
+    image: "/images/city-dresden.jpg",
     status: "coming_soon",
   },
   {
@@ -128,7 +128,7 @@ export const CITIES: CityCard[] = [
     name: "Bremen",
     state: "Bremen",
     tagline: "A Hanseatic city-state on the Weser.",
-    image: null,
+    image: "/images/city-bremen.jpg",
     status: "coming_soon",
   },
   {
@@ -136,7 +136,7 @@ export const CITIES: CityCard[] = [
     name: "Dortmund",
     state: "North Rhine-Westphalia",
     tagline: "The Ruhr's reinvented industrial heart.",
-    image: null,
+    image: "/images/city-dortmund.jpg",
     status: "coming_soon",
   },
   {
@@ -152,7 +152,7 @@ export const CITIES: CityCard[] = [
     name: "Bonn",
     state: "North Rhine-Westphalia",
     tagline: "The Rhine's former capital, quietly grand.",
-    image: null,
+    image: "/images/city-bonn.jpg",
     status: "coming_soon",
   },
   {
@@ -192,7 +192,7 @@ export const CITIES: CityCard[] = [
     name: "Aachen",
     state: "North Rhine-Westphalia",
     tagline: "Charlemagne's spa city at the three-border corner.",
-    image: null,
+    image: "/images/city-aachen.jpg",
     status: "coming_soon",
   },
 ];

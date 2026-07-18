@@ -74,27 +74,38 @@ export default async function CitiesPage() {
             Until then, every step&apos;s Germany-wide guide has you covered.
           </p>
 
-          <Stagger className="mt-10 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-            {comingCities.map((city) => (
-              <StaggerItem key={city.slug} className="h-full">
-                <div className="flex h-full items-start justify-between gap-4 rounded-2xl border border-dashed border-border bg-card/50 p-5 opacity-90">
-                  <div>
-                    <p className="font-display text-lg font-bold">
-                      {city.name}
-                    </p>
-                    <p className="mt-0.5 text-xs text-muted">{city.state}</p>
+          <Stagger className="mt-10 grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
+            {comingCities.map((city) => {
+              const card = CITY_CARDS.find((c) => c.slug === city.slug);
+              return (
+                <StaggerItem key={city.slug} className="h-full">
+                  <div className="h-full overflow-hidden rounded-3xl border border-dashed border-border bg-card/50">
+                    <div className="relative h-40 overflow-hidden">
+                      <CityPhoto
+                        image={card?.image ?? null}
+                        alt={`${city.name} — ${city.tagline ?? city.state}`}
+                        sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw"
+                      />
+                      <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-black/10 to-transparent" />
+                      <span className="absolute right-3 top-3 rounded-full border border-white/40 bg-black/35 px-3 py-1 text-[11px] font-semibold uppercase tracking-wide text-white backdrop-blur-sm">
+                        Coming soon
+                      </span>
+                      <div className="absolute bottom-3 left-4 text-white">
+                        <p className="font-display text-lg font-bold">
+                          {city.name}
+                        </p>
+                        <p className="text-xs text-white/80">{city.state}</p>
+                      </div>
+                    </div>
                     {city.tagline && (
-                      <p className="mt-2 text-sm leading-relaxed text-muted">
+                      <p className="p-4 text-sm leading-relaxed text-muted">
                         {city.tagline}
                       </p>
                     )}
                   </div>
-                  <span className="shrink-0 rounded-full border border-border px-3 py-1 text-[11px] font-semibold uppercase tracking-wide text-muted">
-                    Coming soon
-                  </span>
-                </div>
-              </StaggerItem>
-            ))}
+                </StaggerItem>
+              );
+            })}
           </Stagger>
         </div>
       )}
