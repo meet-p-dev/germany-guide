@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { ArrowRight, Mail } from "lucide-react";
 import { getLetters } from "@/lib/content";
+import { LetterDecoder } from "@/components/ai/assist";
 import { Kicker } from "@/components/ui/kicker";
 import { Stagger, StaggerItem } from "@/components/motion/reveal";
 import { cn } from "@/lib/utils";
@@ -40,6 +41,8 @@ export default async function LettersPage() {
         of a formal envelope. Find your letter below — who sent it, what it
         really says, and what to do about it.
       </p>
+
+      <LetterDecoder />
 
       <Stagger className="mt-10 grid gap-4">
         {letters.map((letter) => (

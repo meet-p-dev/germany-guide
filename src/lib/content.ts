@@ -191,6 +191,23 @@ export function parseTips(json: unknown): string[] {
   return Array.isArray(json) ? (json as string[]) : [];
 }
 
+export interface PersonaPoints {
+  student: string[];
+  worker: string[];
+}
+
+/** Compact per-path bullets; null when the step has none for either path. */
+export function parsePersonaPoints(json: unknown): PersonaPoints | null {
+  if (!json || typeof json !== "object" || Array.isArray(json)) return null;
+  const obj = json as Record<string, unknown>;
+  const list = (v: unknown): string[] =>
+    Array.isArray(v) ? v.filter((x): x is string => typeof x === "string") : [];
+  const student = list(obj.student);
+  const worker = list(obj.worker);
+  if (student.length === 0 && worker.length === 0) return null;
+  return { student, worker };
+}
+
 export type CostType =
   | "one_time"
   | "monthly"

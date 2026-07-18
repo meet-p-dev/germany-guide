@@ -20,13 +20,26 @@ import type { LucideIcon } from "lucide-react";
 import type { Tables } from "@/lib/supabase/types";
 import {
   formatCost,
+  getPhasesWithSteps,
   getStepGraph,
+  isPayableFee,
   parseDocuments,
   parseLinks,
+  parsePersonaPoints,
   parseTips,
   resolveStepMeta,
+  stepAppliesTo,
+  type CostType,
+  type Persona,
   type StepLink,
 } from "@/lib/content";
+import { PersonaCompare } from "@/components/step/persona-compare";
+import { VisaQuiz } from "@/components/step/visa-quiz";
+import {
+  CostEstimator,
+  type PersonaCostTotals,
+} from "@/components/step/cost-estimator";
+import { StepAsk } from "@/components/ai/assist";
 import { Markdown } from "@/components/markdown";
 import { Kicker } from "@/components/ui/kicker";
 import {
@@ -108,6 +121,38 @@ export async function StepView({
     )
     .map((n) => ({ slug: n.slug, title: n.title }));
 
+  const personaPoints = parsePersonaPoints(step.persona_points);
+
+  // "Do it now": the single most relevant official link — the city's own
+  // page when a city is active, otherwise the step's first official source.
+  const activeLinks = active ? parseLinks(active.links) : [];
+  const primaryAction = activeLinks[0] ?? officialLinks[0] ?? null;
+
+  // The costs-of-living page carries the interactive first-year estimator,
+  // fed by the cost fields across the whole journey.
+  let estimatorTotals: Record<Persona, PersonaCostTotals> | null = null;
+  if (step.slug === "costs-of-living") {
+    const phases = await getPhasesWithSteps();
+    const allSteps = phases.flatMap((phase) => phase.steps);
+    const totalsFor = (persona: Persona): PersonaCostTotals => {
+      let oneOffCents = 0;
+      let monthlyCents = 0;
+      let proofCents = 0;
+      for (const s of allSteps) {
+        if (!stepAppliesTo(s, persona) || !s.cost_cents) continue;
+        const type = s.cost_type as CostType | null;
+        if (isPayableFee(type)) oneOffCents += s.cost_cents;
+        if (type === "monthly") monthlyCents += s.cost_cents;
+        if (type === "proof_of_funds") proofCents += s.cost_cents;
+      }
+      return { oneOffCents, monthlyCents, proofCents };
+    };
+    estimatorTotals = {
+      student: totalsFor("student"),
+      worker: totalsFor("worker"),
+    };
+  }
+
   return (
     <article className="mx-auto max-w-3xl px-4 py-14 sm:px-6">
       <StepBreadcrumb phaseTitle={step.phases?.title ?? null} />
@@ -187,6 +232,37 @@ export async function StepView({
             />
           )}
         </div>
+      )}
+
+      {/* The step at a glance, split by path — spares half-irrelevant prose. */}
+      {personaPoints && <PersonaCompare points={personaPoints} />}
+
+      {step.slug === "understand-your-paths" && <VisaQuiz />}
+      {estimatorTotals && <CostEstimator totals={estimatorTotals} />}
+
+      {/* One unmistakable action: the official site to actually do this on. */}
+      {primaryAction && (
+        <section className="mt-10 flex flex-wrap items-center justify-between gap-4 rounded-3xl border border-primary/30 bg-primary-soft/50 p-5">
+          <div className="min-w-0">
+            <p className="text-xs font-semibold uppercase tracking-wide text-primary">
+              Do it now
+            </p>
+            <p className="mt-0.5 font-display font-bold">
+              {active
+                ? `The official page for ${active.cities!.name}`
+                : "The official source for this step"}
+            </p>
+          </div>
+          <a
+            href={primaryAction.url}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="inline-flex h-11 items-center gap-2 rounded-full bg-primary px-5 text-[15px] font-medium text-primary-foreground transition-colors hover:bg-primary-hover"
+          >
+            <ExternalLink className="h-4 w-4" />
+            {primaryAction.label}
+          </a>
+        </section>
       )}
 
       {/* City switcher — links, not state: every variant is its own SEO page */}
@@ -301,6 +377,8 @@ export async function StepView({
       )}
 
       <LinkList links={officialLinks} heading="Official sources" />
+
+      <StepAsk stepSlug={step.slug} />
 
       <p className="mt-12 border-t border-border pt-6 text-xs leading-relaxed text-muted">
         General information, not legal advice. Procedures change — verify with

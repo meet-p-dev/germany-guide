@@ -302,9 +302,11 @@ export type Database = {
           deadline_urgency: string | null
           depends_on: string[]
           documents: Json
+          due_offset_days: number | null
           id: string
           lead_time: string | null
           official_links: Json
+          persona_points: Json
           phase_id: string
           slug: string
           sort_order: number
@@ -324,9 +326,11 @@ export type Database = {
           deadline_urgency?: string | null
           depends_on?: string[]
           documents?: Json
+          due_offset_days?: number | null
           id?: string
           lead_time?: string | null
           official_links?: Json
+          persona_points?: Json
           phase_id: string
           slug: string
           sort_order: number
@@ -346,9 +350,11 @@ export type Database = {
           deadline_urgency?: string | null
           depends_on?: string[]
           documents?: Json
+          due_offset_days?: number | null
           id?: string
           lead_time?: string | null
           official_links?: Json
+          persona_points?: Json
           phase_id?: string
           slug?: string
           sort_order?: number

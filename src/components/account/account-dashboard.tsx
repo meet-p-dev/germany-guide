@@ -7,6 +7,7 @@ import {
   AlertTriangle,
   ArrowRight,
   CalendarClock,
+  CalendarDays,
   FileText,
   Hash,
   KeyRound,
@@ -315,6 +316,16 @@ export function AccountDashboard({
         </ButtonLink>
       </section>
 
+      {/* Dated timeline — the first weeks, anchored to the move-in date. */}
+      {profile.moveInDate && (
+        <TimelineSection
+          moveInDate={profile.moveInDate}
+          steps={allSteps.filter((step) => step.due_offset_days !== null)}
+          progress={progress}
+          hrefFor={hrefFor}
+        />
+      )}
+
       {/* Deadlines at a glance. */}
       {deadlines.length > 0 && (
         <section className="mt-6 rounded-3xl border border-border bg-card p-6">
@@ -442,6 +453,98 @@ export function AccountDashboard({
         .
       </p>
     </motion.div>
+  );
+}
+
+function TimelineSection({
+  moveInDate,
+  steps,
+  progress,
+  hrefFor,
+}: {
+  moveInDate: string;
+  steps: Step[];
+  progress: Record<string, string>;
+  hrefFor: (step: Step) => string;
+}) {
+  if (steps.length === 0) return null;
+  const move = new Date(moveInDate + "T00:00:00");
+  const today = new Date();
+  today.setHours(0, 0, 0, 0);
+
+  const dated = steps
+    .map((step) => {
+      const date = new Date(move);
+      date.setDate(date.getDate() + (step.due_offset_days ?? 0));
+      return { step, date };
+    })
+    .sort((a, b) => a.date.getTime() - b.date.getTime());
+
+  return (
+    <section className="mt-6 rounded-3xl border border-border bg-card p-6">
+      <p className="flex items-center gap-2 font-display text-lg font-bold">
+        <CalendarDays className="h-5 w-5 text-gold" />
+        Your first weeks, dated
+      </p>
+      <p className="mt-1 text-sm leading-relaxed text-muted">
+        Typical timing from your move-in day — the one in red is a legal
+        deadline, the rest are good rhythm.
+      </p>
+      <ol className="mt-5 space-y-0">
+        {dated.map(({ step, date }, index) => {
+          const done = Boolean(progress[step.slug]);
+          const overdue = !done && date < today;
+          const hard = step.deadline_urgency === "hard";
+          return (
+            <li key={step.slug} className="relative flex gap-4 pb-5">
+              {index < dated.length - 1 && (
+                <span
+                  aria-hidden
+                  className="absolute left-[11px] top-6 h-full w-0.5 bg-border"
+                />
+              )}
+              <span
+                className={cn(
+                  "relative mt-1 flex h-6 w-6 shrink-0 items-center justify-center rounded-full border-2",
+                  done
+                    ? "border-success bg-success text-white"
+                    : hard
+                      ? "border-primary bg-primary-soft"
+                      : "border-border bg-card",
+                )}
+              >
+                {done && <ShieldCheck className="h-3.5 w-3.5" />}
+              </span>
+              <span className="min-w-0 flex-1">
+                <span
+                  className={cn(
+                    "text-xs font-semibold uppercase tracking-wide",
+                    overdue && hard ? "text-primary" : "text-muted",
+                  )}
+                >
+                  {done
+                    ? "Done"
+                    : `by ${formatDate(date)}${overdue ? " — overdue" : ""}`}
+                </span>
+                <Link
+                  href={hrefFor(step)}
+                  className={cn(
+                    "block font-medium hover:text-primary hover:underline",
+                    done && "text-muted line-through",
+                  )}
+                >
+                  {step.title}
+                </Link>
+              </span>
+            </li>
+          );
+        })}
+      </ol>
+      <p className="text-xs leading-relaxed text-muted">
+        Typical rhythm, not appointments — the residence permit in particular
+        depends on your visa&apos;s expiry, not your move-in date.
+      </p>
+    </section>
   );
 }
 

@@ -12,6 +12,7 @@ import {
   ClipboardCheck,
   Coins,
   FileText,
+  Lock,
   MapPin,
   PencilLine,
   Sparkles,
@@ -55,7 +56,7 @@ export function JourneyBoard({
   phases: PhaseWithSteps[];
   cities: City[];
 }) {
-  const { ready, profile, progress, toggleStep } = useVisitorProfile();
+  const { ready, profile, progress, toggleStep, session } = useVisitorProfile();
   const celebratedPhases = useRef<Set<string>>(new Set());
 
   const visiblePhases = useMemo(
@@ -231,6 +232,19 @@ export function JourneyBoard({
           <div className="h-24 rounded-3xl bg-card-muted" />
         </div>
       </div>
+    );
+  }
+
+  // The wizard is free for everyone; the personalised plan is the account
+  // benefit. Signed-out visitors see their answers acknowledged and one clear
+  // unlock action — plus an open door to the generic process pages.
+  if (!session) {
+    return (
+      <UnlockJourney
+        stageLabel={profile.stage ? STAGE_LABELS[profile.stage] : null}
+        persona={profile.persona}
+        cityName={city?.name ?? null}
+      />
     );
   }
 
@@ -659,6 +673,100 @@ export function JourneyBoard({
           </div>
         </div>
       )}
+    </div>
+  );
+}
+
+function UnlockJourney({
+  stageLabel,
+  persona,
+  cityName,
+}: {
+  stageLabel: string | null;
+  persona: string | null;
+  cityName: string | null;
+}) {
+  const answered = stageLabel !== null || persona !== null || cityName !== null;
+  return (
+    <div>
+      <Kicker>My journey</Kicker>
+      <h1 className="mt-3 font-display text-4xl font-bold">
+        {answered ? "Your plan is ready." : "Your plan lives here."}
+      </h1>
+      <p className="mt-3 max-w-xl leading-relaxed text-muted">
+        {answered
+          ? "One step left: create your free account and your personalised roadmap — with progress that follows you across devices — unlocks instantly."
+          : "Answer three quick questions, create a free account, and get a roadmap shaped around your stage, your path and your city."}
+      </p>
+
+      {answered && (
+        <div className="mt-5 flex flex-wrap items-center gap-2 text-sm">
+          {stageLabel && (
+            <span className="rounded-full border border-border bg-card px-3 py-1">
+              {stageLabel}
+            </span>
+          )}
+          {persona && (
+            <span className="rounded-full border border-border bg-card px-3 py-1 capitalize">
+              {persona}
+            </span>
+          )}
+          {cityName && (
+            <span className="inline-flex items-center gap-1.5 rounded-full border border-border bg-card px-3 py-1">
+              <MapPin className="h-3.5 w-3.5 text-primary" />
+              {cityName}
+            </span>
+          )}
+        </div>
+      )}
+
+      <div className="mt-8 flex items-start gap-4 rounded-3xl border border-primary/30 bg-primary-soft p-6">
+        <span className="flex h-11 w-11 shrink-0 items-center justify-center rounded-2xl bg-primary text-primary-foreground">
+          <Lock className="h-5 w-5" />
+        </span>
+        <div>
+          <p className="font-display font-bold">
+            Free account, real benefits.
+          </p>
+          <ul className="mt-2 space-y-1.5 text-sm leading-relaxed text-muted">
+            <li className="flex gap-2">
+              <Check className="mt-0.5 h-4 w-4 shrink-0 text-success" />
+              Your checklist, costs and deadlines — synced everywhere
+            </li>
+            <li className="flex gap-2">
+              <Check className="mt-0.5 h-4 w-4 shrink-0 text-success" />
+              Move-in date countdown so the 14-day Anmeldung never surprises you
+            </li>
+            <li className="flex gap-2">
+              <Check className="mt-0.5 h-4 w-4 shrink-0 text-success" />
+              A private vault for reference numbers and appointment notes
+            </li>
+          </ul>
+          <div className="mt-4 flex flex-wrap items-center gap-3">
+            <ButtonLink href="/signin" size="sm">
+              Unlock my plan — free
+              <ArrowRight className="h-4 w-4" />
+            </ButtonLink>
+            {!answered && (
+              <ButtonLink href="/plan" variant="secondary" size="sm">
+                Answer the questions first
+              </ButtonLink>
+            )}
+          </div>
+          <p className="mt-3 text-xs text-muted">
+            No password — we email you a one-tap sign-in link.
+          </p>
+        </div>
+      </div>
+
+      <p className="mt-8 text-sm leading-relaxed text-muted">
+        Prefer to browse without an account? The full Germany-wide guide stays
+        open to everyone on{" "}
+        <Link href="/process" className="font-medium text-primary hover:underline">
+          The process
+        </Link>
+        .
+      </p>
     </div>
   );
 }
