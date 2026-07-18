@@ -4,7 +4,14 @@ import { notFound } from "next/navigation";
 import { AlertTriangle, ListChecks, Mail } from "lucide-react";
 import { getLetterBySlug, getLetters } from "@/lib/content";
 import { Markdown } from "@/components/markdown";
-import { cn } from "@/lib/utils";
+import { cn, markdownToText } from "@/lib/utils";
+import {
+  JsonLd,
+  faqPageJsonLd,
+  breadcrumbJsonLd,
+} from "@/components/seo/json-ld";
+
+const BASE_URL = "https://germanyguide.net";
 
 export const revalidate = 3600;
 export const dynamicParams = true;
@@ -51,6 +58,22 @@ export default async function LetterPage({
 
   return (
     <article className="mx-auto max-w-3xl px-4 py-14 sm:px-6">
+      <JsonLd
+        data={breadcrumbJsonLd([
+          { name: "Letter helper", url: `${BASE_URL}/letters` },
+          { name: letter.name, url: `${BASE_URL}/letters/${letter.slug}` },
+        ])}
+      />
+      <JsonLd
+        data={faqPageJsonLd([
+          {
+            question: `What is a "${letter.german_name ?? letter.name}" letter and what should I do?`,
+            answer: markdownToText(
+              `${letter.what_it_is_md} ${letter.what_to_do_md}`,
+            ),
+          },
+        ])}
+      />
       <nav aria-label="Breadcrumb" className="text-sm text-muted">
         <Link href="/letters" className="hover:text-foreground">
           Letter helper
