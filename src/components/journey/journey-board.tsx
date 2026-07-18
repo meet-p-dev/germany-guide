@@ -5,16 +5,26 @@ import Link from "next/link";
 import { AnimatePresence, motion } from "framer-motion";
 import confetti from "canvas-confetti";
 import {
+  AlertTriangle,
   ArrowRight,
   Check,
   ChevronDown,
   ClipboardCheck,
+  Coins,
+  FileText,
   MapPin,
   PencilLine,
   Sparkles,
 } from "lucide-react";
 import type { City, PhaseWithSteps, Step } from "@/lib/content";
-import { startPhaseForStage, stepAppliesTo } from "@/lib/content";
+import {
+  formatCost,
+  isPayableFee,
+  parseDocuments,
+  startPhaseForStage,
+  stepAppliesTo,
+  type CostType,
+} from "@/lib/content";
 import { REVIEW_BEHIND_KEY, useVisitorProfile } from "@/lib/profile-store";
 import { Button } from "@/components/ui/button";
 import { ButtonLink } from "@/components/ui/button";
@@ -130,6 +140,63 @@ export function JourneyBoard({
     .slice(0, startIndex)
     .reduce((sum, phase) => sum + doneCount(phase.steps), 0);
 
+  // Aggregate the numbers people actually worry about — total fees, money to
+  // show, recurring costs, deadlines — and the paperwork to gather up front.
+  const insights = useMemo(() => {
+    const all = visiblePhases.flatMap((phase) => phase.steps);
+    let feeCents = 0;
+    let proofCents = 0;
+    let monthlyCents = 0;
+    let hardDeadlines = 0;
+    let bookAhead = 0;
+    for (const step of all) {
+      const type = step.cost_type as CostType | null;
+      if (isPayableFee(type) && step.cost_cents) feeCents += step.cost_cents;
+      if (type === "proof_of_funds" && step.cost_cents)
+        proofCents += step.cost_cents;
+      if (type === "monthly" && step.cost_cents) monthlyCents += step.cost_cents;
+      if (step.deadline_urgency === "hard") hardDeadlines += 1;
+      if (step.lead_time) bookAhead += 1;
+    }
+
+    // Documents worth gathering: from steps still ahead and not yet ticked.
+    const seen = new Set<string>();
+    const documents: { name: string; note?: string; stepTitle: string }[] = [];
+    visiblePhases.forEach((phase, phaseIndex) => {
+      if (phaseIndex < startIndex) return;
+      for (const step of phase.steps) {
+        if (progress[step.slug]) continue;
+        for (const doc of parseDocuments(step.documents)) {
+          const key = doc.name.trim().toLowerCase();
+          if (seen.has(key)) continue;
+          seen.add(key);
+          documents.push({ ...doc, stepTitle: step.title });
+        }
+      }
+    });
+
+    return {
+      feeCents,
+      proofCents,
+      monthlyCents,
+      hardDeadlines,
+      bookAhead,
+      documents,
+    };
+  }, [visiblePhases, startIndex, progress]);
+
+  // The single most useful thing on the page: what to do right now.
+  // Left un-memoized on purpose — the React Compiler auto-memoizes it.
+  let nextStep: { phase: PhaseWithSteps; step: Step } | null = null;
+  for (let i = startIndex; i < visiblePhases.length; i += 1) {
+    const phase = visiblePhases[i];
+    const step = phase.steps.find((s) => !progress[s.slug]);
+    if (step) {
+      nextStep = { phase, step };
+      break;
+    }
+  }
+
   const handleToggle = (phase: PhaseWithSteps, step: Step) => {
     const wasDone = Boolean(progress[step.slug]);
     toggleStep(step.slug);
@@ -196,6 +263,46 @@ export function JourneyBoard({
           {city ? city.name : "No city yet — showing the Germany-wide guide"}
         </span>
       </div>
+
+      {hasPlan &&
+        (insights.feeCents > 0 || insights.hardDeadlines > 0) && (
+          <p className="mt-4 flex flex-wrap items-center gap-x-3 gap-y-1 text-sm text-muted">
+            {insights.feeCents > 0 && (
+              <span>
+                <span className="font-semibold text-foreground">
+                  ≈ {formatCost(insights.feeCents, "one_time")}
+                </span>{" "}
+                in official fees
+              </span>
+            )}
+            {insights.hardDeadlines > 0 && (
+              <>
+                <span aria-hidden className="text-border">
+                  ·
+                </span>
+                <span>
+                  <span className="font-semibold text-foreground">
+                    {insights.hardDeadlines}
+                  </span>{" "}
+                  hard {insights.hardDeadlines === 1 ? "deadline" : "deadlines"}
+                </span>
+              </>
+            )}
+            {insights.bookAhead > 0 && (
+              <>
+                <span aria-hidden className="text-border">
+                  ·
+                </span>
+                <span>
+                  <span className="font-semibold text-foreground">
+                    {insights.bookAhead}
+                  </span>{" "}
+                  to book ahead
+                </span>
+              </>
+            )}
+          </p>
+        )}
 
       {!hasPlan && (
         <div className="mt-8 flex items-start gap-4 rounded-3xl border border-primary/30 bg-primary-soft p-6">
@@ -272,6 +379,121 @@ export function JourneyBoard({
           />
         </div>
       </div>
+
+      {/* Do this now — one clear action instead of the whole tree. */}
+      {hasPlan && nextStep && (
+        <Link
+          href={
+            nextStep.step.city_variable && profile.citySlug
+              ? `/cities/${profile.citySlug}/${nextStep.step.slug}`
+              : `/guide/${nextStep.step.slug}`
+          }
+          className="mt-6 flex items-center gap-4 rounded-3xl border border-primary/30 bg-primary-soft p-6 transition-all hover:shadow-md"
+        >
+          <span className="flex h-11 w-11 shrink-0 items-center justify-center rounded-2xl bg-primary text-primary-foreground">
+            <ArrowRight className="h-5 w-5" />
+          </span>
+          <span className="min-w-0 flex-1">
+            <span className="text-xs font-semibold uppercase tracking-wide text-primary">
+              Your next step
+            </span>
+            <span className="mt-0.5 flex items-center gap-1.5 font-display text-lg font-bold">
+              {nextStep.step.title}
+              {nextStep.step.deadline_urgency === "hard" && (
+                <AlertTriangle className="h-4 w-4 shrink-0 text-primary" />
+              )}
+            </span>
+            {nextStep.step.deadline_rule ? (
+              <span className="mt-0.5 block text-sm text-muted">
+                {nextStep.step.deadline_rule}
+              </span>
+            ) : (
+              nextStep.step.summary && (
+                <span className="mt-0.5 block text-sm text-muted">
+                  {nextStep.step.summary}
+                </span>
+              )
+            )}
+          </span>
+        </Link>
+      )}
+
+      {/* Money at a glance — fees you pay, funds to show, monthly running cost. */}
+      {hasPlan &&
+        (insights.feeCents > 0 ||
+          insights.proofCents > 0 ||
+          insights.monthlyCents > 0) && (
+          <div className="mt-4 rounded-3xl border border-border bg-card p-6">
+            <p className="flex items-center gap-2 font-display text-lg font-bold">
+              <Coins className="h-5 w-5 text-gold" />
+              What this journey costs
+            </p>
+            <div className="mt-4 grid gap-4 sm:grid-cols-3">
+              {insights.feeCents > 0 && (
+                <CostStat
+                  value={formatCost(insights.feeCents, "one_time")!}
+                  label="in one-off official fees"
+                />
+              )}
+              {insights.proofCents > 0 && (
+                <CostStat
+                  value={formatCost(insights.proofCents, "one_time")!}
+                  label="to show as proof of funds (your own money)"
+                />
+              )}
+              {insights.monthlyCents > 0 && (
+                <CostStat
+                  value={`${formatCost(insights.monthlyCents, "one_time")!}/mo`}
+                  label="rough recurring costs (insurance, fees, SIM)"
+                />
+              )}
+            </div>
+            <p className="mt-4 text-xs leading-relaxed text-muted">
+              Estimates that adapt to your path — check each step for the exact,
+              locally-verified figure.
+            </p>
+          </div>
+        )}
+
+      {/* Gather these now — every document across the road ahead, in one list. */}
+      {hasPlan && insights.documents.length > 0 && (
+        <details className="group mt-4 rounded-3xl border border-border bg-card p-6 [&_summary]:cursor-pointer">
+          <summary className="flex items-center gap-3 font-display text-lg font-bold [&::-webkit-details-marker]:hidden">
+            <FileText className="h-5 w-5 text-primary" />
+            <span className="flex-1">
+              Get these documents ready
+              <span className="ml-2 text-sm font-normal text-muted">
+                {insights.documents.length} to gather
+              </span>
+            </span>
+            <ChevronDown className="h-5 w-5 shrink-0 text-muted transition-transform group-open:rotate-180" />
+          </summary>
+          <p className="mt-2 text-sm leading-relaxed text-muted">
+            Everything the road ahead asks for, pulled into one place — prepare
+            these before the appointment maze begins.
+          </p>
+          <ul className="mt-4 space-y-3">
+            {insights.documents.map((doc) => (
+              <li
+                key={doc.name}
+                className="flex items-start gap-3 text-[15px]"
+              >
+                <span
+                  aria-hidden
+                  className="mt-1.5 h-2 w-2 shrink-0 rounded-full bg-primary"
+                />
+                <span>
+                  <span className="font-medium">{doc.name}</span>
+                  {doc.note && <span className="text-muted"> — {doc.note}</span>}
+                  <span className="mt-0.5 block text-xs text-muted">
+                    for “{doc.stepTitle}”
+                  </span>
+                </span>
+              </li>
+            ))}
+          </ul>
+        </details>
+      )}
 
       <div className="mt-10 space-y-4">
         {visiblePhases.map((phase, phaseIndex) => {
@@ -437,6 +659,15 @@ export function JourneyBoard({
           </div>
         </div>
       )}
+    </div>
+  );
+}
+
+function CostStat({ value, label }: { value: string; label: string }) {
+  return (
+    <div className="rounded-2xl bg-card-muted/60 p-4">
+      <p className="font-display text-2xl font-bold">{value}</p>
+      <p className="mt-1 text-sm leading-snug text-muted">{label}</p>
     </div>
   );
 }

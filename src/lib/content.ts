@@ -59,6 +59,22 @@ export const getAllStepSlugs = cache(async () => {
   return data.map((row) => row.slug);
 });
 
+export interface StepGraphNode {
+  slug: string;
+  title: string;
+  depends_on: string[];
+}
+
+/** Lightweight slug → {title, prerequisites} map for rendering dependencies. */
+export const getStepGraph = cache(async (): Promise<StepGraphNode[]> => {
+  const supabase = createContentClient();
+  const { data, error } = await supabase
+    .from("steps")
+    .select("slug, title, depends_on");
+  if (error) throw error;
+  return data;
+});
+
 export const getCityStepPairs = cache(async () => {
   const supabase = createContentClient();
   const { data, error } = await supabase
@@ -173,4 +189,88 @@ export function parseLinks(json: unknown): StepLink[] {
 
 export function parseTips(json: unknown): string[] {
   return Array.isArray(json) ? (json as string[]) : [];
+}
+
+export type CostType =
+  | "one_time"
+  | "monthly"
+  | "deposit"
+  | "proof_of_funds"
+  | "none";
+
+/** Cost/timing that a city variant can override on top of the base step. */
+export interface StepMeta {
+  costCents: number | null;
+  costType: CostType | null;
+  costNote: string | null;
+  deadlineRule: string | null;
+  deadlineUrgency: "hard" | "soft" | null;
+  leadTime: string | null;
+}
+
+/** Merge a step's base cost/timing with a city override (city wins per field). */
+export function resolveStepMeta(
+  step: Pick<
+    Step,
+    | "cost_cents"
+    | "cost_type"
+    | "cost_note"
+    | "deadline_rule"
+    | "deadline_urgency"
+    | "lead_time"
+  >,
+  city?: Pick<
+    CityStep,
+    | "cost_cents"
+    | "cost_type"
+    | "cost_note"
+    | "deadline_rule"
+    | "deadline_urgency"
+    | "lead_time"
+  > | null,
+): StepMeta {
+  const pick = <T>(c: T | null | undefined, s: T | null): T | null =>
+    c !== null && c !== undefined ? c : s;
+  return {
+    costCents: pick(city?.cost_cents, step.cost_cents),
+    costType: pick(city?.cost_type, step.cost_type) as CostType | null,
+    costNote: pick(city?.cost_note, step.cost_note),
+    deadlineRule: pick(city?.deadline_rule, step.deadline_rule),
+    deadlineUrgency: pick(city?.deadline_urgency, step.deadline_urgency) as
+      | "hard"
+      | "soft"
+      | null,
+    leadTime: pick(city?.lead_time, step.lead_time),
+  };
+}
+
+const EURO = new Intl.NumberFormat("en-IE", {
+  style: "currency",
+  currency: "EUR",
+  maximumFractionDigits: 2,
+});
+
+/** "€100", "€18.36 / mo", "€11,904 to show" — null when there's nothing to say. */
+export function formatCost(
+  cents: number | null,
+  type: CostType | null,
+): string | null {
+  if (type === "none") return "Free";
+  if (cents === null || cents === undefined) return null;
+  const amount = EURO.format(cents / 100).replace(/\.00$/, "");
+  switch (type) {
+    case "monthly":
+      return `${amount} / mo`;
+    case "proof_of_funds":
+      return `${amount} to show`;
+    case "deposit":
+      return `${amount} deposit`;
+    default:
+      return amount;
+  }
+}
+
+/** Only genuine one-off fees count toward the "fees you'll pay" total. */
+export function isPayableFee(type: CostType | null): boolean {
+  return type === "one_time" || type === "deposit";
 }

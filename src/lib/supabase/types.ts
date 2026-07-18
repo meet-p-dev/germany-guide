@@ -50,9 +50,15 @@ export type Database = {
           city_id: string
           contact: Json
           content_md: string
+          cost_cents: number | null
+          cost_note: string | null
+          cost_type: string | null
           created_at: string
+          deadline_rule: string | null
+          deadline_urgency: string | null
           id: string
           last_verified: string | null
+          lead_time: string | null
           links: Json
           method: string | null
           method_note: string | null
@@ -65,9 +71,15 @@ export type Database = {
           city_id: string
           contact?: Json
           content_md: string
+          cost_cents?: number | null
+          cost_note?: string | null
+          cost_type?: string | null
           created_at?: string
+          deadline_rule?: string | null
+          deadline_urgency?: string | null
           id?: string
           last_verified?: string | null
+          lead_time?: string | null
           links?: Json
           method?: string | null
           method_note?: string | null
@@ -80,9 +92,15 @@ export type Database = {
           city_id?: string
           contact?: Json
           content_md?: string
+          cost_cents?: number | null
+          cost_note?: string | null
+          cost_type?: string | null
           created_at?: string
+          deadline_rule?: string | null
+          deadline_urgency?: string | null
           id?: string
           last_verified?: string | null
+          lead_time?: string | null
           links?: Json
           method?: string | null
           method_note?: string | null
@@ -246,6 +264,7 @@ export type Database = {
           city_slug: string | null
           created_at: string
           id: string
+          move_in_date: string | null
           persona: string | null
           stage: string | null
           updated_at: string
@@ -254,6 +273,7 @@ export type Database = {
           city_slug?: string | null
           created_at?: string
           id: string
+          move_in_date?: string | null
           persona?: string | null
           stage?: string | null
           updated_at?: string
@@ -262,6 +282,7 @@ export type Database = {
           city_slug?: string | null
           created_at?: string
           id?: string
+          move_in_date?: string | null
           persona?: string | null
           stage?: string | null
           updated_at?: string
@@ -273,9 +294,16 @@ export type Database = {
           applies_to: string
           city_variable: boolean
           content_md: string
+          cost_cents: number | null
+          cost_note: string | null
+          cost_type: string | null
           created_at: string
+          deadline_rule: string | null
+          deadline_urgency: string | null
+          depends_on: string[]
           documents: Json
           id: string
+          lead_time: string | null
           official_links: Json
           phase_id: string
           slug: string
@@ -288,9 +316,16 @@ export type Database = {
           applies_to?: string
           city_variable?: boolean
           content_md: string
+          cost_cents?: number | null
+          cost_note?: string | null
+          cost_type?: string | null
           created_at?: string
+          deadline_rule?: string | null
+          deadline_urgency?: string | null
+          depends_on?: string[]
           documents?: Json
           id?: string
+          lead_time?: string | null
           official_links?: Json
           phase_id: string
           slug: string
@@ -303,9 +338,16 @@ export type Database = {
           applies_to?: string
           city_variable?: boolean
           content_md?: string
+          cost_cents?: number | null
+          cost_note?: string | null
+          cost_type?: string | null
           created_at?: string
+          deadline_rule?: string | null
+          deadline_urgency?: string | null
+          depends_on?: string[]
           documents?: Json
           id?: string
+          lead_time?: string | null
           official_links?: Json
           phase_id?: string
           slug?: string
@@ -320,6 +362,38 @@ export type Database = {
             columns: ["phase_id"]
             isOneToOne: false
             referencedRelation: "phases"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      user_notes: {
+        Row: {
+          reference_number: string | null
+          note: string | null
+          step_id: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          reference_number?: string | null
+          note?: string | null
+          step_id: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          reference_number?: string | null
+          note?: string | null
+          step_id?: string
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "user_notes_step_id_fkey"
+            columns: ["step_id"]
+            isOneToOne: false
+            referencedRelation: "steps"
             referencedColumns: ["id"]
           },
         ]

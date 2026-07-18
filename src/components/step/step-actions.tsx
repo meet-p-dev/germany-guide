@@ -6,6 +6,43 @@ import { ArrowRight, Check, Circle } from "lucide-react";
 import { useVisitorProfile } from "@/lib/profile-store";
 import { cn } from "@/lib/utils";
 
+/**
+ * Breadcrumb that respects which spine the visitor is travelling on. Steps are
+ * reached from two places — the generic "The process" overview and a visitor's
+ * personalised journey — so a fixed link back to /process ejects committed
+ * visitors out of their own flow. Once the profile has hydrated and shows a
+ * saved plan, the crumb leads back to /journey instead. Before hydration we
+ * render the neutral /process link so server and first client paint agree.
+ */
+export function StepBreadcrumb({ phaseTitle }: { phaseTitle: string | null }) {
+  const { ready, profile } = useVisitorProfile();
+  const hasPlan =
+    ready &&
+    (profile.stage !== null ||
+      profile.persona !== null ||
+      profile.citySlug !== null);
+  const back = hasPlan
+    ? { href: "/journey", label: "My journey" }
+    : { href: "/process", label: "The process" };
+
+  return (
+    <nav
+      aria-label="Breadcrumb"
+      className="flex items-center gap-2 text-sm text-muted"
+    >
+      <Link href={back.href} className="hover:text-foreground">
+        {back.label}
+      </Link>
+      {phaseTitle && (
+        <>
+          <span aria-hidden>/</span>
+          <span>{phaseTitle}</span>
+        </>
+      )}
+    </nav>
+  );
+}
+
 /** Toggle a step done/undone from its own page — synced with My Journey. */
 export function StepDoneButton({ stepSlug }: { stepSlug: string }) {
   const { ready, progress, toggleStep } = useVisitorProfile();

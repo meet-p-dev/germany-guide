@@ -204,6 +204,11 @@ function PlanFlow({
       persona: overrides?.persona !== undefined ? overrides.persona : persona,
       citySlug:
         overrides?.citySlug !== undefined ? overrides.citySlug : citySlug,
+      // The wizard doesn't ask for a move-in date — preserve any saved one.
+      moveInDate:
+        overrides?.moveInDate !== undefined
+          ? overrides.moveInDate
+          : profile.moveInDate,
     };
     const switchingPersona =
       profile.persona !== null &&
@@ -219,7 +224,7 @@ function PlanFlow({
 
   const startOver = () => {
     resetProgress();
-    setProfile({ stage: null, persona: null, citySlug: null });
+    setProfile({ stage: null, persona: null, citySlug: null, moveInDate: null });
     setStage(null);
     setPersona(null);
     setCitySlug(null);

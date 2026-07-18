@@ -1,11 +1,16 @@
 import Link from "next/link";
 import {
+  AlertTriangle,
   CalendarClock,
   CheckSquare,
+  Clock,
+  Coins,
   ExternalLink,
   Footprints,
   Globe,
+  KeyRound,
   Lightbulb,
+  Lock,
   Mail,
   MapPin,
   Send,
@@ -14,14 +19,21 @@ import {
 import type { LucideIcon } from "lucide-react";
 import type { Tables } from "@/lib/supabase/types";
 import {
+  formatCost,
+  getStepGraph,
   parseDocuments,
   parseLinks,
   parseTips,
+  resolveStepMeta,
   type StepLink,
 } from "@/lib/content";
 import { Markdown } from "@/components/markdown";
 import { Kicker } from "@/components/ui/kicker";
-import { StepDoneButton, YourCityHint } from "@/components/step/step-actions";
+import {
+  StepBreadcrumb,
+  StepDoneButton,
+  YourCityHint,
+} from "@/components/step/step-actions";
 import { cn } from "@/lib/utils";
 
 type StepWithRelations = Tables<"steps"> & {
@@ -60,7 +72,7 @@ const METHOD_META: Record<
   },
 };
 
-export function StepView({
+export async function StepView({
   step,
   activeCitySlug,
 }: {
@@ -76,15 +88,29 @@ export function StepView({
     ? (cityVariants.find((cs) => cs.cities!.slug === activeCitySlug) ?? null)
     : null;
 
+  // City variant (when set) overrides the base cost / timing figures.
+  const meta = resolveStepMeta(step, active);
+  const costLabel = formatCost(meta.costCents, meta.costType);
+
+  // Resolve prerequisite and "unlocks" titles from the step graph.
+  const graph = await getStepGraph();
+  const titleFor = (slug: string) =>
+    graph.find((n) => n.slug === slug)?.title ?? slug;
+  // Guard the arrays: right after a schema change PostgREST can briefly serve
+  // rows without the new column, and a crash here would fail the whole build.
+  const prerequisites = (step.depends_on ?? []).map((slug) => ({
+    slug,
+    title: titleFor(slug),
+  }));
+  const unlocks = graph
+    .filter(
+      (n) => n.slug !== step.slug && (n.depends_on ?? []).includes(step.slug),
+    )
+    .map((n) => ({ slug: n.slug, title: n.title }));
+
   return (
     <article className="mx-auto max-w-3xl px-4 py-14 sm:px-6">
-      <nav aria-label="Breadcrumb" className="flex items-center gap-2 text-sm text-muted">
-        <Link href="/process" className="hover:text-foreground">
-          The process
-        </Link>
-        <span aria-hidden>/</span>
-        <span>{step.phases?.title}</span>
-      </nav>
+      <StepBreadcrumb phaseTitle={step.phases?.title ?? null} />
 
       <h1 className="font-display mt-4 text-4xl font-bold sm:text-5xl">
         {step.title}
@@ -101,6 +127,67 @@ export function StepView({
           </span>
         )}
       </div>
+
+      {/* At-a-glance facts: cost, hard/soft deadline, and lead time. */}
+      {(costLabel || meta.deadlineRule || meta.leadTime) && (
+        <div className="mt-5 flex flex-wrap items-center gap-2.5">
+          {costLabel && (
+            <FactChip
+              icon={Coins}
+              className="bg-card text-foreground/80 border border-border"
+            >
+              <span className="font-semibold">{costLabel}</span>
+              {meta.costNote && (
+                <span className="text-muted"> — {meta.costNote}</span>
+              )}
+            </FactChip>
+          )}
+          {meta.deadlineRule && (
+            <FactChip
+              icon={meta.deadlineUrgency === "hard" ? AlertTriangle : CalendarClock}
+              className={cn(
+                meta.deadlineUrgency === "hard"
+                  ? "bg-primary-soft text-primary"
+                  : "bg-gold-soft text-gold",
+              )}
+            >
+              {meta.deadlineUrgency === "hard" && (
+                <span className="font-semibold">Deadline:</span>
+              )}{" "}
+              {meta.deadlineRule}
+            </FactChip>
+          )}
+          {meta.leadTime && (
+            <FactChip icon={Clock} className="bg-card text-muted border border-border">
+              {meta.leadTime}
+            </FactChip>
+          )}
+        </div>
+      )}
+
+      {/* Dependency map — the chicken-and-egg ordering made explicit. */}
+      {(prerequisites.length > 0 || unlocks.length > 0) && (
+        <div className="mt-8 grid gap-3 sm:grid-cols-2">
+          {prerequisites.length > 0 && (
+            <DependencyCard
+              icon={Lock}
+              tone="prereq"
+              title="Finish these first"
+              items={prerequisites}
+              linkFor={(slug) => `/guide/${slug}`}
+            />
+          )}
+          {unlocks.length > 0 && (
+            <DependencyCard
+              icon={KeyRound}
+              tone="unlock"
+              title="This unlocks"
+              items={unlocks}
+              linkFor={(slug) => `/guide/${slug}`}
+            />
+          )}
+        </div>
+      )}
 
       {/* City switcher — links, not state: every variant is its own SEO page */}
       {step.city_variable && (
@@ -220,6 +307,75 @@ export function StepView({
         the official source before acting.
       </p>
     </article>
+  );
+}
+
+function FactChip({
+  icon: Icon,
+  className,
+  children,
+}: {
+  icon: LucideIcon;
+  className?: string;
+  children: React.ReactNode;
+}) {
+  return (
+    <span
+      className={cn(
+        "inline-flex items-center gap-2 rounded-full px-3.5 py-1.5 text-sm leading-snug",
+        className,
+      )}
+    >
+      <Icon className="h-4 w-4 shrink-0" />
+      <span>{children}</span>
+    </span>
+  );
+}
+
+function DependencyCard({
+  icon: Icon,
+  tone,
+  title,
+  items,
+  linkFor,
+}: {
+  icon: LucideIcon;
+  tone: "prereq" | "unlock";
+  title: string;
+  items: { slug: string; title: string }[];
+  linkFor: (slug: string) => string;
+}) {
+  return (
+    <div
+      className={cn(
+        "rounded-2xl border p-4",
+        tone === "prereq"
+          ? "border-border bg-card-muted/60"
+          : "border-primary/25 bg-primary-soft/50",
+      )}
+    >
+      <p className="flex items-center gap-2 text-sm font-semibold">
+        <Icon
+          className={cn(
+            "h-4 w-4",
+            tone === "prereq" ? "text-muted" : "text-primary",
+          )}
+        />
+        {title}
+      </p>
+      <ul className="mt-2.5 space-y-1.5">
+        {items.map((item) => (
+          <li key={item.slug}>
+            <Link
+              href={linkFor(item.slug)}
+              className="text-sm font-medium text-foreground/85 hover:text-primary hover:underline"
+            >
+              {item.title}
+            </Link>
+          </li>
+        ))}
+      </ul>
+    </div>
   );
 }
 

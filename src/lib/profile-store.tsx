@@ -17,6 +17,8 @@ export interface VisitorProfile {
   persona: Persona | null;
   citySlug: string | null;
   stage: Stage | null;
+  /** ISO date (yyyy-mm-dd) the visitor moves / moved in; anchors deadlines. */
+  moveInDate: string | null;
 }
 
 export type ProgressMap = Record<string, "done" | "skipped">;
@@ -35,6 +37,7 @@ const EMPTY_PROFILE: VisitorProfile = {
   persona: null,
   citySlug: null,
   stage: null,
+  moveInDate: null,
 };
 
 interface ProfileContextValue {
@@ -128,6 +131,7 @@ export function ProfileProvider({ children }: { children: React.ReactNode }) {
             profile.persona ?? ((remote?.persona as Persona | null) ?? null),
           citySlug: profile.citySlug ?? remote?.city_slug ?? null,
           stage: profile.stage ?? ((remote?.stage as Stage | null) ?? null),
+          moveInDate: profile.moveInDate ?? remote?.move_in_date ?? null,
         };
         setProfileState(merged);
         window.localStorage.setItem(PROFILE_KEY, JSON.stringify(merged));
@@ -136,6 +140,7 @@ export function ProfileProvider({ children }: { children: React.ReactNode }) {
           persona: merged.persona,
           city_slug: merged.citySlug,
           stage: merged.stage,
+          move_in_date: merged.moveInDate,
         });
 
         // ----- progress union -----
@@ -185,6 +190,7 @@ export function ProfileProvider({ children }: { children: React.ReactNode }) {
               persona: next.persona,
               city_slug: next.citySlug,
               stage: next.stage,
+              move_in_date: next.moveInDate,
             })
             .then(({ error }) => {
               if (error) console.error("Profile sync failed:", error);

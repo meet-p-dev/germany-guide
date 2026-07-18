@@ -3,7 +3,7 @@
 import { useState } from "react";
 import Link from "next/link";
 import { AnimatePresence, motion } from "framer-motion";
-import { LogOut, UserRound } from "lucide-react";
+import { LayoutDashboard, LogOut, UserRound } from "lucide-react";
 import { useVisitorProfile } from "@/lib/profile-store";
 import { cn } from "@/lib/utils";
 
@@ -52,6 +52,14 @@ export function AuthButton() {
               <UserRound className="h-4 w-4 shrink-0" />
               {email}
             </p>
+            <Link
+              href="/account"
+              onClick={() => setOpen(false)}
+              className="flex w-full items-center gap-2 rounded-xl px-3 py-2 text-left text-sm font-medium transition-colors hover:bg-card-muted"
+            >
+              <LayoutDashboard className="h-4 w-4" />
+              My account
+            </Link>
             <button
               type="button"
               onClick={() => {
