@@ -1,7 +1,10 @@
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
-import { getAllStepSlugs, getStepBySlug } from "@/lib/content";
+import { getAllStepSlugs, getStepBySlug, parseDocuments } from "@/lib/content";
 import { StepView } from "@/components/step/step-view";
+import { JsonLd, howToJsonLd, breadcrumbJsonLd } from "@/components/seo/json-ld";
+
+const BASE_URL = "https://germanyguide.net";
 
 export const revalidate = 3600;
 export const dynamicParams = true;
@@ -34,5 +37,30 @@ export default async function StepPage({
   const step = await getStepBySlug(slug);
   if (!step) notFound();
 
-  return <StepView step={step} activeCitySlug={null} />;
+  const documents = parseDocuments(step.documents);
+
+  return (
+    <>
+      <JsonLd
+        data={breadcrumbJsonLd([
+          { name: "Guide", url: `${BASE_URL}/process` },
+          { name: step.title, url: `${BASE_URL}/guide/${step.slug}` },
+        ])}
+      />
+      <JsonLd
+        data={howToJsonLd({
+          name: step.title,
+          description: step.summary ?? step.title,
+          totalCostCents: step.cost_cents,
+          steps: documents.length
+            ? documents.map((doc) => ({
+                name: doc.name,
+                text: doc.note ? `${doc.name} — ${doc.note}` : doc.name,
+              }))
+            : [{ name: step.title, text: step.summary ?? step.title }],
+        })}
+      />
+      <StepView step={step} activeCitySlug={null} />
+    </>
+  );
 }

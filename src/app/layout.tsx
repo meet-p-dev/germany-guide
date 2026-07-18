@@ -7,6 +7,12 @@ import { SiteHeader } from "@/components/layout/site-header";
 import { SiteFooter } from "@/components/layout/site-footer";
 import { FlagStripe } from "@/components/layout/flag-stripe";
 import { ChatWidget } from "@/components/chat/chat-widget";
+import { Analytics } from "@vercel/analytics/next";
+import {
+  JsonLd,
+  organizationJsonLd,
+  websiteJsonLd,
+} from "@/components/seo/json-ld";
 import "./globals.css";
 
 // Self-hosted variable font (weights 100–1000) — no build-time network
@@ -68,6 +74,8 @@ export default function RootLayout({
       className={`${dmSans.variable} ${cabinetGrotesk.variable} h-full antialiased`}
     >
       <body className="flex min-h-full flex-col">
+        <JsonLd data={organizationJsonLd()} />
+        <JsonLd data={websiteJsonLd()} />
         <ThemeProvider attribute="class" defaultTheme="system" enableSystem>
           <ProfileProvider>
             <MotionProvider>
@@ -79,6 +87,7 @@ export default function RootLayout({
             </MotionProvider>
           </ProfileProvider>
         </ThemeProvider>
+        <Analytics />
       </body>
     </html>
   );
