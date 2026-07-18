@@ -24,6 +24,13 @@ export type ProgressMap = Record<string, "done" | "skipped">;
 const PROFILE_KEY = "gg.profile.v1";
 const PROGRESS_KEY = "gg.progress.v1";
 
+/**
+ * Session flag set by the plan wizard after it pre-ticks steps that lie
+ * behind the visitor's stage; the journey reads it once and asks the
+ * visitor to verify those ticks.
+ */
+export const REVIEW_BEHIND_KEY = "gg.review-behind.v1";
+
 const EMPTY_PROFILE: VisitorProfile = {
   persona: null,
   citySlug: null,
@@ -38,6 +45,8 @@ interface ProfileContextValue {
   session: Session | null;
   setProfile: (patch: Partial<VisitorProfile>) => void;
   toggleStep: (stepSlug: string) => void;
+  /** Bulk-tick steps as done; already-ticked slugs are left untouched. */
+  markStepsDone: (stepSlugs: string[]) => void;
   resetProgress: () => void;
   signOut: () => Promise<void>;
 }
@@ -228,6 +237,43 @@ export function ProfileProvider({ children }: { children: React.ReactNode }) {
     [session, getStepIds],
   );
 
+  const markStepsDone = useCallback(
+    (stepSlugs: string[]) => {
+      setProgress((prev) => {
+        const fresh = stepSlugs.filter((slug) => !prev[slug]);
+        if (fresh.length === 0) return prev;
+        const next: ProgressMap = { ...prev };
+        for (const slug of fresh) next[slug] = "done";
+        window.localStorage.setItem(PROGRESS_KEY, JSON.stringify(next));
+
+        const userId = session?.user.id;
+        if (userId) {
+          getStepIds()
+            .then(async (stepIds) => {
+              const rows = fresh
+                .map((slug) => {
+                  const stepId = stepIds.get(slug);
+                  return stepId
+                    ? {
+                        user_id: userId,
+                        step_id: stepId,
+                        status: "done" as const,
+                      }
+                    : null;
+                })
+                .filter((row) => row !== null);
+              if (rows.length > 0) {
+                await getBrowserClient().from("user_progress").upsert(rows);
+              }
+            })
+            .catch((error) => console.error("Progress sync failed:", error));
+        }
+        return next;
+      });
+    },
+    [session, getStepIds],
+  );
+
   const resetProgress = useCallback(() => {
     setProgress({});
     window.localStorage.removeItem(PROGRESS_KEY);
@@ -256,6 +302,7 @@ export function ProfileProvider({ children }: { children: React.ReactNode }) {
       session,
       setProfile,
       toggleStep,
+      markStepsDone,
       resetProgress,
       signOut,
     }),
@@ -266,6 +313,7 @@ export function ProfileProvider({ children }: { children: React.ReactNode }) {
       session,
       setProfile,
       toggleStep,
+      markStepsDone,
       resetProgress,
       signOut,
     ],

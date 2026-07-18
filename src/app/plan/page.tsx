@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 import { Suspense } from "react";
-import { getCities } from "@/lib/content";
+import { getCities, getPhasesWithSteps } from "@/lib/content";
 import { PlanWizard } from "@/components/plan/plan-wizard";
 
 export const metadata: Metadata = {
@@ -12,12 +12,15 @@ export const metadata: Metadata = {
 export const revalidate = 3600;
 
 export default async function PlanPage() {
-  const cities = await getCities();
+  const [cities, phases] = await Promise.all([
+    getCities(),
+    getPhasesWithSteps(),
+  ]);
 
   return (
     <div className="mx-auto max-w-2xl px-4 py-16 sm:px-6">
       <Suspense>
-        <PlanWizard cities={cities} />
+        <PlanWizard cities={cities} phases={phases} />
       </Suspense>
     </div>
   );

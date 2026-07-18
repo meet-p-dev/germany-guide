@@ -83,6 +83,13 @@ export function ProcessTimeline({ phases }: { phases: PhaseWithSteps[] }) {
                           </span>
                         )}
                       </span>
+                      {step.applies_to !== "both" && (
+                        <span className="mt-2 w-fit rounded-full border border-border px-2.5 py-0.5 text-[11px] font-semibold uppercase tracking-wide text-muted">
+                          {step.applies_to === "student"
+                            ? "Students only"
+                            : "Workers only"}
+                        </span>
+                      )}
                       {step.summary && (
                         <span className="mt-2 text-sm leading-relaxed text-muted">
                           {step.summary}
@@ -99,8 +106,9 @@ export function ProcessTimeline({ phases }: { phases: PhaseWithSteps[] }) {
 
               {phase.steps.some((step) => step.applies_to !== "both") && (
                 <p className="mt-3 text-xs text-muted">
-                  Some steps here apply only to students or only to workers —
-                  your personal plan filters them for you.
+                  Steps marked &ldquo;Students only&rdquo; or &ldquo;Workers
+                  only&rdquo; drop out of your personal plan when they
+                  don&apos;t apply to you.
                 </p>
               )}
             </motion.div>

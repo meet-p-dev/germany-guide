@@ -8,13 +8,15 @@ import {
   ArrowRight,
   Check,
   ChevronDown,
+  ClipboardCheck,
   MapPin,
   PencilLine,
   Sparkles,
 } from "lucide-react";
 import type { City, PhaseWithSteps, Step } from "@/lib/content";
 import { startPhaseForStage, stepAppliesTo } from "@/lib/content";
-import { useVisitorProfile } from "@/lib/profile-store";
+import { REVIEW_BEHIND_KEY, useVisitorProfile } from "@/lib/profile-store";
+import { Button } from "@/components/ui/button";
 import { ButtonLink } from "@/components/ui/button";
 import { Kicker } from "@/components/ui/kicker";
 import { cn } from "@/lib/utils";
@@ -26,6 +28,14 @@ const STAGE_LABELS: Record<string, string> = {
   applied: "Applied & waiting",
   moving: "Moving soon",
   arrived: "Already in Germany",
+};
+
+/** Mid-sentence versions of the stage labels ("Germany" keeps its capital). */
+const STAGE_PHRASES: Record<string, string> = {
+  exploring: "just exploring",
+  applied: "applied & waiting",
+  moving: "moving soon",
+  arrived: "already in Germany",
 };
 
 export function JourneyBoard({
@@ -55,13 +65,37 @@ export function JourneyBoard({
     visiblePhases.findIndex((phase) => phase.slug === startPhase),
   );
 
+  // Set by the plan wizard right after it pre-ticked the phases behind the
+  // visitor's stage — we open those phases and ask for a quick review.
+  const [reviewingBehind, setReviewingBehind] = useState<boolean>(() => {
+    if (typeof window === "undefined") return false;
+    try {
+      return window.sessionStorage.getItem(REVIEW_BEHIND_KEY) === "1";
+    } catch {
+      return false;
+    }
+  });
+  const dismissReview = () => {
+    try {
+      window.sessionStorage.removeItem(REVIEW_BEHIND_KEY);
+    } catch {
+      // Nothing to clear when storage is unavailable.
+    }
+    setReviewingBehind(false);
+  };
+
   // null = "no user interaction yet" → derive the default (start phase open)
   // instead of initialising via effect.
   const [toggledPhases, setToggledPhases] = useState<Set<string> | null>(null);
   const openPhases =
     toggledPhases ??
     (ready
-      ? new Set([visiblePhases[startIndex]?.slug].filter(Boolean))
+      ? new Set(
+          (reviewingBehind
+            ? visiblePhases.slice(0, startIndex + 1).map((phase) => phase.slug)
+            : [visiblePhases[startIndex]?.slug]
+          ).filter((slug): slug is string => Boolean(slug)),
+        )
       : new Set<string>());
   const togglePhase = (slug: string) => {
     setToggledPhases(() => {
@@ -88,6 +122,13 @@ export function JourneyBoard({
   );
 
   const city = cities.find((c) => c.slug === profile.citySlug) ?? null;
+  const hasPlan =
+    profile.stage !== null ||
+    profile.persona !== null ||
+    profile.citySlug !== null;
+  const behindDone = visiblePhases
+    .slice(0, startIndex)
+    .reduce((sum, phase) => sum + doneCount(phase.steps), 0);
 
   const handleToggle = (phase: PhaseWithSteps, step: Step) => {
     const wasDone = Boolean(progress[step.slug]);
@@ -108,6 +149,23 @@ export function JourneyBoard({
       }
     }
   };
+
+  // The profile hydrates from localStorage after mount; rendering the board
+  // before that flashes the generic Germany-wide plan at returning visitors.
+  if (!ready) {
+    return (
+      <div aria-hidden className="animate-pulse">
+        <div className="h-5 w-28 rounded-full bg-card-muted" />
+        <div className="mt-4 h-10 w-2/3 rounded-2xl bg-card-muted" />
+        <div className="mt-8 h-24 rounded-2xl bg-card-muted" />
+        <div className="mt-10 space-y-4">
+          <div className="h-24 rounded-3xl bg-card-muted" />
+          <div className="h-24 rounded-3xl bg-card-muted" />
+          <div className="h-24 rounded-3xl bg-card-muted" />
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div>
@@ -138,6 +196,55 @@ export function JourneyBoard({
           {city ? city.name : "No city yet — showing the Germany-wide guide"}
         </span>
       </div>
+
+      {!hasPlan && (
+        <div className="mt-8 flex items-start gap-4 rounded-3xl border border-primary/30 bg-primary-soft p-6">
+          <span className="flex h-11 w-11 shrink-0 items-center justify-center rounded-2xl bg-primary text-primary-foreground">
+            <Sparkles className="h-5 w-5" />
+          </span>
+          <div>
+            <p className="font-display font-bold">
+              This is the full Germany-wide roadmap.
+            </p>
+            <p className="mt-1 text-sm leading-relaxed text-muted">
+              Answer up to three quick questions and this checklist reshapes
+              itself around your stage, your path, and your city.
+            </p>
+            <ButtonLink href="/plan" size="sm" className="mt-4">
+              Build my plan
+              <ArrowRight className="h-4 w-4" />
+            </ButtonLink>
+          </div>
+        </div>
+      )}
+
+      {reviewingBehind && profile.stage && behindDone > 0 && (
+        <div className="mt-8 flex items-start gap-4 rounded-3xl border border-gold/40 bg-gold-soft p-6">
+          <span className="flex h-11 w-11 shrink-0 items-center justify-center rounded-2xl bg-card text-gold">
+            <ClipboardCheck className="h-5 w-5" />
+          </span>
+          <div>
+            <p className="font-display font-bold">
+              Quick check — {behindDone} earlier{" "}
+              {behindDone === 1 ? "step is" : "steps are"} ticked as done.
+            </p>
+            <p className="mt-1 text-sm leading-relaxed text-muted">
+              You said you&apos;re {STAGE_PHRASES[profile.stage]},
+              so everything before that point is marked done below. Skim the
+              opened phases and untick anything you haven&apos;t actually
+              finished.
+            </p>
+            <div className="mt-4 flex flex-wrap items-center gap-2">
+              <Button size="sm" onClick={dismissReview}>
+                Yes, all done
+              </Button>
+              <Button variant="ghost" size="sm" onClick={dismissReview}>
+                I&apos;ll fix the ticks below
+              </Button>
+            </div>
+          </div>
+        </div>
+      )}
 
       {/* overall progress */}
       <div className="mt-8 rounded-2xl border border-border bg-card p-5">

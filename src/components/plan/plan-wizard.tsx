@@ -1,6 +1,6 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { motion } from "framer-motion";
 import {
@@ -12,18 +12,44 @@ import {
   Compass,
   GraduationCap,
   HelpCircle,
+  ListChecks,
   MapPin,
+  PencilLine,
   Plane,
+  RotateCcw,
   Sprout,
 } from "lucide-react";
 import type { LucideIcon } from "lucide-react";
-import type { City, Persona, Stage } from "@/lib/content";
-import { useVisitorProfile } from "@/lib/profile-store";
+import {
+  startPhaseForStage,
+  stepAppliesTo,
+  type City,
+  type Persona,
+  type PhaseWithSteps,
+  type Stage,
+} from "@/lib/content";
+import {
+  REVIEW_BEHIND_KEY,
+  useVisitorProfile,
+  type VisitorProfile,
+} from "@/lib/profile-store";
 import { Button } from "@/components/ui/button";
 import { Kicker } from "@/components/ui/kicker";
 import { cn } from "@/lib/utils";
 
 const EASE = [0.22, 1, 0.36, 1] as const;
+
+const STAGE_LABELS: Record<Stage, string> = {
+  exploring: "Just exploring",
+  applied: "Applied & waiting",
+  moving: "Moving soon",
+  arrived: "Already in Germany",
+};
+
+const PERSONA_LABELS: Record<Persona, string> = {
+  student: "Student",
+  worker: "Skilled worker",
+};
 
 const STAGES: { value: Stage; icon: LucideIcon; title: string; hint: string }[] = [
   {
@@ -83,15 +109,51 @@ function cityMatters(stage: Stage | null): boolean {
   return stage === "moving" || stage === "arrived";
 }
 
-export function PlanWizard({ cities }: { cities: City[] }) {
+export function PlanWizard({
+  cities,
+  phases,
+}: {
+  cities: City[];
+  phases: PhaseWithSteps[];
+}) {
+  const { ready } = useVisitorProfile();
+
+  // The saved profile hydrates from localStorage after mount; mounting the
+  // flow before that would seed the wizard with an empty profile and lose
+  // the visitor's previous answers.
+  if (!ready) return <WizardSkeleton />;
+  return <PlanFlow cities={cities} phases={phases} />;
+}
+
+function PlanFlow({
+  cities,
+  phases,
+}: {
+  cities: City[];
+  phases: PhaseWithSteps[];
+}) {
   const router = useRouter();
   const searchParams = useSearchParams();
-  const { profile, setProfile } = useVisitorProfile();
+  const { profile, progress, setProfile, markStepsDone, resetProgress } =
+    useVisitorProfile();
 
   const initialPersona = (() => {
     const p = searchParams.get("persona");
     return p === "student" || p === "worker" ? (p as Persona) : null;
   })();
+
+  const hasSavedPlan =
+    profile.stage !== null ||
+    profile.persona !== null ||
+    profile.citySlug !== null;
+  const doneCount = Object.keys(progress).length;
+
+  // Returning visitors resume their saved plan instead of re-answering
+  // everything; an explicit ?persona= link means "rebuild", so it goes
+  // straight into the wizard.
+  const [mode, setMode] = useState<"resume" | "wizard">(
+    hasSavedPlan && !initialPersona ? "resume" : "wizard",
+  );
 
   const [stage, setStage] = useState<Stage | null>(profile.stage);
   const [persona, setPersona] = useState<Persona | null>(
@@ -100,21 +162,70 @@ export function PlanWizard({ cities }: { cities: City[] }) {
   const [citySlug, setCitySlug] = useState<string | null>(profile.citySlug);
   const [stepIndex, setStepIndex] = useState(0);
 
+  /** Set when finishing would silently carry ticked steps across a persona switch. */
+  const [pendingProfile, setPendingProfile] = useState<VisitorProfile | null>(
+    null,
+  );
+  const [confirmingReset, setConfirmingReset] = useState(false);
+
   const askCity = cityMatters(stage);
   const totalSteps = askCity ? 3 : 2;
 
-  const finish = (overrides?: {
-    stage?: Stage | null;
-    persona?: Persona | null;
-    citySlug?: string | null;
-  }) => {
-    setProfile({
+  const commit = (next: VisitorProfile) => {
+    // A stage further along the journey means the phases before it are
+    // behind the visitor: tick their steps and let the journey ask for a
+    // quick review. Only on a stage change, so deliberate unticks survive
+    // re-running the wizard.
+    if (next.stage !== profile.stage) {
+      const startIndex = phases.findIndex(
+        (phase) => phase.slug === startPhaseForStage(next.stage),
+      );
+      const behind = phases
+        .slice(0, Math.max(0, startIndex))
+        .flatMap((phase) => phase.steps)
+        .filter((step) => stepAppliesTo(step, next.persona))
+        .map((step) => step.slug);
+      if (behind.length > 0) {
+        markStepsDone(behind);
+        try {
+          window.sessionStorage.setItem(REVIEW_BEHIND_KEY, "1");
+        } catch {
+          // Storage unavailable (private mode) — skip the review nudge.
+        }
+      }
+    }
+    setProfile(next);
+    router.push("/journey");
+  };
+
+  const finish = (overrides?: Partial<VisitorProfile>) => {
+    const next: VisitorProfile = {
       stage: overrides?.stage !== undefined ? overrides.stage : stage,
       persona: overrides?.persona !== undefined ? overrides.persona : persona,
       citySlug:
         overrides?.citySlug !== undefined ? overrides.citySlug : citySlug,
-    });
-    router.push("/journey");
+    };
+    const switchingPersona =
+      profile.persona !== null &&
+      next.persona !== null &&
+      next.persona !== profile.persona &&
+      doneCount > 0;
+    if (switchingPersona) {
+      setPendingProfile(next);
+      return;
+    }
+    commit(next);
+  };
+
+  const startOver = () => {
+    resetProgress();
+    setProfile({ stage: null, persona: null, citySlug: null });
+    setStage(null);
+    setPersona(null);
+    setCitySlug(null);
+    setStepIndex(0);
+    setConfirmingReset(false);
+    setMode("wizard");
   };
 
   const next = () => {
@@ -132,6 +243,94 @@ export function PlanWizard({ cities }: { cities: City[] }) {
   }, [askCity]);
 
   const current = steps[Math.min(stepIndex, steps.length - 1)];
+
+  if (mode === "resume") {
+    const city = cities.find((c) => c.slug === profile.citySlug) ?? null;
+    return (
+      <div>
+        <Kicker>Build my plan</Kicker>
+        <motion.div
+          initial={{ opacity: 0, y: 16 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.4, ease: EASE }}
+        >
+          <h1 className="mt-3 font-display text-3xl font-bold sm:text-4xl">
+            Welcome back — your plan is saved.
+          </h1>
+          <p className="mt-3 leading-relaxed text-muted">
+            Pick up where you left off, adjust your answers, or wipe the slate
+            clean and start again.
+          </p>
+
+          <div className="mt-6 flex flex-wrap items-center gap-2 text-sm">
+            {profile.stage && (
+              <span className="rounded-full border border-border bg-card px-3 py-1">
+                {STAGE_LABELS[profile.stage]}
+              </span>
+            )}
+            {profile.persona && (
+              <span className="rounded-full border border-border bg-card px-3 py-1">
+                {PERSONA_LABELS[profile.persona]}
+              </span>
+            )}
+            <span className="inline-flex items-center gap-1.5 rounded-full border border-border bg-card px-3 py-1">
+              <MapPin className="h-3.5 w-3.5 text-primary" />
+              {city ? city.name : "No city yet"}
+            </span>
+            {doneCount > 0 && (
+              <span className="inline-flex items-center gap-1.5 rounded-full border border-border bg-card px-3 py-1">
+                <ListChecks className="h-3.5 w-3.5 text-success" />
+                {doneCount} {doneCount === 1 ? "step" : "steps"} ticked
+              </span>
+            )}
+          </div>
+
+          <div className="mt-8 flex flex-wrap items-center gap-3">
+            <Button onClick={() => router.push("/journey")}>
+              Continue my journey
+              <ArrowRight className="h-4 w-4" />
+            </Button>
+            <Button variant="secondary" onClick={() => setMode("wizard")}>
+              <PencilLine className="h-4 w-4" />
+              Change my answers
+            </Button>
+            <Button variant="ghost" onClick={() => setConfirmingReset(true)}>
+              <RotateCcw className="h-4 w-4" />
+              Start over
+            </Button>
+          </div>
+        </motion.div>
+
+        {confirmingReset && (
+          <ConfirmDialog
+            title="Start from scratch?"
+            body={
+              doneCount > 0
+                ? `This clears your answers and the ${doneCount} ${
+                    doneCount === 1 ? "step" : "steps"
+                  } you've ticked so far. There's no undo.`
+                : "This clears your saved answers so you can rebuild your plan from the beginning."
+            }
+            onClose={() => setConfirmingReset(false)}
+            actions={
+              <>
+                <Button size="sm" onClick={startOver}>
+                  Start over
+                </Button>
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  onClick={() => setConfirmingReset(false)}
+                >
+                  Cancel
+                </Button>
+              </>
+            }
+          />
+        )}
+      </div>
+    );
+  }
 
   return (
     <div>
@@ -235,7 +434,7 @@ export function PlanWizard({ cities }: { cities: City[] }) {
                 icon={Compass}
                 title="Another city / don't know yet"
                 hint="You'll get the full Germany-wide guide — set your city anytime later."
-                selected={citySlug === null && profile.citySlug === null}
+                selected={false}
                 onSelect={() => finish({ citySlug: null })}
               />
             </StepShell>
@@ -252,6 +451,11 @@ export function PlanWizard({ cities }: { cities: City[] }) {
             <ArrowLeft className="h-4 w-4" />
             Back
           </Button>
+        ) : hasSavedPlan ? (
+          <Button variant="ghost" size="sm" onClick={() => setMode("resume")}>
+            <ArrowLeft className="h-4 w-4" />
+            My saved plan
+          </Button>
         ) : (
           <span />
         )}
@@ -259,6 +463,110 @@ export function PlanWizard({ cities }: { cities: City[] }) {
           Skip this question
           <ArrowRight className="h-4 w-4" />
         </Button>
+      </div>
+
+      {pendingProfile && (
+        <ConfirmDialog
+          title={`Switch to the ${
+            PERSONA_LABELS[pendingProfile.persona as Persona].toLowerCase()
+          } path?`}
+          body={`You built this plan as a ${PERSONA_LABELS[
+            profile.persona as Persona
+          ].toLowerCase()} and have ${doneCount} ${
+            doneCount === 1 ? "step" : "steps"
+          } ticked — some may belong to that path. Start the new path with a clean checklist, or keep your ticks if they still apply.`}
+          onClose={() => setPendingProfile(null)}
+          actions={
+            <>
+              <Button
+                size="sm"
+                onClick={() => {
+                  resetProgress();
+                  commit(pendingProfile);
+                }}
+              >
+                Start fresh
+              </Button>
+              <Button
+                variant="secondary"
+                size="sm"
+                onClick={() => commit(pendingProfile)}
+              >
+                Keep my progress
+              </Button>
+              <Button
+                variant="ghost"
+                size="sm"
+                onClick={() => setPendingProfile(null)}
+              >
+                Go back
+              </Button>
+            </>
+          }
+        />
+      )}
+    </div>
+  );
+}
+
+function ConfirmDialog({
+  title,
+  body,
+  actions,
+  onClose,
+}: {
+  title: string;
+  body: string;
+  actions: React.ReactNode;
+  onClose: () => void;
+}) {
+  useEffect(() => {
+    const onKey = (event: KeyboardEvent) => {
+      if (event.key === "Escape") onClose();
+    };
+    window.addEventListener("keydown", onKey);
+    return () => window.removeEventListener("keydown", onKey);
+  }, [onClose]);
+
+  return (
+    <div className="fixed inset-0 z-50 flex items-end justify-center p-4 sm:items-center">
+      <motion.button
+        type="button"
+        aria-label="Close dialog"
+        onClick={onClose}
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 1 }}
+        transition={{ duration: 0.2 }}
+        className="absolute inset-0 cursor-default bg-black/40"
+      />
+      <motion.div
+        role="dialog"
+        aria-modal="true"
+        aria-label={title}
+        initial={{ opacity: 0, y: 16, scale: 0.97 }}
+        animate={{ opacity: 1, y: 0, scale: 1 }}
+        transition={{ duration: 0.3, ease: EASE }}
+        className="relative w-full max-w-md rounded-3xl border border-border bg-card p-6 shadow-xl"
+      >
+        <h2 className="font-display text-xl font-bold">{title}</h2>
+        <p className="mt-2 text-sm leading-relaxed text-muted">{body}</p>
+        <div className="mt-6 flex flex-wrap items-center gap-2">{actions}</div>
+      </motion.div>
+    </div>
+  );
+}
+
+function WizardSkeleton() {
+  return (
+    <div aria-hidden className="animate-pulse">
+      <div className="h-5 w-32 rounded-full bg-card-muted" />
+      <div className="mt-3 h-1 rounded-full bg-card-muted" />
+      <div className="mt-10 h-9 w-3/4 rounded-2xl bg-card-muted" />
+      <div className="mt-4 h-5 w-2/3 rounded-2xl bg-card-muted" />
+      <div className="mt-8 grid gap-3">
+        <div className="h-20 rounded-2xl bg-card-muted" />
+        <div className="h-20 rounded-2xl bg-card-muted" />
+        <div className="h-20 rounded-2xl bg-card-muted" />
       </div>
     </div>
   );
