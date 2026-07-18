@@ -48,6 +48,7 @@ export const metadata: Metadata = {
     description:
       "A clear, personalised checklist for moving to Germany that knows how your exact city works.",
     url: "https://germanyguide.net",
+    images: [{ url: "/images/hero-moving-in.jpg", width: 1600, height: 1063 }],
   },
   twitter: {
     card: "summary_large_image",
