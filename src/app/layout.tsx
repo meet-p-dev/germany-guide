@@ -12,6 +12,9 @@ import "./globals.css";
 // dependency. The latin subset includes German umlauts and ß.
 const dmSans = localFont({
   src: "../fonts/dm-sans-latin.woff2",
+  // Declare the variable axis range — without it the @font-face is pinned to
+  // 400 and browsers fake every heavier weight (faux bold).
+  weight: "100 1000",
   variable: "--font-dm-sans",
   display: "swap",
 });
