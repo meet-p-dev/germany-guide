@@ -5,6 +5,8 @@ const GUIDE_LINKS = [
   { href: "/process", label: "The process" },
   { href: "/journey", label: "My journey" },
   { href: "/cities", label: "Cities" },
+  { href: "/costs", label: "What it costs" },
+  { href: "/why-germany", label: "Why Germany" },
 ];
 
 const HELP_LINKS = [
