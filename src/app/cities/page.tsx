@@ -1,9 +1,9 @@
 import type { Metadata } from "next";
-import Image from "next/image";
 import Link from "next/link";
 import { MapPinPlus } from "lucide-react";
 import { getCities } from "@/lib/content";
 import { CITIES as CITY_CARDS } from "@/lib/site-config";
+import { CityPhoto } from "@/components/city/city-photo";
 import { Kicker } from "@/components/ui/kicker";
 import { Stagger, StaggerItem } from "@/components/motion/reveal";
 
@@ -41,17 +41,11 @@ export default async function CitiesPage() {
                   className="group block h-full overflow-hidden rounded-3xl border border-border bg-card transition-all duration-300 hover:-translate-y-1 hover:shadow-lg"
                 >
                   <div className="relative h-52 overflow-hidden">
-                    {card ? (
-                      <Image
-                        src={card.image}
-                        alt={`${city.name} — ${city.tagline ?? city.state}`}
-                        fill
-                        sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw"
-                        className="object-cover transition-transform duration-500 group-hover:scale-105"
-                      />
-                    ) : (
-                      <div className="h-full w-full bg-gradient-to-br from-primary/70 to-gold/70" />
-                    )}
+                    <CityPhoto
+                      image={card?.image ?? null}
+                      alt={`${city.name} — ${city.tagline ?? city.state}`}
+                      sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw"
+                    />
                     <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-black/10 to-transparent" />
                     <div className="absolute bottom-4 left-5 text-white">
                       <p className="font-display text-2xl font-bold">

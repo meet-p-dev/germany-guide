@@ -1,7 +1,7 @@
-import Image from "next/image";
 import Link from "next/link";
 import { ArrowRight, MapPinPlus } from "lucide-react";
 import { CITIES } from "@/lib/site-config";
+import { CityPhoto } from "@/components/city/city-photo";
 import { Kicker } from "@/components/ui/kicker";
 import { Reveal, Stagger, StaggerItem } from "@/components/motion/reveal";
 
@@ -32,12 +32,10 @@ export function CitiesSection() {
               className="group block h-full overflow-hidden rounded-3xl border border-border bg-card transition-all duration-300 hover:-translate-y-1 hover:shadow-lg"
             >
               <div className="relative h-44 overflow-hidden">
-                <Image
-                  src={city.image}
+                <CityPhoto
+                  image={city.image}
                   alt={`${city.name} — ${city.tagline}`}
-                  fill
                   sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 25vw"
-                  className="object-cover transition-transform duration-500 group-hover:scale-105"
                 />
                 <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-black/10 to-transparent" />
                 <div className="absolute bottom-4 left-5 text-white">

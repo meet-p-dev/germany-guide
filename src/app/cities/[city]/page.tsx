@@ -1,5 +1,4 @@
 import type { Metadata } from "next";
-import Image from "next/image";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import {
@@ -14,6 +13,7 @@ import {
 import type { LucideIcon } from "lucide-react";
 import { getCities, getCityBySlug } from "@/lib/content";
 import { CITIES as CITY_CARDS } from "@/lib/site-config";
+import { CityPhoto } from "@/components/city/city-photo";
 import { Kicker } from "@/components/ui/kicker";
 import { SetCityButton } from "@/components/city/set-city-button";
 import { Reveal, Stagger, StaggerItem } from "@/components/motion/reveal";
@@ -77,18 +77,12 @@ export default async function CityHubPage({
       {/* Header */}
       <div className="relative overflow-hidden rounded-[2.5rem]">
         <div className="relative h-72 sm:h-96">
-          {card ? (
-            <Image
-              src={card.image}
-              alt={`${city.name} — ${city.tagline ?? city.state}`}
-              fill
-              priority
-              sizes="(max-width: 1152px) 100vw, 1152px"
-              className="object-cover"
-            />
-          ) : (
-            <div className="h-full w-full bg-gradient-to-br from-primary/70 to-gold/70" />
-          )}
+          <CityPhoto
+            image={card?.image ?? null}
+            alt={`${city.name} — ${city.tagline ?? city.state}`}
+            sizes="(max-width: 1152px) 100vw, 1152px"
+            priority
+          />
           <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/20 to-transparent" />
         </div>
         <div className="absolute bottom-0 left-0 right-0 p-8 text-white sm:p-10">

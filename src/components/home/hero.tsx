@@ -1,8 +1,14 @@
 "use client";
 
-import Image from "next/image";
 import { motion } from "framer-motion";
-import { ArrowRight, CalendarClock, Compass, Footprints, MapPin } from "lucide-react";
+import {
+  ArrowRight,
+  CalendarClock,
+  Compass,
+  Footprints,
+  MapPin,
+  MapPinned,
+} from "lucide-react";
 import { ButtonLink } from "@/components/ui/button";
 import { Float } from "@/components/motion/reveal";
 
@@ -68,15 +74,12 @@ export function Hero() {
         transition={{ duration: 0.8, ease: EASE, delay: 0.2 }}
         className="relative"
       >
-        <div className="overflow-hidden rounded-3xl">
-          <Image
-            src="/images/hero-moving-in.jpg"
-            alt="A couple carrying moving boxes into their new home in Germany"
-            width={760}
-            height={560}
-            priority
-            sizes="(max-width: 1024px) 100vw, 46vw"
-            className="h-[420px] w-full object-cover sm:h-[480px]"
+        <div className="relative h-[420px] w-full overflow-hidden rounded-3xl bg-gradient-to-br from-primary via-primary-hover to-gold/80 sm:h-[480px]">
+          <div className="absolute inset-0 bg-[radial-gradient(circle_at_30%_20%,rgba(255,255,255,0.18),transparent_55%)]" />
+          <MapPinned
+            aria-hidden
+            className="absolute -bottom-8 -right-6 h-56 w-56 text-white/10"
+            strokeWidth={0.75}
           />
         </div>
 

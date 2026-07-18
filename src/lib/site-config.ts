@@ -11,7 +11,13 @@ export interface CityCard {
   name: string;
   state: string;
   tagline: string;
-  image: string;
+  /**
+   * Path to a verifiably-licensed city photo, or null to render the branded
+   * placeholder. Keep null until a photo's license + source is confirmed —
+   * see the image-licensing rule. Old stock photos of unknown provenance were
+   * removed on 2026-07-18.
+   */
+  image: string | null;
   status: CityStatus;
 }
 
@@ -21,7 +27,7 @@ export const CITIES: CityCard[] = [
     name: "Munich",
     state: "Bavaria",
     tagline: "Bavaria's orderly heart on the Isar.",
-    image: "/images/city-munich.jpg",
+    image: null,
     status: "live",
   },
   {
@@ -29,7 +35,7 @@ export const CITIES: CityCard[] = [
     name: "Ingolstadt",
     state: "Bavaria",
     tagline: "The Danube city of Audi and students.",
-    image: "/images/city-ingolstadt.jpg",
+    image: null,
     status: "live",
   },
   {
@@ -37,7 +43,7 @@ export const CITIES: CityCard[] = [
     name: "Nuremberg",
     state: "Bavaria",
     tagline: "Franconia's historic metropolis.",
-    image: "/images/city-nuremberg.jpg",
+    image: null,
     status: "live",
   },
 ];
