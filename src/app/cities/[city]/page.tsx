@@ -112,17 +112,44 @@ export default async function CityHubPage({
         )}
       </div>
 
+      {/* No verified local data yet — coming_soon city */}
+      {citySteps.length === 0 && (
+        <Reveal className="mt-14 rounded-[2.5rem] border border-dashed border-border bg-card-muted/60 p-8 sm:p-10">
+          <span className="inline-flex rounded-full border border-border px-3 py-1 text-[11px] font-semibold uppercase tracking-wide text-muted">
+            Coming soon
+          </span>
+          <h2 className="font-display mt-4 max-w-2xl text-3xl font-bold sm:text-4xl">
+            We&apos;re verifying {city.name}&apos;s local process.
+          </h2>
+          <p className="mt-3 max-w-xl leading-relaxed text-muted">
+            {city.name} is next in line. We add a city&apos;s registration,
+            residence-permit and extension details only after checking them
+            first-hand — so nothing here is a guess. In the meantime, the
+            Germany-wide guide covers every step of your journey.
+          </p>
+          <Link
+            href="/process"
+            className="group mt-6 inline-flex items-center gap-1.5 font-semibold text-primary"
+          >
+            Browse the full process
+            <ArrowRight className="h-4 w-4 transition-transform group-hover:translate-x-0.5" />
+          </Link>
+        </Reveal>
+      )}
+
       {/* How this city works */}
-      <Reveal className="mt-14">
-        <Kicker>How {city.name} works</Kicker>
-        <h2 className="font-display mt-3 max-w-2xl text-3xl font-bold sm:text-4xl">
-          The local way of doing the big three.
-        </h2>
-        <p className="mt-3 max-w-xl leading-relaxed text-muted">
-          These are the steps where {city.name} does things its own way — each
-          card opens the full local guide.
-        </p>
-      </Reveal>
+      {citySteps.length > 0 && (
+        <Reveal className="mt-14">
+          <Kicker>How {city.name} works</Kicker>
+          <h2 className="font-display mt-3 max-w-2xl text-3xl font-bold sm:text-4xl">
+            The local way of doing the big three.
+          </h2>
+          <p className="mt-3 max-w-xl leading-relaxed text-muted">
+            These are the steps where {city.name} does things its own way — each
+            card opens the full local guide.
+          </p>
+        </Reveal>
+      )}
 
       <Stagger className="mt-10 grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
         {citySteps.map((cs) => {

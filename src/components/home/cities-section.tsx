@@ -25,7 +25,7 @@ export function CitiesSection() {
       </Reveal>
 
       <Stagger className="mt-12 grid gap-5 sm:grid-cols-2 lg:grid-cols-4">
-        {CITIES.map((city) => (
+        {CITIES.filter((city) => city.status === "live").map((city) => (
           <StaggerItem key={city.slug} className="h-full">
             <Link
               href={`/cities/${city.slug}`}
