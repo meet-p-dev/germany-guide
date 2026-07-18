@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import localFont from "next/font/local";
 import { ThemeProvider } from "next-themes";
+import { SpeedInsights } from "@vercel/speed-insights/next";
 import { ProfileProvider } from "@/lib/profile-store";
 import { MotionProvider } from "@/components/motion/motion-provider";
 import { SiteHeader } from "@/components/layout/site-header";
@@ -77,6 +78,7 @@ export default function RootLayout({
             </MotionProvider>
           </ProfileProvider>
         </ThemeProvider>
+        <SpeedInsights />
       </body>
     </html>
   );
