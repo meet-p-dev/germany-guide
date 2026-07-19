@@ -191,18 +191,17 @@ export const CITIES: CityCard[] = [
     status: "live",
   },
 
-  // Coming soon — cards are live, but the city-specific step data (Anmeldung,
-  // residence permit, extension) is verified and added in batches. Until a
-  // city's procedures are confirmed first-hand, it stays coming_soon and keeps
-  // the branded placeholder (image: null). Never ship an unverified photo or
-  // an unverified city claim — see the image-licensing rule and CLAUDE.md.
+  // Promoted to live 2026-07-19 once their Anmeldung / residence-permit /
+  // extension steps were researched first-hand from official city and
+  // authority sources. Photos stay null (branded placeholder) until a
+  // license + source is confirmed — see the image-licensing rule and CLAUDE.md.
   {
     slug: "karlsruhe",
     name: "Karlsruhe",
     state: "Baden-Württemberg",
     tagline: "The fan-shaped city of courts and computing.",
     image: null,
-    status: "coming_soon",
+    status: "live",
   },
   {
     slug: "darmstadt",
@@ -210,7 +209,7 @@ export const CITIES: CityCard[] = [
     state: "Hesse",
     tagline: "The Jugendstil city of science and engineers.",
     image: null,
-    status: "coming_soon",
+    status: "live",
   },
   {
     slug: "mainz",
@@ -218,7 +217,7 @@ export const CITIES: CityCard[] = [
     state: "Rhineland-Palatinate",
     tagline: "The Rhine's wine capital where printing began.",
     image: null,
-    status: "coming_soon",
+    status: "live",
   },
   {
     slug: "saarbrucken",
@@ -226,7 +225,7 @@ export const CITIES: CityCard[] = [
     state: "Saarland",
     tagline: "The French-tinged capital on the Saar.",
     image: null,
-    status: "coming_soon",
+    status: "live",
   },
   {
     slug: "kiel",
@@ -234,7 +233,7 @@ export const CITIES: CityCard[] = [
     state: "Schleswig-Holstein",
     tagline: "The Baltic sailing city at the fjord's end.",
     image: null,
-    status: "coming_soon",
+    status: "live",
   },
   {
     slug: "rostock",
@@ -242,7 +241,7 @@ export const CITIES: CityCard[] = [
     state: "Mecklenburg-Vorpommern",
     tagline: "The Hanseatic port on the Baltic coast.",
     image: null,
-    status: "coming_soon",
+    status: "live",
   },
   {
     slug: "potsdam",
@@ -250,7 +249,7 @@ export const CITIES: CityCard[] = [
     state: "Brandenburg",
     tagline: "Prussia's palace city at Berlin's edge.",
     image: null,
-    status: "coming_soon",
+    status: "live",
   },
   {
     slug: "magdeburg",
@@ -258,7 +257,7 @@ export const CITIES: CityCard[] = [
     state: "Saxony-Anhalt",
     tagline: "The Ottonian city rebuilt on the Elbe.",
     image: null,
-    status: "coming_soon",
+    status: "live",
   },
   {
     slug: "jena",
@@ -266,7 +265,7 @@ export const CITIES: CityCard[] = [
     state: "Thuringia",
     tagline: "The optics valley in Thuringia's hills.",
     image: null,
-    status: "coming_soon",
+    status: "live",
   },
 ];
 
