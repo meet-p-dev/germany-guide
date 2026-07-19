@@ -24,11 +24,19 @@ export async function generateMetadata({
   const variant = step?.city_steps.find((cs) => cs.cities?.slug === city);
   if (!step || !variant) return {};
   const cityName = variant.cities!.name;
+  const title = `${step.title} in ${cityName}`;
+  const description = `How "${step.title}" actually works in ${cityName}: ${
+    variant.method_note ?? step.seo_description ?? step.summary ?? ""
+  }`;
   return {
-    title: `${step.title} in ${cityName}`,
-    description: `How "${step.title}" actually works in ${cityName}: ${
-      variant.method_note ?? step.summary ?? ""
-    }`,
+    title,
+    description,
+    alternates: { canonical: `${BASE_URL}/cities/${city}/${step.slug}` },
+    openGraph: {
+      title: `${title} · Germany Guide`,
+      description,
+      url: `${BASE_URL}/cities/${city}/${step.slug}`,
+    },
   };
 }
 
