@@ -14,6 +14,25 @@ const PROVIDER_LABELS: Record<string, string> = {
   apple: "Apple",
 };
 
+/** Turn GoTrue password-update errors into copy a user can act on. */
+function friendlyPasswordError(message: string): string {
+  const lower = message.toLowerCase();
+  if (lower.includes("different from the old")) {
+    return "That's already your current password — pick a new one.";
+  }
+  if (
+    lower.includes("current password") ||
+    lower.includes("reauthentication") ||
+    lower.includes("incorrect")
+  ) {
+    return "To change your password, enter your current one above. If you only ever signed in with Google, use “Forgot password?” on the sign-in page to set your first password.";
+  }
+  if (lower.includes("weak") || lower.includes("pwned") || lower.includes("leaked")) {
+    return "That password has appeared in a data breach — please choose a different one.";
+  }
+  return message;
+}
+
 /** Editable identity details + password management for the signed-in user. */
 export function ProfileSettings({ session }: { session: Session }) {
   const { signOut } = useVisitorProfile();
@@ -23,6 +42,7 @@ export function ProfileSettings({ session }: { session: Session }) {
     "loading" | "idle" | "saving" | "saved" | "error"
   >("loading");
 
+  const [currentPassword, setCurrentPassword] = useState("");
   const [newPassword, setNewPassword] = useState("");
   const [passwordStatus, setPasswordStatus] = useState<
     "idle" | "saving" | "saved"
@@ -88,18 +108,19 @@ export function ProfileSettings({ session }: { session: Session }) {
       return;
     }
     setPasswordStatus("saving");
+    // Pass current_password when supplied so the change succeeds even if the
+    // project enforces "require current password" — left blank for people
+    // who only ever signed in with Google and have no password yet.
     const { error } = await getBrowserClient().auth.updateUser({
       password: newPassword,
+      ...(currentPassword ? { current_password: currentPassword } : {}),
     });
     if (error) {
       setPasswordStatus("idle");
-      setPasswordError(
-        error.message.toLowerCase().includes("different from the old")
-          ? "That's already your current password — pick a new one."
-          : error.message,
-      );
+      setPasswordError(friendlyPasswordError(error.message));
     } else {
       setPasswordStatus("saved");
+      setCurrentPassword("");
       setNewPassword("");
       setTimeout(() => setPasswordStatus("idle"), 2500);
     }
@@ -189,8 +210,17 @@ export function ProfileSettings({ session }: { session: Session }) {
           .
         </p>
         <form onSubmit={savePassword} className="mt-4 max-w-sm space-y-4">
+          {hasPassword && (
+            <PasswordField
+              label="Current password"
+              value={currentPassword}
+              onChange={setCurrentPassword}
+              autoComplete="current-password"
+              required={false}
+            />
+          )}
           <PasswordField
-            label={hasPassword ? "Change password" : "Set a password"}
+            label={hasPassword ? "New password" : "Set a password"}
             value={newPassword}
             onChange={setNewPassword}
             autoComplete="new-password"

@@ -612,7 +612,7 @@ function SignedOut() {
         </ButtonLink>
       </div>
       <p className="mt-4 text-sm text-muted">
-        Sign up with your email, Google or Apple — free, no card, no spam.
+        Sign up with your email or Google — free, no card, no spam.
       </p>
     </div>
   );

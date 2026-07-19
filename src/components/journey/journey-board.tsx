@@ -754,7 +754,7 @@ function UnlockJourney({
             )}
           </div>
           <p className="mt-3 text-xs text-muted">
-            Sign up in seconds with your email, Google or Apple.
+            Sign up in seconds with your email or Google.
           </p>
         </div>
       </div>

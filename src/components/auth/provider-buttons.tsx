@@ -4,9 +4,12 @@ import { useState } from "react";
 import { getBrowserClient } from "@/lib/supabase/browser-client";
 import { cn } from "@/lib/utils";
 
-type Provider = "google" | "apple";
+// Apple sign-in is temporarily disabled until the Apple Developer account is
+// active. To re-enable: add "apple" back to Provider, restore the AppleMark
+// and its button below, and enable Apple in Supabase Auth → Providers.
+type Provider = "google";
 
-/** Official brand marks — auth buttons are the one place brand SVGs belong. */
+/** Official brand mark — auth buttons are the one place brand SVGs belong. */
 function GoogleMark() {
   return (
     <svg viewBox="0 0 24 24" className="h-5 w-5" aria-hidden>
@@ -30,17 +33,9 @@ function GoogleMark() {
   );
 }
 
-function AppleMark() {
-  return (
-    <svg viewBox="0 0 24 24" className="h-5 w-5 fill-current" aria-hidden>
-      <path d="M16.365 1.43c0 1.14-.42 2.2-1.24 3.09-.9 1.01-2.1 1.6-3.21 1.51-.06-1.1.44-2.22 1.24-3.06.87-.94 2.2-1.56 3.21-1.54zM20.94 17.1c-.53 1.22-.78 1.76-1.46 2.84-.95 1.51-2.29 3.39-3.95 3.4-1.47.02-1.86-.96-3.85-.95-2 .01-2.42.97-3.9.96-1.66-.02-2.93-1.71-3.88-3.22C1.24 16.02.96 11.3 2.7 8.8c1.23-1.78 3.17-2.83 5-2.83 1.86 0 3.03 1.02 4.57 1.02 1.49 0 2.4-1.02 4.55-1.02 1.62 0 3.34.88 4.56 2.41-4.01 2.2-3.36 7.93-.44 8.72z" />
-    </svg>
-  );
-}
-
 /**
- * "Continue with Google / Apple" pair. OAuth restarts the page, so the only
- * error surface we need is the pre-redirect failure (e.g. provider disabled).
+ * "Continue with Google" button. OAuth restarts the page, so the only error
+ * surface we need is the pre-redirect failure (e.g. provider disabled).
  */
 export function ProviderButtons({ next }: { next: string }) {
   const [pending, setPending] = useState<Provider | null>(null);
@@ -58,7 +53,7 @@ export function ProviderButtons({ next }: { next: string }) {
     if (oauthError) {
       setPending(null);
       setError(
-        `Couldn't start ${provider === "google" ? "Google" : "Apple"} sign-in. Please try again or use your email instead.`,
+        "Couldn't start Google sign-in. Please try again or use your email instead.",
       );
     }
   };
@@ -79,15 +74,6 @@ export function ProviderButtons({ next }: { next: string }) {
       >
         <GoogleMark />
         {pending === "google" ? "Opening Google…" : "Continue with Google"}
-      </button>
-      <button
-        type="button"
-        onClick={() => void continueWith("apple")}
-        disabled={pending !== null}
-        className={buttonClass}
-      >
-        <AppleMark />
-        {pending === "apple" ? "Opening Apple…" : "Continue with Apple"}
       </button>
       {error && (
         <p role="alert" className="text-sm font-medium text-primary">
