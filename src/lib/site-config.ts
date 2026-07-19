@@ -118,18 +118,13 @@ export const CITIES: CityCard[] = [
     status: "live",
   },
 
-  // Coming soon — cards are live, but the city-specific step data (Anmeldung,
-  // residence permit, extension) is verified and added in batches. Until a
-  // city's procedures are confirmed first-hand, it stays coming_soon and keeps
-  // the branded placeholder (image: null). Never ship an unverified photo or
-  // an unverified city claim — see the image-licensing rule and CLAUDE.md.
   {
     slug: "hamburg",
     name: "Hamburg",
     state: "Hamburg",
     tagline: "Germany's harbour gateway to the world.",
     image: null,
-    status: "coming_soon",
+    status: "live",
   },
   {
     slug: "stuttgart",
@@ -137,7 +132,7 @@ export const CITIES: CityCard[] = [
     state: "Baden-Württemberg",
     tagline: "Swabia's carmaking city in the vineyards.",
     image: null,
-    status: "coming_soon",
+    status: "live",
   },
   {
     slug: "dusseldorf",
@@ -145,7 +140,7 @@ export const CITIES: CityCard[] = [
     state: "North Rhine-Westphalia",
     tagline: "The Rhine's stylish state capital.",
     image: "/images/city-dusseldorf.jpg",
-    status: "coming_soon",
+    status: "live",
   },
   {
     slug: "leipzig",
@@ -153,7 +148,7 @@ export const CITIES: CityCard[] = [
     state: "Saxony",
     tagline: "Saxony's fast-rising creative hub.",
     image: null,
-    status: "coming_soon",
+    status: "live",
   },
   {
     slug: "dresden",
@@ -161,7 +156,7 @@ export const CITIES: CityCard[] = [
     state: "Saxony",
     tagline: "Baroque splendour on the Elbe.",
     image: "/images/city-dresden.jpg",
-    status: "coming_soon",
+    status: "live",
   },
   {
     slug: "hanover",
@@ -169,7 +164,7 @@ export const CITIES: CityCard[] = [
     state: "Lower Saxony",
     tagline: "The trade-fair crossroads of the north.",
     image: null,
-    status: "coming_soon",
+    status: "live",
   },
   {
     slug: "bremen",
@@ -177,7 +172,7 @@ export const CITIES: CityCard[] = [
     state: "Bremen",
     tagline: "A Hanseatic city-state on the Weser.",
     image: "/images/city-bremen.jpg",
-    status: "coming_soon",
+    status: "live",
   },
   {
     slug: "dortmund",
@@ -185,13 +180,91 @@ export const CITIES: CityCard[] = [
     state: "North Rhine-Westphalia",
     tagline: "The Ruhr's reinvented industrial heart.",
     image: "/images/city-dortmund.jpg",
-    status: "coming_soon",
+    status: "live",
   },
   {
     slug: "essen",
     name: "Essen",
     state: "North Rhine-Westphalia",
     tagline: "Green heart of the changing Ruhr.",
+    image: null,
+    status: "live",
+  },
+
+  // Coming soon — cards are live, but the city-specific step data (Anmeldung,
+  // residence permit, extension) is verified and added in batches. Until a
+  // city's procedures are confirmed first-hand, it stays coming_soon and keeps
+  // the branded placeholder (image: null). Never ship an unverified photo or
+  // an unverified city claim — see the image-licensing rule and CLAUDE.md.
+  {
+    slug: "karlsruhe",
+    name: "Karlsruhe",
+    state: "Baden-Württemberg",
+    tagline: "The fan-shaped city of courts and computing.",
+    image: null,
+    status: "coming_soon",
+  },
+  {
+    slug: "darmstadt",
+    name: "Darmstadt",
+    state: "Hesse",
+    tagline: "The Jugendstil city of science and engineers.",
+    image: null,
+    status: "coming_soon",
+  },
+  {
+    slug: "mainz",
+    name: "Mainz",
+    state: "Rhineland-Palatinate",
+    tagline: "The Rhine's wine capital where printing began.",
+    image: null,
+    status: "coming_soon",
+  },
+  {
+    slug: "saarbrucken",
+    name: "Saarbrücken",
+    state: "Saarland",
+    tagline: "The French-tinged capital on the Saar.",
+    image: null,
+    status: "coming_soon",
+  },
+  {
+    slug: "kiel",
+    name: "Kiel",
+    state: "Schleswig-Holstein",
+    tagline: "The Baltic sailing city at the fjord's end.",
+    image: null,
+    status: "coming_soon",
+  },
+  {
+    slug: "rostock",
+    name: "Rostock",
+    state: "Mecklenburg-Vorpommern",
+    tagline: "The Hanseatic port on the Baltic coast.",
+    image: null,
+    status: "coming_soon",
+  },
+  {
+    slug: "potsdam",
+    name: "Potsdam",
+    state: "Brandenburg",
+    tagline: "Prussia's palace city at Berlin's edge.",
+    image: null,
+    status: "coming_soon",
+  },
+  {
+    slug: "magdeburg",
+    name: "Magdeburg",
+    state: "Saxony-Anhalt",
+    tagline: "The Ottonian city rebuilt on the Elbe.",
+    image: null,
+    status: "coming_soon",
+  },
+  {
+    slug: "jena",
+    name: "Jena",
+    state: "Thuringia",
+    tagline: "The optics valley in Thuringia's hills.",
     image: null,
     status: "coming_soon",
   },
