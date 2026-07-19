@@ -261,8 +261,11 @@ export type Database = {
       }
       profiles: {
         Row: {
+          avatar_url: string | null
           city_slug: string | null
+          country: string | null
           created_at: string
+          full_name: string | null
           id: string
           move_in_date: string | null
           persona: string | null
@@ -270,8 +273,11 @@ export type Database = {
           updated_at: string
         }
         Insert: {
+          avatar_url?: string | null
           city_slug?: string | null
+          country?: string | null
           created_at?: string
+          full_name?: string | null
           id: string
           move_in_date?: string | null
           persona?: string | null
@@ -279,8 +285,11 @@ export type Database = {
           updated_at?: string
         }
         Update: {
+          avatar_url?: string | null
           city_slug?: string | null
+          country?: string | null
           created_at?: string
+          full_name?: string | null
           id?: string
           move_in_date?: string | null
           persona?: string | null

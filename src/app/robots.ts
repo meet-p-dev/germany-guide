@@ -5,7 +5,13 @@ export default function robots(): MetadataRoute.Robots {
     rules: {
       userAgent: "*",
       allow: "/",
-      disallow: ["/auth/", "/signin", "/impressum", "/privacy"],
+      disallow: [
+        "/auth/",
+        "/signin",
+        "/reset-password",
+        "/impressum",
+        "/privacy",
+      ],
     },
     sitemap: "https://germanyguide.net/sitemap.xml",
   };

@@ -754,7 +754,7 @@ function UnlockJourney({
             )}
           </div>
           <p className="mt-3 text-xs text-muted">
-            No password — we email you a one-tap sign-in link.
+            Sign up in seconds with your email, Google or Apple.
           </p>
         </div>
       </div>

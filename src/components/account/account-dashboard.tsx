@@ -20,6 +20,7 @@ import type { City, PhaseWithSteps, Step } from "@/lib/content";
 import { stepAppliesTo } from "@/lib/content";
 import { useVisitorProfile } from "@/lib/profile-store";
 import { getBrowserClient } from "@/lib/supabase/browser-client";
+import { ProfileSettings } from "@/components/account/profile-settings";
 import { Button, ButtonLink } from "@/components/ui/button";
 import { Kicker } from "@/components/ui/kicker";
 import { cn } from "@/lib/utils";
@@ -166,6 +167,10 @@ export function AccountDashboard({
 
   if (!session) return <SignedOut />;
 
+  const displayName =
+    (session.user.user_metadata.full_name as string | undefined) ??
+    (session.user.user_metadata.name as string | undefined) ??
+    null;
   const email = session.user.email ?? "there";
 
   return (
@@ -176,7 +181,9 @@ export function AccountDashboard({
     >
       <Kicker>My account</Kicker>
       <h1 className="mt-3 font-display text-4xl font-bold">
-        Your command center.
+        {displayName
+          ? `${displayName.split(" ")[0]}, your command center.`
+          : "Your command center."}
       </h1>
       <p className="mt-2 text-muted">
         Signed in as <span className="font-medium text-foreground">{email}</span>
@@ -444,6 +451,8 @@ export function AccountDashboard({
         </section>
       )}
 
+      <ProfileSettings session={session} />
+
       <p className="mt-8 flex items-center gap-2 text-xs text-muted">
         <FileText className="h-3.5 w-3.5" />
         Your full document checklist lives on your{" "}
@@ -594,16 +603,16 @@ function SignedOut() {
         ))}
       </div>
       <div className="mt-8 flex flex-wrap items-center gap-3">
-        <ButtonLink href="/signin">
-          Sign in — it&apos;s free
+        <ButtonLink href="/signin?mode=signup">
+          Create my free account
           <ArrowRight className="h-4 w-4" />
         </ButtonLink>
-        <ButtonLink href="/plan" variant="secondary">
-          Build my plan first
+        <ButtonLink href="/signin" variant="secondary">
+          I already have one
         </ButtonLink>
       </div>
       <p className="mt-4 text-sm text-muted">
-        No password to remember — we email you a one-tap magic link.
+        Sign up with your email, Google or Apple — free, no card, no spam.
       </p>
     </div>
   );
