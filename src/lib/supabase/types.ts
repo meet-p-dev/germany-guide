@@ -308,6 +308,8 @@ export type Database = {
           official_links: Json
           persona_points: Json
           phase_id: string
+          seo_description: string | null
+          seo_title: string | null
           slug: string
           sort_order: number
           summary: string | null
@@ -332,6 +334,8 @@ export type Database = {
           official_links?: Json
           persona_points?: Json
           phase_id: string
+          seo_description?: string | null
+          seo_title?: string | null
           slug: string
           sort_order: number
           summary?: string | null
@@ -356,6 +360,8 @@ export type Database = {
           official_links?: Json
           persona_points?: Json
           phase_id?: string
+          seo_description?: string | null
+          seo_title?: string | null
           slug?: string
           sort_order?: number
           summary?: string | null

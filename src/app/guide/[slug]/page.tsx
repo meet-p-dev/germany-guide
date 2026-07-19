@@ -22,9 +22,17 @@ export async function generateMetadata({
   const { slug } = await params;
   const step = await getStepBySlug(slug);
   if (!step) return {};
+  const title = step.seo_title ?? step.title;
+  const description = step.seo_description ?? step.summary ?? undefined;
   return {
-    title: step.title,
-    description: step.summary ?? undefined,
+    title,
+    description,
+    alternates: { canonical: `${BASE_URL}/guide/${step.slug}` },
+    openGraph: {
+      title: `${title} · Germany Guide`,
+      description,
+      url: `${BASE_URL}/guide/${step.slug}`,
+    },
   };
 }
 
