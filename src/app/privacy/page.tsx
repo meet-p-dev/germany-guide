@@ -37,11 +37,12 @@ export default function PrivacyPage() {
               your device and we cannot see them.
             </li>
             <li>
-              <strong>With an account:</strong> your email address, your
+              <strong>With an account:</strong> your name, email address, your
               journey settings and your ticked steps are stored with our
               database provider Supabase (hosted in the EU, Frankfurt region).
-              Sign-in works via emailed links; we never see or store a
-              password.
+              You can sign in with an email and password or with Google; if you
+              set a password we only ever store it in securely hashed form,
+              never in plain text.
             </li>
             <li>
               <strong>Hosting:</strong> the website is served by Vercel, which
@@ -74,7 +75,7 @@ export default function PrivacyPage() {
             deletion of your data at any time. Deleting your account removes
             your profile and progress from our database. Without an account,
             simply clearing your browser storage removes everything. Contact:
-            [kontakt@germanyguide.net].
+            germanyguide.net@gmail.com.
           </p>
         </section>
       </div>

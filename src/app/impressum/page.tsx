@@ -6,8 +6,6 @@ export const metadata: Metadata = {
   robots: { index: false },
 };
 
-// TODO(meet): German law (§5 TMG/DDG) requires the site operator's real name,
-// address and contact here before public launch. Replace the placeholders.
 export default function ImpressumPage() {
   return (
     <div className="mx-auto max-w-2xl px-4 py-14 sm:px-6">
@@ -20,11 +18,13 @@ export default function ImpressumPage() {
             Angaben gemäß § 5 DDG
           </h2>
           <p className="mt-2 text-muted">
-            [Vollständiger Name]
+            Germany Guide
             <br />
-            [Straße und Hausnummer]
+            Betreiber: Meet Patel
             <br />
-            [PLZ und Ort]
+            Münchener Str. 67
+            <br />
+            85051 Ingolstadt
             <br />
             Deutschland
           </p>
@@ -32,7 +32,20 @@ export default function ImpressumPage() {
 
         <section>
           <h2 className="font-display text-lg font-bold">Kontakt</h2>
-          <p className="mt-2 text-muted">E-Mail: [kontakt@germanyguide.net]</p>
+          <p className="mt-2 text-muted">
+            E-Mail: germanyguide.net@gmail.com
+          </p>
+        </section>
+
+        <section>
+          <h2 className="font-display text-lg font-bold">
+            Verantwortlich für den Inhalt nach § 18 Abs. 2 MStV
+          </h2>
+          <p className="mt-2 text-muted">
+            Meet Patel
+            <br />
+            Anschrift wie oben
+          </p>
         </section>
 
         <section>
