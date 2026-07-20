@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { AnimatePresence, motion } from "framer-motion";
-import { ArrowRight, Check, Circle } from "lucide-react";
+import { ArrowRight, Check, Circle, Lock } from "lucide-react";
 import { useVisitorProfile } from "@/lib/profile-store";
 import { cn } from "@/lib/utils";
 
@@ -43,10 +43,27 @@ export function StepBreadcrumb({ phaseTitle }: { phaseTitle: string | null }) {
   );
 }
 
-/** Toggle a step done/undone from its own page — synced with My Journey. */
+/**
+ * Toggle a step done/undone from its own page — synced with My Journey.
+ * Progress is an account feature (the journey itself is behind sign-in), so a
+ * signed-out visitor is invited to sign in rather than ticking a checkbox that
+ * has nowhere to live and nothing to sync to.
+ */
 export function StepDoneButton({ stepSlug }: { stepSlug: string }) {
-  const { ready, progress, toggleStep } = useVisitorProfile();
+  const { ready, session, progress, toggleStep } = useVisitorProfile();
   const done = Boolean(progress[stepSlug]);
+
+  if (ready && !session) {
+    return (
+      <Link
+        href="/signin"
+        className="inline-flex h-11 items-center gap-2 rounded-full border border-border bg-card px-5 text-[15px] font-medium transition-all hover:border-foreground/30 hover:shadow-sm"
+      >
+        <Lock className="h-4 w-4 text-muted" />
+        Sign in to track this
+      </Link>
+    );
+  }
 
   return (
     <motion.button

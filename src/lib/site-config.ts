@@ -20,6 +20,18 @@ export interface CityCard {
   status: CityStatus;
 }
 
+/**
+ * The five cities shown on the home page. The full set lives on /cities;
+ * the home grid only teases the biggest metros so it stays tidy.
+ */
+export const MAJOR_CITY_SLUGS = [
+  "berlin",
+  "munich",
+  "hamburg",
+  "frankfurt",
+  "cologne",
+] as const;
+
 export const CITIES: CityCard[] = [
   {
     slug: "munich",
