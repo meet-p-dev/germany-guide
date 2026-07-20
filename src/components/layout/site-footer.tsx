@@ -12,6 +12,7 @@ const GUIDE_LINKS = [
 const HELP_LINKS = [
   { href: "/problems", label: "Problems & solutions" },
   { href: "/letters", label: "Letter helper" },
+  { href: "/updates", label: "Updates" },
   { href: "/glossary", label: "Glossary" },
 ];
 
