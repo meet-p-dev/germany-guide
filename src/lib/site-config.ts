@@ -279,6 +279,59 @@ export const CITIES: CityCard[] = [
     image: null,
     status: "live",
   },
+
+  // Added 2026-07-20 with 3 verified city_steps each (Anmeldung /
+  // residence-permit / extension) researched first-hand from official city and
+  // authority sources. Photos stay null (branded placeholder) until a license +
+  // source is confirmed — see the image-licensing rule and CLAUDE.md.
+  {
+    slug: "erlangen",
+    name: "Erlangen",
+    state: "Bavaria",
+    tagline: "The Franconian research city of Siemens and FAU.",
+    image: "/images/city-erlangen.jpg",
+    status: "live",
+  },
+  {
+    slug: "regensburg",
+    name: "Regensburg",
+    state: "Bavaria",
+    tagline: "A UNESCO medieval city on the Danube.",
+    image: null,
+    status: "live",
+  },
+  {
+    slug: "chemnitz",
+    name: "Chemnitz",
+    state: "Saxony",
+    tagline: "Saxony's industrial heart, remade.",
+    image: null,
+    status: "live",
+  },
+  {
+    slug: "wuppertal",
+    name: "Wuppertal",
+    state: "North Rhine-Westphalia",
+    tagline: "The Bergisch city of the floating railway.",
+    image: null,
+    status: "live",
+  },
+  {
+    slug: "ulm",
+    name: "Ulm",
+    state: "Baden-Württemberg",
+    tagline: "The Danube city under the world's tallest spire.",
+    image: null,
+    status: "live",
+  },
+  {
+    slug: "kassel",
+    name: "Kassel",
+    state: "Hesse",
+    tagline: "The documenta city on the Fulda.",
+    image: null,
+    status: "live",
+  },
 ];
 
 export type PersonaStatus = "live" | "coming_soon";

@@ -18,9 +18,10 @@ verifiable source and license on file.
 | `city-dortmund.jpg` | Altes Hafenamt (Old Harbour Office) at night | Evgeni Tcherkasski | [Unsplash License](https://unsplash.com/license) — https://unsplash.com/photos/HQSLj87yY9U |
 | `city-aachen.jpg` | Aachen Cathedral from the Katschhof | Selina Bubendorfer | [Unsplash License](https://unsplash.com/license) — https://unsplash.com/photos/h-hlBO8sThE |
 | `city-bonn.jpg` | Arcaded gabled townhouses on a market street (the Unsplash page tags the location "Bonn"; the streetscape matches Münster's Prinzipalmarkt — used as the Bonn card image by owner's choice) | Reinhart Julian | [Unsplash License](https://unsplash.com/license) — https://unsplash.com/photos/vbi5T06-IHM |
+| `city-erlangen.jpg` | Neustädter (Hugenotten) Kirche tower with its green dome, over Hauptstraße gables | Meet Patel (site owner) | Original photo, owned by the site owner. Resized to 1600px wide and re-encoded with all EXIF/GPS metadata stripped (APP0/APP1/APP2/APP13 markers removed) before adding to the repo. |
 
 All Unsplash photos above were downloaded at 1600px wide and re-encoded (metadata
 stripped) before adding to the repo. Each city image was visually verified to
 depict the city it is filed under.
 
-Last updated: 2026-07-18.
+Last updated: 2026-07-20.
