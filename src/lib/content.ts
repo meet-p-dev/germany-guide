@@ -9,6 +9,7 @@ export type CityStep = Tables<"city_steps">;
 export type GlossaryTerm = Tables<"glossary_terms">;
 export type Problem = Tables<"problems">;
 export type Letter = Tables<"letters">;
+export type Update = Tables<"updates">;
 
 export type Persona = "student" | "worker";
 export type Stage = "exploring" | "applied" | "moving" | "arrived";
@@ -154,6 +155,30 @@ export const getLetterBySlug = cache(async (slug: string) => {
     .from("letters")
     .select("*")
     .eq("slug", slug)
+    .maybeSingle();
+  if (error) throw error;
+  return data;
+});
+
+export const getUpdates = cache(async (): Promise<Update[]> => {
+  const supabase = createContentClient();
+  const { data, error } = await supabase
+    .from("updates")
+    .select("*")
+    .order("published_at", { ascending: false })
+    .order("created_at", { ascending: false });
+  if (error) throw error;
+  return data;
+});
+
+export const getLatestUpdate = cache(async (): Promise<Update | null> => {
+  const supabase = createContentClient();
+  const { data, error } = await supabase
+    .from("updates")
+    .select("*")
+    .order("published_at", { ascending: false })
+    .order("created_at", { ascending: false })
+    .limit(1)
     .maybeSingle();
   if (error) throw error;
   return data;

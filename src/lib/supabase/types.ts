@@ -387,6 +387,45 @@ export type Database = {
           },
         ]
       }
+      updates: {
+        Row: {
+          body_md: string
+          category: string
+          created_at: string
+          id: string
+          published_at: string
+          slug: string
+          source_name: string | null
+          source_url: string | null
+          step_slug: string | null
+          title: string
+        }
+        Insert: {
+          body_md: string
+          category?: string
+          created_at?: string
+          id?: string
+          published_at?: string
+          slug: string
+          source_name?: string | null
+          source_url?: string | null
+          step_slug?: string | null
+          title: string
+        }
+        Update: {
+          body_md?: string
+          category?: string
+          created_at?: string
+          id?: string
+          published_at?: string
+          slug?: string
+          source_name?: string | null
+          source_url?: string | null
+          step_slug?: string | null
+          title?: string
+        }
+        Relationships: []
+      }
       user_notes: {
         Row: {
           reference_number: string | null

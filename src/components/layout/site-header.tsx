@@ -17,6 +17,7 @@ const NAV_LINKS = [
   { href: "/costs", label: "Costs" },
   { href: "/problems", label: "Problems" },
   { href: "/letters", label: "Letters" },
+  { href: "/updates", label: "Updates" },
   { href: "/glossary", label: "Glossary" },
 ];
 
