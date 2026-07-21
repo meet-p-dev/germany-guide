@@ -158,7 +158,9 @@ ${SHARED_RULES}
       body: JSON.stringify({
         model: hasImage ? VISION_MODEL : MODEL,
         temperature: 0.2,
-        max_tokens: 700,
+        // The vision model reasons before answering; give it headroom so the
+        // reasoning tokens don't crowd out the actual answer (stripped below).
+        max_tokens: hasImage ? 1400 : 700,
         messages: [
           { role: "system", content: system },
           {
@@ -196,7 +198,12 @@ ${SHARED_RULES}
     const data = (await groqRes.json()) as {
       choices?: { message?: { content?: string } }[];
     };
-    const answer = data.choices?.[0]?.message?.content?.trim();
+    // Reasoning models (e.g. qwen) wrap their chain-of-thought in
+    // <think>…</think> before the real answer — strip it so the user never
+    // sees the model thinking out loud.
+    const answer = data.choices?.[0]?.message?.content
+      ?.replace(/<think>[\s\S]*?<\/think>/gi, "")
+      .trim();
     if (!answer) {
       return NextResponse.json(
         { error: "No answer came back — try again." },
