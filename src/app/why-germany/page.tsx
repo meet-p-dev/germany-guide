@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import Image from "next/image";
 import Link from "next/link";
 import {
   ArrowRight,
@@ -141,23 +142,125 @@ export default function WhyGermanyPage() {
   return (
     <div className="mx-auto max-w-5xl px-4 py-16 sm:px-6">
       <Reveal>
-        <Kicker>Why Germany?</Kicker>
-        <h1 className="font-display mt-3 max-w-3xl text-4xl font-extrabold leading-[1.08] sm:text-5xl">
-          Worth the paperwork — and here&apos;s the honest reason why.
+        <Kicker>The honest case</Kicker>
+        <h1 className="font-display mt-4 text-6xl font-extrabold leading-[0.95] tracking-tight sm:text-8xl">
+          Why Germany?
         </h1>
-        <p className="mt-5 max-w-2xl text-lg leading-relaxed text-muted">
-          Every step on this site is a bit of German bureaucracy. Before you take
-          it on, it&apos;s fair to ask what you get in return. Here&apos;s the
-          case — the genuinely great parts, and the hard parts told straight.
+        <p className="mt-6 max-w-2xl text-lg leading-relaxed text-muted">
+          Before the forms, the appointments and the formal letters, it&apos;s
+          fair to ask what you get in return. The answer starts with a story —
+          because you are not the first to make this journey.
         </p>
-        <div className="mt-8 flex flex-wrap gap-3">
-          <ButtonLink href="/plan" size="lg">
-            Build my plan
-            <ArrowRight className="h-4 w-4" />
-          </ButtonLink>
-          <ButtonLink href="/costs" variant="secondary" size="lg">
-            See what it costs
-          </ButtonLink>
+      </Reveal>
+
+      {/* The story: Germany as a country built, rebuilt and renewed by
+          people who arrived with a suitcase and a plan. */}
+      <div className="mt-20 space-y-20">
+        <Reveal>
+          <div className="grid items-center gap-8 lg:grid-cols-2">
+            <div>
+              <Kicker>1955 onwards</Kicker>
+              <h2 className="font-display mt-3 text-3xl font-bold sm:text-4xl">
+                A country rebuilt by people who arrived with a suitcase
+              </h2>
+              <p className="mt-4 leading-relaxed text-muted">
+                After 1945, Germany rebuilt itself from rubble into Europe&apos;s
+                largest economy — and it could not have done so alone. From 1955
+                it signed recruitment agreements with Italy, then Greece, Spain
+                and Turkey, and millions of so-called guest workers
+                (Gastarbeiter) arrived by train with one bag and a work
+                contract. Many planned to stay two years. They stayed for good,
+                raised families, and helped build the prosperity people move
+                here for today.
+              </p>
+            </div>
+            <StoryImage
+              src="/images/why-gastarbeiterinnen-1974.jpg"
+              alt="Five women in headscarves at a textile mill, one showing another a spool of thread, Ebersbach, 1974"
+              credit="Bundesarchiv, Bild 183-N0916-0005 / Häßler, Ulrich · CC BY-SA 3.0 DE"
+            />
+          </div>
+        </Reveal>
+
+        <Reveal>
+          <div className="grid items-center gap-8 lg:grid-cols-2">
+            <StoryImage
+              src="/images/why-berlin-reichstag.jpg"
+              alt="The Reichstag's glass dome in Berlin, with the Charité hospital tower behind it"
+              className="order-last lg:order-first"
+            />
+            <div>
+              <Kicker>A nation of arrivals</Kicker>
+              <h2 className="font-display mt-3 text-3xl font-bold sm:text-4xl">
+                Today, more than one in four has an immigration story
+              </h2>
+              <p className="mt-4 leading-relaxed text-muted">
+                Reunification, the European Union, and decades of students,
+                engineers, nurses and researchers arriving from everywhere have
+                made modern Germany one of the world&apos;s great immigration
+                countries. More than a quarter of the people living here have
+                immigration in their family story. The country you are
+                considering is not a closed club — it is a place that has been
+                absorbing newcomers, imperfectly but persistently, for seventy
+                years.
+              </p>
+            </div>
+          </div>
+        </Reveal>
+
+        <Reveal>
+          <div className="grid items-center gap-8 lg:grid-cols-2">
+            <div>
+              <Kicker>Now — deliberately open</Kicker>
+              <h2 className="font-display mt-3 text-3xl font-bold sm:text-4xl">
+                The door isn&apos;t ajar. It&apos;s held open.
+              </h2>
+              <p className="mt-4 leading-relaxed text-muted">
+                An ageing workforce means Germany needs hundreds of thousands
+                of skilled newcomers every year — so the rules keep bending
+                toward you: the Skilled Immigration Act opened more routes, the
+                EU Blue Card thresholds came down, the Chancenkarte lets
+                qualified people come and search from inside the country, and
+                citizenship is now possible after five years. Immigration
+                isn&apos;t a loophole here; it&apos;s the plan.
+              </p>
+              <p className="mt-4 leading-relaxed text-muted">
+                What hasn&apos;t changed since the Gastarbeiter era: the
+                counters, the forms, and the letters in formal German. Every
+                generation of newcomers has faced that same maze — the
+                Anmeldung, the Ausländerbehörde, the Krankenkasse. That maze is
+                exactly why this site exists. You walk the same road they did,
+                but with a guide that knows your city.
+              </p>
+            </div>
+            <StoryImage
+              src="/images/why-munich-karlstor.jpg"
+              alt="A crowded evening street scene through the medieval Karlstor gate in Munich"
+            />
+          </div>
+        </Reveal>
+      </div>
+
+      <Reveal className="mt-20">
+        <div className="flex flex-wrap items-center justify-between gap-6 rounded-[2.5rem] border border-border bg-card-muted/50 p-8 sm:p-10">
+          <div>
+            <h2 className="font-display text-2xl font-bold sm:text-3xl">
+              So what do you actually get?
+            </h2>
+            <p className="mt-2 max-w-xl leading-relaxed text-muted">
+              The concrete case — study, work, daily life and the long game —
+              plus the hard parts told straight.
+            </p>
+          </div>
+          <div className="flex flex-wrap gap-3">
+            <ButtonLink href="/plan" size="lg">
+              Build my plan
+              <ArrowRight className="h-4 w-4" />
+            </ButtonLink>
+            <ButtonLink href="/costs" variant="secondary" size="lg">
+              See what it costs
+            </ButtonLink>
+          </div>
         </div>
       </Reveal>
 
@@ -228,6 +331,42 @@ export default function WhyGermanyPage() {
         their official sources.
       </p>
     </div>
+  );
+}
+
+/**
+ * One story photo, rounded to match the site's card language. `credit` is
+ * only passed for images whose license requires visible attribution (the
+ * Bundesarchiv photo) — Unsplash/Pexels photos are credited in
+ * public/images/CREDITS.md instead, per the site's licensing rule.
+ */
+function StoryImage({
+  src,
+  alt,
+  credit,
+  className,
+}: {
+  src: string;
+  alt: string;
+  credit?: string;
+  className?: string;
+}) {
+  return (
+    <figure className={className}>
+      <div className="overflow-hidden rounded-3xl border border-border">
+        <Image
+          src={src}
+          alt={alt}
+          width={800}
+          height={600}
+          sizes="(max-width: 1024px) 100vw, 50vw"
+          className="aspect-[4/3] w-full object-cover"
+        />
+      </div>
+      {credit && (
+        <figcaption className="mt-2 text-xs text-muted">{credit}</figcaption>
+      )}
+    </figure>
   );
 }
 

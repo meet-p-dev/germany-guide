@@ -51,9 +51,9 @@ export function WhyGermany() {
     <section className="mx-auto max-w-6xl px-4 py-20 sm:px-6">
       <Reveal className="flex flex-wrap items-end justify-between gap-4">
         <div>
-          <Kicker>Why Germany?</Kicker>
-          <h2 className="font-display mt-3 max-w-2xl text-4xl font-bold sm:text-[2.75rem] sm:leading-[1.1]">
-            The bureaucracy is worth it. Here&apos;s why.
+          <Kicker>The honest case</Kicker>
+          <h2 className="font-display mt-3 max-w-2xl text-5xl font-extrabold sm:text-6xl">
+            Why Germany?
           </h2>
         </div>
         <Link

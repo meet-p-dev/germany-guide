@@ -1,20 +1,36 @@
 import Link from "next/link";
 import {
   AlertTriangle,
+  BookOpen,
+  Briefcase,
   CalendarClock,
-  CheckSquare,
+  Check,
+  ChevronDown,
+  ClipboardList,
   Clock,
   Coins,
+  Compass,
+  Euro,
   ExternalLink,
+  FileCheck,
   Footprints,
   Globe,
+  GraduationCap,
+  HeartPulse,
+  Home,
   KeyRound,
+  Landmark,
+  Languages,
   Lightbulb,
   Lock,
   Mail,
   MapPin,
+  Plane,
+  Receipt,
   Send,
   ShieldCheck,
+  Smartphone,
+  Stamp,
 } from "lucide-react";
 import type { LucideIcon } from "lucide-react";
 import type { Tables } from "@/lib/supabase/types";
@@ -31,7 +47,6 @@ import {
   stepAppliesTo,
   type CostType,
   type Persona,
-  type StepLink,
 } from "@/lib/content";
 import { PersonaCompare } from "@/components/step/persona-compare";
 import { VisaQuiz } from "@/components/step/visa-quiz";
@@ -43,6 +58,7 @@ import { StepAsk } from "@/components/ai/assist";
 import { Markdown } from "@/components/markdown";
 import { Kicker } from "@/components/ui/kicker";
 import {
+  NextStepButton,
   StepBreadcrumb,
   StepDoneButton,
   YourCityHint,
@@ -60,30 +76,52 @@ const METHOD_META: Record<
 > = {
   walk_in: {
     icon: Footprints,
-    label: "Walk-in",
-    className: "bg-success-soft text-success",
+    label: "Walk-in available",
+    className: "border-success/30 bg-success-soft text-success",
   },
   appointment: {
     icon: CalendarClock,
-    label: "Appointment",
-    className: "bg-gold-soft text-gold",
+    label: "Appointment needed",
+    className: "border-gold/30 bg-gold-soft text-gold",
   },
   email: {
     icon: Mail,
     label: "By email",
-    className: "bg-primary-soft text-primary",
+    className: "border-primary/25 bg-primary-soft text-primary",
   },
   online: {
     icon: Globe,
     label: "Online",
-    className: "bg-primary-soft text-primary",
+    className: "border-primary/25 bg-primary-soft text-primary",
   },
   post: {
     icon: Send,
     label: "By post",
-    className: "bg-gold-soft text-gold",
+    className: "border-gold/30 bg-gold-soft text-gold",
   },
 };
+
+/** The card's header icon, resolved from what the step is about. */
+const STEP_ICONS: [RegExp, LucideIcon][] = [
+  [/anmeldung|register|meld/, MapPin],
+  [/visa|permit|aufenthalt|auslaender|behoerde/, Stamp],
+  [/university|admission|uni-assist|study|enrol/, GraduationCap],
+  [/bank|blocked|sperrkonto|account|fund/, Landmark],
+  [/insurance|health|kranken/, HeartPulse],
+  [/housing|apartment|flat|wohnung|accommodation/, Home],
+  [/job|work|employ/, Briefcase],
+  [/language|german|deutsch/, Languages],
+  [/cost|living|budget/, Coins],
+  [/phone|sim|mobile/, Smartphone],
+  [/tax|steuer/, Receipt],
+  [/flight|travel|arriv|pack/, Plane],
+  [/path|understand|choose/, Compass],
+  [/document|apostille|translat/, FileCheck],
+];
+
+function stepIcon(slug: string): LucideIcon {
+  return STEP_ICONS.find(([re]) => re.test(slug))?.[1] ?? ClipboardList;
+}
 
 export async function StepView({
   step,
@@ -104,6 +142,12 @@ export async function StepView({
   // City variant (when set) overrides the base cost / timing figures.
   const meta = resolveStepMeta(step, active);
   const costLabel = formatCost(meta.costCents, meta.costType);
+  // A note that just repeats the label ("Free — Free") adds nothing.
+  const costNote =
+    meta.costNote &&
+    meta.costNote.trim().toLowerCase() !== costLabel?.trim().toLowerCase()
+      ? meta.costNote
+      : null;
 
   // Resolve prerequisite and "unlocks" titles from the step graph.
   const graph = await getStepGraph();
@@ -127,13 +171,25 @@ export async function StepView({
   // page when a city is active, otherwise the step's first official source.
   const activeLinks = active ? parseLinks(active.links) : [];
   const primaryAction = activeLinks[0] ?? officialLinks[0] ?? null;
+  const activeTips = active ? parseTips(active.tips) : [];
+
+  // The journey in walking order: feeds the "next step" button and, on the
+  // costs page, the estimator.
+  const phases = await getPhasesWithSteps();
+  const orderedSteps = phases.flatMap((phase) => phase.steps);
+  const stepIndex = orderedSteps.findIndex((s) => s.slug === step.slug);
+  const upcoming = orderedSteps.slice(stepIndex + 1).map((s) => ({
+    slug: s.slug,
+    title: s.title,
+    cityVariable: s.city_variable,
+    appliesTo: s.applies_to,
+  }));
 
   // The costs-of-living page carries the interactive first-year estimator,
   // fed by the cost fields across the whole journey.
   let estimatorTotals: Record<Persona, PersonaCostTotals> | null = null;
   if (step.slug === "costs-of-living") {
-    const phases = await getPhasesWithSteps();
-    const allSteps = phases.flatMap((phase) => phase.steps);
+    const allSteps = orderedSteps;
     const totalsFor = (persona: Persona): PersonaCostTotals => {
       let oneOffCents = 0;
       let monthlyCents = 0;
@@ -157,117 +213,9 @@ export async function StepView({
     <article className="mx-auto max-w-3xl px-4 py-14 sm:px-6">
       <StepBreadcrumb phaseTitle={step.phases?.title ?? null} />
 
-      <h1 className="font-display mt-4 text-4xl font-bold sm:text-5xl">
-        {step.title}
-      </h1>
-      {step.summary && (
-        <p className="mt-4 text-lg leading-relaxed text-muted">{step.summary}</p>
-      )}
-
-      <div className="mt-6 flex flex-wrap items-center gap-3">
-        <StepDoneButton stepSlug={step.slug} />
-        {step.applies_to !== "both" && (
-          <span className="rounded-full border border-border bg-card px-3 py-1.5 text-sm capitalize text-muted">
-            {step.applies_to}s only
-          </span>
-        )}
-      </div>
-
-      {/* At-a-glance facts: cost, hard/soft deadline, and lead time. */}
-      {(costLabel || meta.deadlineRule || meta.leadTime) && (
-        <div className="mt-5 flex flex-wrap items-center gap-2.5">
-          {costLabel && (
-            <FactChip
-              icon={Coins}
-              className="bg-card text-foreground/80 border border-border"
-            >
-              <span className="font-semibold">{costLabel}</span>
-              {meta.costNote && (
-                <span className="text-muted"> — {meta.costNote}</span>
-              )}
-            </FactChip>
-          )}
-          {meta.deadlineRule && (
-            <FactChip
-              icon={meta.deadlineUrgency === "hard" ? AlertTriangle : CalendarClock}
-              className={cn(
-                meta.deadlineUrgency === "hard"
-                  ? "bg-primary-soft text-primary"
-                  : "bg-gold-soft text-gold",
-              )}
-            >
-              {meta.deadlineUrgency === "hard" && (
-                <span className="font-semibold">Deadline:</span>
-              )}{" "}
-              {meta.deadlineRule}
-            </FactChip>
-          )}
-          {meta.leadTime && (
-            <FactChip icon={Clock} className="bg-card text-muted border border-border">
-              {meta.leadTime}
-            </FactChip>
-          )}
-        </div>
-      )}
-
-      {/* Dependency map — the chicken-and-egg ordering made explicit. */}
-      {(prerequisites.length > 0 || unlocks.length > 0) && (
-        <div className="mt-8 grid gap-3 sm:grid-cols-2">
-          {prerequisites.length > 0 && (
-            <DependencyCard
-              icon={Lock}
-              tone="prereq"
-              title="Finish these first"
-              items={prerequisites}
-              linkFor={(slug) => `/guide/${slug}`}
-            />
-          )}
-          {unlocks.length > 0 && (
-            <DependencyCard
-              icon={KeyRound}
-              tone="unlock"
-              title="This unlocks"
-              items={unlocks}
-              linkFor={(slug) => `/guide/${slug}`}
-            />
-          )}
-        </div>
-      )}
-
-      {/* The step at a glance, split by path — spares half-irrelevant prose. */}
-      {personaPoints && <PersonaCompare points={personaPoints} />}
-
-      {step.slug === "understand-your-paths" && <VisaQuiz />}
-      {estimatorTotals && <CostEstimator totals={estimatorTotals} />}
-
-      {/* One unmistakable action: the official site to actually do this on. */}
-      {primaryAction && (
-        <section className="mt-10 flex flex-wrap items-center justify-between gap-4 rounded-3xl border border-primary/30 bg-primary-soft/50 p-5">
-          <div className="min-w-0">
-            <p className="text-xs font-semibold uppercase tracking-wide text-primary">
-              Do it now
-            </p>
-            <p className="mt-0.5 font-display font-bold">
-              {active
-                ? `The official page for ${active.cities!.name}`
-                : "The official source for this step"}
-            </p>
-          </div>
-          <a
-            href={primaryAction.url}
-            target="_blank"
-            rel="noopener noreferrer"
-            className="inline-flex h-11 items-center gap-2 rounded-full bg-primary px-5 text-[15px] font-medium text-primary-foreground transition-colors hover:bg-primary-hover"
-          >
-            <ExternalLink className="h-4 w-4" />
-            {primaryAction.label}
-          </a>
-        </section>
-      )}
-
       {/* City switcher — links, not state: every variant is its own SEO page */}
       {step.city_variable && (
-        <div className="mt-10">
+        <div className="mt-6">
           <Kicker>How it works in your city</Kicker>
           <div className="mt-3 flex flex-wrap gap-2" role="tablist">
             <CityTab
@@ -284,99 +232,298 @@ export async function StepView({
               />
             ))}
           </div>
-          {!active && <YourCityHint stepSlug={step.slug} cityVariants={cityVariants.map((cs) => cs.cities!.slug)} />}
+          {!active && (
+            <YourCityHint
+              stepSlug={step.slug}
+              cityVariants={cityVariants.map((cs) => cs.cities!.slug)}
+            />
+          )}
         </div>
       )}
 
-      {/* Active city section */}
-      {active && (
-        <section className="mt-6 overflow-hidden rounded-3xl border border-border bg-card">
-          <div className="border-b border-border bg-card-muted/60 p-6">
-            <div className="flex flex-wrap items-center justify-between gap-3">
-              <p className="font-display flex items-center gap-2 text-xl font-bold">
-                <MapPin className="h-5 w-5 text-primary" />
-                In {active.cities!.name}
-              </p>
-              {active.method && METHOD_META[active.method] && (
-                <MethodChip
-                  method={active.method}
-                  note={active.method_note}
-                />
+      {/* The step as one card: header, facts, city panel, checklists, action. */}
+      <div className="mt-6 overflow-hidden rounded-3xl border border-border bg-card shadow-sm">
+        {/* Card header: icon tile + title + one-line promise */}
+        <header className="p-6 sm:p-8">
+          <div className="flex items-start gap-4">
+            <IconTile icon={stepIcon(step.slug)} />
+            <div className="min-w-0">
+              <h1 className="font-display text-3xl font-bold sm:text-4xl">
+                {step.title}
+              </h1>
+              {step.summary && (
+                <p className="mt-2 text-base leading-relaxed text-muted sm:text-lg">
+                  {step.summary}
+                </p>
               )}
             </div>
-            {active.last_verified && (
-              <p className="mt-2 flex items-center gap-1.5 text-xs text-muted">
-                <ShieldCheck className="h-3.5 w-3.5 text-success" />
-                Last verified {formatDate(active.last_verified)}
-              </p>
-            )}
           </div>
-          <div className="p-6">
-            <Markdown>{active.content_md}</Markdown>
 
-            {active.address && (
-              <p className="mt-6 rounded-2xl bg-card-muted/70 p-4 text-sm leading-relaxed">
-                <span className="font-semibold">Where:</span> {active.address}
-              </p>
-            )}
+          {/* At-a-glance facts: cost, hard/soft deadline, and lead time. */}
+          {(costLabel ||
+            meta.deadlineRule ||
+            meta.leadTime ||
+            step.applies_to !== "both") && (
+            <div className="mt-5 flex flex-wrap items-center gap-2.5">
+              {costLabel && (
+                <FactChip
+                  icon={Coins}
+                  className="border border-border bg-card-muted/60 text-foreground/80"
+                >
+                  <span className="font-semibold">{costLabel}</span>
+                  {costNote && (
+                    <span className="text-muted"> — {costNote}</span>
+                  )}
+                </FactChip>
+              )}
+              {meta.deadlineRule && (
+                <FactChip
+                  icon={
+                    meta.deadlineUrgency === "hard"
+                      ? AlertTriangle
+                      : CalendarClock
+                  }
+                  className={cn(
+                    "border",
+                    meta.deadlineUrgency === "hard"
+                      ? "border-primary/25 bg-primary-soft text-primary"
+                      : "border-gold/30 bg-gold-soft text-gold",
+                  )}
+                >
+                  {meta.deadlineUrgency === "hard" && (
+                    <span className="font-semibold">Deadline:</span>
+                  )}{" "}
+                  {meta.deadlineRule}
+                </FactChip>
+              )}
+              {meta.leadTime && (
+                <FactChip
+                  icon={Clock}
+                  className="border border-border bg-card-muted/60 text-muted"
+                >
+                  {meta.leadTime}
+                </FactChip>
+              )}
+              {step.applies_to !== "both" && (
+                <FactChip
+                  icon={step.applies_to === "student" ? GraduationCap : Briefcase}
+                  className="border border-border bg-card-muted/60 capitalize text-muted"
+                >
+                  {step.applies_to}s only
+                </FactChip>
+              )}
+            </div>
+          )}
+        </header>
 
-            {parseTips(active.tips).length > 0 && (
-              <div className="mt-6 rounded-2xl border border-gold/30 bg-gold-soft/50 p-5">
-                <p className="flex items-center gap-2 font-display font-bold">
-                  <Lightbulb className="h-4 w-4 text-gold" />
-                  Local tips
-                </p>
-                <ul className="mt-3 space-y-2 text-sm leading-relaxed text-foreground/85">
-                  {parseTips(active.tips).map((tip) => (
-                    <li key={tip} className="flex gap-2">
-                      <span aria-hidden className="text-gold">
-                        —
-                      </span>
+        <div className="space-y-8 px-6 pb-8 sm:px-8">
+          {/* City panel — the local specifics, framed like a field note. */}
+          {active && (
+            <section className="rounded-2xl border border-gold/35 bg-gold-soft/40 p-5 sm:p-6">
+              <div className="flex flex-wrap items-center justify-between gap-3">
+                <Kicker className="text-gold">
+                  For this city — {active.cities!.name}
+                </Kicker>
+                {active.method && METHOD_META[active.method] && (
+                  <MethodChip method={active.method} note={active.method_note} />
+                )}
+              </div>
+
+              <div className="mt-4">
+                <Markdown>{active.content_md}</Markdown>
+              </div>
+
+              {/* Fact grid: where, when, what it costs, where to do it. */}
+              {(active.address || meta.leadTime || costLabel || primaryAction) && (
+                <div className="mt-5 grid gap-x-6 gap-y-3 border-t border-gold/25 pt-5 sm:grid-cols-2">
+                  {active.address && (
+                    <CityFact icon={MapPin}>{active.address}</CityFact>
+                  )}
+                  {meta.leadTime && (
+                    <CityFact icon={Clock}>{meta.leadTime}</CityFact>
+                  )}
+                  {costLabel && (
+                    <CityFact icon={Euro}>
+                      <span className="font-semibold">{costLabel}</span>
+                      {costNote && (
+                        <span className="text-muted"> — {costNote}</span>
+                      )}
+                    </CityFact>
+                  )}
+                  {primaryAction && (
+                    <a
+                      href={primaryAction.url}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="inline-flex items-start gap-2.5 text-sm font-semibold text-primary hover:underline"
+                    >
+                      <ExternalLink className="mt-0.5 h-4 w-4 shrink-0" />
+                      {primaryAction.label}
+                    </a>
+                  )}
+                </div>
+              )}
+
+              {activeTips.length > 0 && (
+                <ul className="mt-5 space-y-2.5 border-t border-gold/25 pt-5">
+                  {activeTips.map((tip) => (
+                    <li
+                      key={tip}
+                      className="flex items-start gap-2.5 text-sm leading-relaxed text-foreground/85"
+                    >
+                      <Lightbulb className="mt-0.5 h-4 w-4 shrink-0 text-gold" />
                       {tip}
                     </li>
                   ))}
                 </ul>
+              )}
+
+              {active.last_verified && (
+                <p className="mt-4 flex items-center gap-1.5 text-xs text-muted">
+                  <ShieldCheck className="h-3.5 w-3.5 text-success" />
+                  Last verified {formatDate(active.last_verified)}
+                </p>
+              )}
+            </section>
+          )}
+
+          {/* One unmistakable action when no city panel carries the link. */}
+          {!active && primaryAction && (
+            <section className="flex flex-wrap items-center justify-between gap-4 rounded-2xl border border-primary/30 bg-primary-soft/50 p-5">
+              <div className="min-w-0">
+                <Kicker className="text-primary">Do it now</Kicker>
+                <p className="mt-0.5 font-display font-bold">
+                  The official source for this step
+                </p>
               </div>
-            )}
+              <a
+                href={primaryAction.url}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="inline-flex h-11 items-center gap-2 rounded-full bg-primary px-5 text-[15px] font-medium text-primary-foreground transition-colors hover:bg-primary-hover"
+              >
+                <ExternalLink className="h-4 w-4" />
+                {primaryAction.label}
+              </a>
+            </section>
+          )}
 
-            <LinkList links={parseLinks(active.links)} />
-          </div>
-        </section>
-      )}
+          {/* The step at a glance, split by path — spares half-irrelevant prose. */}
+          {personaPoints && <PersonaCompare points={personaPoints} />}
 
-      {/* General content */}
-      <section className={cn("mt-10", active && "mt-12")}>
-        {active && <Kicker className="mb-4">The Germany-wide basics</Kicker>}
-        <Markdown>{step.content_md}</Markdown>
-      </section>
+          {step.slug === "understand-your-paths" && <VisaQuiz />}
+          {estimatorTotals && <CostEstimator totals={estimatorTotals} />}
 
-      {/* Documents */}
-      {documents.length > 0 && (
-        <section className="mt-12 rounded-3xl border border-border bg-card p-6">
-          <p className="font-display flex items-center gap-2 text-xl font-bold">
-            <CheckSquare className="h-5 w-5 text-primary" />
-            What to bring
-          </p>
-          <ul className="mt-4 space-y-3">
-            {documents.map((doc) => (
-              <li key={doc.name} className="flex items-start gap-3 text-[15px]">
-                <span
-                  aria-hidden
-                  className="mt-1 h-2 w-2 shrink-0 rounded-full bg-primary"
-                />
-                <span>
-                  <span className="font-medium">{doc.name}</span>
-                  {doc.note && (
-                    <span className="text-muted"> — {doc.note}</span>
-                  )}
+          {/* The full write-up. On city pages the local panel already carries
+              the actionable part, so the basics fold away instead of piling
+              a second essay onto the card. */}
+          {active ? (
+            <details className="group rounded-2xl border border-border bg-card-muted/30 px-5 py-4">
+              <summary className="flex cursor-pointer list-none items-center gap-2.5 [&::-webkit-details-marker]:hidden">
+                <BookOpen className="h-4 w-4 shrink-0 text-muted" aria-hidden />
+                <span className="flex-1 font-display font-bold">
+                  The Germany-wide basics
                 </span>
-              </li>
-            ))}
-          </ul>
-        </section>
-      )}
+                <span className="hidden text-sm text-muted sm:block">
+                  how this works everywhere
+                </span>
+                <ChevronDown className="h-5 w-5 shrink-0 text-muted transition-transform group-open:rotate-180" />
+              </summary>
+              <div className="pt-4">
+                <Markdown>{step.content_md}</Markdown>
+              </div>
+            </details>
+          ) : (
+            <section>
+              <Markdown>{step.content_md}</Markdown>
+            </section>
+          )}
 
-      <LinkList links={officialLinks} heading="Official sources" />
+          {/* Dependency map — the chicken-and-egg ordering, one slim strip. */}
+          {(prerequisites.length > 0 || unlocks.length > 0) && (
+            <div className="space-y-2.5 rounded-2xl border border-border bg-card-muted/40 p-4 text-sm">
+              {prerequisites.length > 0 && (
+                <DependencyRow
+                  icon={Lock}
+                  iconClass="text-muted"
+                  label="Finish first:"
+                  items={prerequisites}
+                />
+              )}
+              {unlocks.length > 0 && (
+                <DependencyRow
+                  icon={KeyRound}
+                  iconClass="text-primary"
+                  label="Unlocks:"
+                  items={unlocks}
+                />
+              )}
+            </div>
+          )}
+
+          {/* Checklist columns: papers in one hand, sources in the other. */}
+          {(documents.length > 0 || officialLinks.length > 0) && (
+            <div className="grid gap-x-8 gap-y-6 border-t border-border pt-6 sm:grid-cols-2">
+              {documents.length > 0 && (
+                <section>
+                  <Kicker className="flex items-center gap-2">
+                    <ClipboardList className="h-4 w-4" aria-hidden />
+                    What to bring
+                  </Kicker>
+                  <ul className="mt-3.5 space-y-2.5">
+                    {documents.map((doc) => (
+                      <li
+                        key={doc.name}
+                        className="flex items-start gap-2.5 text-sm leading-relaxed"
+                      >
+                        <Check
+                          aria-hidden
+                          className="mt-0.5 h-4 w-4 shrink-0 text-primary"
+                        />
+                        <span>
+                          <span className="font-medium">{doc.name}</span>
+                          {doc.note && (
+                            <span className="text-muted"> — {doc.note}</span>
+                          )}
+                        </span>
+                      </li>
+                    ))}
+                  </ul>
+                </section>
+              )}
+              {officialLinks.length > 0 && (
+                <section>
+                  <Kicker className="flex items-center gap-2">
+                    <Globe className="h-4 w-4" aria-hidden />
+                    Official sources
+                  </Kicker>
+                  <ul className="mt-3.5 space-y-2.5">
+                    {officialLinks.map((link) => (
+                      <li key={link.url}>
+                        <a
+                          href={link.url}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="inline-flex items-start gap-2.5 text-sm font-medium text-primary hover:underline"
+                        >
+                          <ExternalLink className="mt-0.5 h-4 w-4 shrink-0" />
+                          {link.label}
+                        </a>
+                      </li>
+                    ))}
+                  </ul>
+                </section>
+              )}
+            </div>
+          )}
+        </div>
+
+        {/* Card footer: tick it off, then walk straight on. */}
+        <footer className="flex flex-wrap items-center justify-between gap-3 border-t border-border bg-card-muted/50 px-6 py-5 sm:px-8">
+          <StepDoneButton stepSlug={step.slug} />
+          <NextStepButton stepSlug={step.slug} upcoming={upcoming} />
+        </footer>
+      </div>
 
       <StepAsk stepSlug={step.slug} />
 
@@ -410,50 +557,63 @@ function FactChip({
   );
 }
 
-function DependencyCard({
+function IconTile({ icon: Icon }: { icon: LucideIcon }) {
+  return (
+    <span
+      aria-hidden
+      className="flex h-12 w-12 shrink-0 items-center justify-center rounded-2xl bg-card-muted"
+    >
+      <Icon className="h-6 w-6 text-foreground/75" />
+    </span>
+  );
+}
+
+function CityFact({
   icon: Icon,
-  tone,
-  title,
-  items,
-  linkFor,
+  children,
 }: {
   icon: LucideIcon;
-  tone: "prereq" | "unlock";
-  title: string;
-  items: { slug: string; title: string }[];
-  linkFor: (slug: string) => string;
+  children: React.ReactNode;
 }) {
   return (
-    <div
-      className={cn(
-        "rounded-2xl border p-4",
-        tone === "prereq"
-          ? "border-border bg-card-muted/60"
-          : "border-primary/25 bg-primary-soft/50",
-      )}
-    >
-      <p className="flex items-center gap-2 text-sm font-semibold">
-        <Icon
-          className={cn(
-            "h-4 w-4",
-            tone === "prereq" ? "text-muted" : "text-primary",
+    <p className="flex items-start gap-2.5 text-sm leading-relaxed text-foreground/85">
+      <Icon aria-hidden className="mt-0.5 h-4 w-4 shrink-0 text-gold" />
+      <span>{children}</span>
+    </p>
+  );
+}
+
+function DependencyRow({
+  icon: Icon,
+  iconClass,
+  label,
+  items,
+}: {
+  icon: LucideIcon;
+  iconClass: string;
+  label: string;
+  items: { slug: string; title: string }[];
+}) {
+  return (
+    <p className="flex flex-wrap items-center gap-x-2 gap-y-1 leading-relaxed">
+      <Icon className={cn("h-4 w-4 shrink-0", iconClass)} aria-hidden />
+      <span className="font-semibold">{label}</span>
+      {items.map((item, index) => (
+        <span key={item.slug} className="inline-flex items-center gap-x-2">
+          <Link
+            href={`/guide/${item.slug}`}
+            className="font-medium text-foreground/85 hover:text-primary hover:underline"
+          >
+            {item.title}
+          </Link>
+          {index < items.length - 1 && (
+            <span aria-hidden className="text-muted">
+              ·
+            </span>
           )}
-        />
-        {title}
-      </p>
-      <ul className="mt-2.5 space-y-1.5">
-        {items.map((item) => (
-          <li key={item.slug}>
-            <Link
-              href={linkFor(item.slug)}
-              className="text-sm font-medium text-foreground/85 hover:text-primary hover:underline"
-            >
-              {item.title}
-            </Link>
-          </li>
-        ))}
-      </ul>
-    </div>
+        </span>
+      ))}
+    </p>
   );
 }
 
@@ -488,43 +648,13 @@ function MethodChip({ method, note }: { method: string; note: string | null }) {
   return (
     <span
       className={cn(
-        "inline-flex items-center gap-2 rounded-full px-3.5 py-1.5 text-sm font-semibold",
+        "inline-flex items-center gap-2 rounded-full border px-3.5 py-1.5 text-sm font-semibold",
         meta.className,
       )}
     >
       <Icon className="h-4 w-4" />
       {note ?? meta.label}
     </span>
-  );
-}
-
-function LinkList({
-  links,
-  heading = "Links",
-}: {
-  links: StepLink[];
-  heading?: string;
-}) {
-  if (links.length === 0) return null;
-  return (
-    <section className="mt-8">
-      <p className="font-display font-bold">{heading}</p>
-      <ul className="mt-3 space-y-2">
-        {links.map((link) => (
-          <li key={link.url}>
-            <a
-              href={link.url}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="inline-flex items-center gap-2 text-[15px] font-medium text-primary hover:underline"
-            >
-              <ExternalLink className="h-4 w-4 shrink-0" />
-              {link.label}
-            </a>
-          </li>
-        ))}
-      </ul>
-    </section>
   );
 }
 

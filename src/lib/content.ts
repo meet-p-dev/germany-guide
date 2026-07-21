@@ -28,6 +28,13 @@ export interface PhaseWithSteps extends Phase {
   steps: Step[];
 }
 
+/**
+ * "Understand your two main paths" is orientation, not a checklist item — it
+ * belongs to choosing student vs worker in the plan wizard, so it stays out of
+ * the journey/process listings. The page itself remains live at /guide/….
+ */
+export const PATHS_EXPLAINER_SLUG = "understand-your-paths";
+
 export const getPhasesWithSteps = cache(async (): Promise<PhaseWithSteps[]> => {
   const supabase = createContentClient();
   const [phasesRes, stepsRes] = await Promise.all([
@@ -38,7 +45,10 @@ export const getPhasesWithSteps = cache(async (): Promise<PhaseWithSteps[]> => {
   if (stepsRes.error) throw stepsRes.error;
   return phasesRes.data.map((phase) => ({
     ...phase,
-    steps: stepsRes.data.filter((step) => step.phase_id === phase.id),
+    steps: stepsRes.data.filter(
+      (step) =>
+        step.phase_id === phase.id && step.slug !== PATHS_EXPLAINER_SLUG,
+    ),
   }));
 });
 

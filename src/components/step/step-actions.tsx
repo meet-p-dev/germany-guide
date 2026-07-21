@@ -105,6 +105,70 @@ export function StepDoneButton({ stepSlug }: { stepSlug: string }) {
   );
 }
 
+export interface UpcomingStep {
+  slug: string;
+  title: string;
+  cityVariable: boolean;
+  appliesTo: string;
+}
+
+/**
+ * "Next step" companion to the done button: always present so the journey can
+ * be walked page by page, and promoted to the primary action the moment the
+ * current step is ticked. Skips steps that don't apply to the visitor's path
+ * and steps already done; respects the visitor's city on city-variable steps.
+ */
+export function NextStepButton({
+  stepSlug,
+  upcoming,
+}: {
+  stepSlug: string;
+  upcoming: UpcomingStep[];
+}) {
+  const { ready, profile, progress } = useVisitorProfile();
+  if (!ready) return null;
+
+  const next = upcoming.find(
+    (s) =>
+      (s.appliesTo === "both" ||
+        profile.persona === null ||
+        s.appliesTo === profile.persona) &&
+      !progress[s.slug],
+  );
+  if (!next) return null;
+
+  const done = Boolean(progress[stepSlug]);
+  const href =
+    next.cityVariable && profile.citySlug
+      ? `/cities/${profile.citySlug}/${next.slug}`
+      : `/guide/${next.slug}`;
+
+  return (
+    <motion.span
+      key={done ? "done" : "todo"}
+      initial={{ scale: 0.95, opacity: 0.6 }}
+      animate={{ scale: 1, opacity: 1 }}
+      transition={{ type: "spring", stiffness: 400, damping: 25 }}
+      className="inline-flex max-w-full"
+    >
+      <Link
+        href={href}
+        className={cn(
+          "inline-flex h-11 max-w-full items-center gap-2 rounded-full border px-5 text-[15px] font-medium transition-all",
+          done
+            ? "border-primary bg-primary text-primary-foreground shadow-sm hover:bg-primary-hover"
+            : "border-border bg-card text-foreground hover:border-foreground/30 hover:shadow-sm",
+        )}
+      >
+        <span className="truncate">
+          <span className={done ? "" : "text-muted"}>Next:</span> {next.title}
+        </span>
+        <ArrowRight className="h-4 w-4 shrink-0" />
+      </Link>
+    </motion.span>
+  );
+}
+
 /**
  * On the Germany-wide view of a city-variable step: if the visitor has set a
  * city with a local variant, nudge them to it.

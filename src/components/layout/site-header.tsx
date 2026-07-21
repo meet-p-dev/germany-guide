@@ -6,6 +6,7 @@ import { usePathname } from "next/navigation";
 import { AnimatePresence, motion } from "framer-motion";
 import { Menu, X } from "lucide-react";
 import { Logo } from "@/components/layout/logo";
+import { PathSwitcher } from "@/components/layout/path-switcher";
 import { ThemeToggle } from "@/components/theme-toggle";
 import { AuthButton } from "@/components/auth/auth-button";
 import { ButtonLink } from "@/components/ui/button";
@@ -52,6 +53,7 @@ export function SiteHeader() {
         </nav>
 
         <div className="flex items-center gap-2.5">
+          <PathSwitcher />
           <ThemeToggle />
           <AuthButton />
           <ButtonLink

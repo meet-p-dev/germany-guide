@@ -1,6 +1,7 @@
 "use client";
 
-import { Briefcase, Check, GraduationCap } from "lucide-react";
+import { useState } from "react";
+import { Briefcase, Check, Eye, GraduationCap } from "lucide-react";
 import type { LucideIcon } from "lucide-react";
 import type { PersonaPoints } from "@/lib/content";
 import type { Persona } from "@/lib/content";
@@ -10,13 +11,15 @@ import { cn } from "@/lib/utils";
 
 /**
  * The "half of this isn't for you" problem, solved: the step compressed into
- * two scannable cards. The visitor can pick their path right here — the choice
- * saves to their profile, so every other page instantly shows their path first
- * without asking again.
+ * scannable path cards. A visitor who hasn't chosen yet can pick right here —
+ * the choice saves to their profile. A visitor who HAS chosen sees only their
+ * own path and is never asked again; the other path stays one tap away as a
+ * read-only peek, and changing paths lives in the header switcher instead.
  */
 export function PersonaCompare({ points }: { points: PersonaPoints }) {
   const { ready, profile, setProfile } = useVisitorProfile();
   const persona = ready ? profile.persona : null;
+  const [peeking, setPeeking] = useState(false);
 
   const cards = (
     [
@@ -37,37 +40,48 @@ export function PersonaCompare({ points }: { points: PersonaPoints }) {
 
   if (cards.length === 0) return null;
 
-  // The visitor's own path comes first.
-  if (persona) {
-    cards.sort((a, b) => (a.key === persona ? -1 : b.key === persona ? 1 : 0));
-  }
+  // The visitor's own path comes first; without a peek it stands alone.
+  const sorted = persona
+    ? [...cards].sort((a, b) =>
+        a.key === persona ? -1 : b.key === persona ? 1 : 0,
+      )
+    : cards;
+  const visible =
+    persona && !peeking
+      ? sorted.filter((card) => card.key === persona)
+      : sorted;
+  const hasOther = persona !== null && cards.some((c) => c.key !== persona);
 
   return (
-    <section className="mt-10">
+    <section>
       <div className="flex flex-wrap items-center justify-between gap-2">
-        <Kicker>The short version, by path</Kicker>
-        {persona && (
+        <Kicker>
+          {persona ? "The short version, for your path" : "The short version, by path"}
+        </Kicker>
+        {hasOther && (
           <button
             type="button"
-            onClick={() => setProfile({ persona: null })}
-            className="text-xs font-semibold text-muted underline-offset-2 hover:text-foreground hover:underline"
+            onClick={() => setPeeking((v) => !v)}
+            className="inline-flex items-center gap-1.5 text-xs font-semibold text-muted underline-offset-2 hover:text-foreground hover:underline"
           >
-            Show both paths
+            <Eye className="h-3.5 w-3.5" aria-hidden />
+            {peeking ? "Hide the other path" : "Peek at the other path"}
           </button>
         )}
       </div>
 
       {!persona && cards.length > 1 && (
         <p className="mt-2 text-sm text-muted">
-          Which one are you? Pick your path to tailor this — and the rest of the
-          site — to you.
+          Which one are you? Pick your path once — the whole site tailors
+          itself to it, and you can change it anytime from the switcher in the
+          header.
         </p>
       )}
 
       <div
-        className={cn("mt-4 grid gap-4", cards.length > 1 && "sm:grid-cols-2")}
+        className={cn("mt-4 grid gap-4", visible.length > 1 && "sm:grid-cols-2")}
       >
-        {cards.map((card) => (
+        {visible.map((card) => (
           <PathCard
             key={card.key}
             icon={card.icon}
@@ -147,18 +161,13 @@ function PathCard({
         ))}
       </ul>
 
-      {!chosen && (
+      {undecided && (
         <button
           type="button"
           onClick={onChoose}
-          className={cn(
-            "mt-4 inline-flex items-center justify-center gap-2 self-start rounded-full border px-4 py-2 text-sm font-semibold transition-colors",
-            undecided
-              ? "border-primary bg-primary text-primary-foreground hover:bg-primary-hover"
-              : "border-border bg-card text-foreground hover:border-foreground/30",
-          )}
+          className="mt-4 inline-flex items-center justify-center gap-2 self-start rounded-full border border-primary bg-primary px-4 py-2 text-sm font-semibold text-primary-foreground transition-colors hover:bg-primary-hover"
         >
-          {undecided ? "This is me" : "I'm this instead"}
+          This is me
         </button>
       )}
     </div>

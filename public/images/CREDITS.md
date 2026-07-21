@@ -19,9 +19,23 @@ verifiable source and license on file.
 | `city-aachen.jpg` | Aachen Cathedral from the Katschhof | Selina Bubendorfer | [Unsplash License](https://unsplash.com/license) — https://unsplash.com/photos/h-hlBO8sThE |
 | `city-bonn.jpg` | Arcaded gabled townhouses on a market street (the Unsplash page tags the location "Bonn"; the streetscape matches Münster's Prinzipalmarkt — used as the Bonn card image by owner's choice) | Reinhart Julian | [Unsplash License](https://unsplash.com/license) — https://unsplash.com/photos/vbi5T06-IHM |
 | `city-erlangen.jpg` | Neustädter (Hugenotten) Kirche tower with its green dome, over Hauptstraße gables | Meet Patel (site owner) | Original photo, owned by the site owner. Resized to 1600px wide and re-encoded with all EXIF/GPS metadata stripped (APP0/APP1/APP2/APP13 markers removed) before adding to the repo. |
+| `why-gastarbeiterinnen-1974.jpg` | Guest workers (Gastarbeiterinnen) at a textile mill, Ebersbach, 16 Sept 1974 — /why-germany "1955 onwards" section | Ulrich Häßler, German Federal Archive (Bundesarchiv) | [CC BY-SA 3.0 DE](https://creativecommons.org/licenses/by-sa/3.0/de/deed.en) — Bundesarchiv Bild 183-N0916-0005 — https://commons.wikimedia.org/wiki/File:Bundesarchiv_Bild_183-N0916-0005,_Ebersbach,_Gastarbeiterinnen.jpg |
+| `why-berlin-reichstag.jpg` | Reichstag glass dome with the Charité tower behind, Berlin — /why-germany "A nation of arrivals" section | Denis Dz. (desigens) | [Unsplash License](https://unsplash.com/license) — https://unsplash.com/photos/BzbLYLUAGqQ |
+| `why-munich-karlstor.jpg` | Crowded evening at the Karlstor city gate, Munich — /why-germany "Now — deliberately open" section | Bastian Riccardi | [Pexels License](https://www.pexels.com/license/) — https://www.pexels.com/photo/29719846/ |
 
 All Unsplash photos above were downloaded at 1600px wide and re-encoded (metadata
 stripped) before adding to the repo. Each city image was visually verified to
 depict the city it is filed under.
 
-Last updated: 2026-07-20.
+The Bundesarchiv photo requires attribution under CC BY-SA 3.0 DE, credited as
+"Bundesarchiv, Bild 183-N0916-0005 / Häßler, Ulrich" wherever it is displayed;
+that credit line renders as a caption on the /why-germany page itself.
+
+A second Bundesarchiv candidate for the historic section — Bild 183-B25447,
+"Eisenbahntransport russischer Zwangsarbeiter" — was deliberately NOT used.
+That photo depicts Russian forced laborers deported under the Nazi regime
+during WWII, a different and much darker history than the postwar (1955+)
+Gastarbeiter guest-worker programme the page's "1955 onwards" section tells.
+Conflating the two would misrepresent both.
+
+Last updated: 2026-07-21.

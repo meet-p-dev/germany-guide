@@ -16,7 +16,11 @@ import { createContentClient } from "@/lib/supabase/content-client";
 
 const GROQ_URL = "https://api.groq.com/openai/v1/chat/completions";
 const MODEL = "llama-3.3-70b-versatile";
+/** Vision-capable model for photographed/scanned letters. */
+const VISION_MODEL = "meta-llama/llama-4-scout-17b-16e-instruct";
 const MAX_INPUT_CHARS = 6000;
+/** Data-URL ceiling (~4.5 MB image after base64) — client downscales first. */
+const MAX_IMAGE_DATA_URL_CHARS = 6_000_000;
 
 const SHARED_RULES = `You write for stressed newcomers to Germany. Rules you never break:
 - Plain English, calm tone, short sentences. No emojis.
@@ -27,6 +31,8 @@ interface AssistBody {
   mode?: string;
   text?: string;
   stepSlug?: string;
+  /** Letter mode only: a photo/scan of the letter as a data URL. */
+  imageDataUrl?: string;
 }
 
 export async function POST(request: Request) {
@@ -46,7 +52,25 @@ export async function POST(request: Request) {
   }
 
   const text = (body.text ?? "").trim();
-  if (!text) {
+  const imageDataUrl = (body.imageDataUrl ?? "").trim();
+  const hasImage = imageDataUrl.length > 0 && body.mode === "letter";
+
+  if (hasImage) {
+    if (!/^data:image\/(jpeg|png|webp);base64,/.test(imageDataUrl)) {
+      return NextResponse.json(
+        { error: "The image must be a JPEG, PNG or WebP photo." },
+        { status: 400 },
+      );
+    }
+    if (imageDataUrl.length > MAX_IMAGE_DATA_URL_CHARS) {
+      return NextResponse.json(
+        { error: "That image is too large — try a smaller photo." },
+        { status: 400 },
+      );
+    }
+  }
+
+  if (!text && !hasImage) {
     return NextResponse.json({ error: "Nothing to analyse." }, { status: 400 });
   }
   if (text.length > MAX_INPUT_CHARS) {
@@ -82,9 +106,14 @@ Known letter types:
 ${known}
 
 ${SHARED_RULES}
-- Only use dates, amounts and reference numbers that appear in the pasted text itself.
-- If the text does not look like an official letter, say so briefly and stop.`;
-    user = `Here is the letter text:\n\n${text}`;
+- Only use dates, amounts and reference numbers that appear in the letter itself.
+- If the input does not look like an official letter, say so briefly and stop.
+- If parts of a photographed letter are unreadable, say which part you could not read instead of guessing.`;
+    user = hasImage
+      ? text
+        ? `Here is a photo of the letter. Extra context from the user:\n\n${text}`
+        : "Here is a photo of the letter."
+      : `Here is the letter text:\n\n${text}`;
   } else if (body.mode === "step") {
     const slug = (body.stepSlug ?? "").trim();
     if (!slug) {
@@ -124,12 +153,20 @@ ${SHARED_RULES}
         "Content-Type": "application/json",
       },
       body: JSON.stringify({
-        model: MODEL,
+        model: hasImage ? VISION_MODEL : MODEL,
         temperature: 0.2,
         max_tokens: 700,
         messages: [
           { role: "system", content: system },
-          { role: "user", content: user },
+          {
+            role: "user",
+            content: hasImage
+              ? [
+                  { type: "text", text: user },
+                  { type: "image_url", image_url: { url: imageDataUrl } },
+                ]
+              : user,
+          },
         ],
       }),
     });

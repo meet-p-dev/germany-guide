@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useMemo, useState } from "react";
+import { useMemo, useState } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { motion } from "framer-motion";
 import {
@@ -34,6 +34,7 @@ import {
   type VisitorProfile,
 } from "@/lib/profile-store";
 import { Button } from "@/components/ui/button";
+import { ConfirmDialog } from "@/components/ui/confirm-dialog";
 import { Kicker } from "@/components/ui/kicker";
 import { cn } from "@/lib/utils";
 
@@ -100,7 +101,7 @@ const PERSONAS: {
     value: null,
     icon: HelpCircle,
     title: "Not sure yet",
-    hint: "Show me both paths.",
+    hint: "Compare the two paths — a five-tap quiz points you to your route.",
   },
 ];
 
@@ -403,6 +404,15 @@ function PlanFlow({
                     option.value !== null && persona === option.value
                   }
                   onSelect={() => {
+                    // "Not sure yet" hands over to the paths explainer: the
+                    // quiz there ends in a "build my plan" link that returns
+                    // here with the persona pre-selected. Stage is saved so
+                    // that answer survives the round trip.
+                    if (option.value === null) {
+                      setProfile({ stage });
+                      router.push("/guide/understand-your-paths");
+                      return;
+                    }
                     setPersona(option.value);
                     if (stepIndex + 1 >= totalSteps) {
                       finish({ persona: option.value });
@@ -510,53 +520,6 @@ function PlanFlow({
           }
         />
       )}
-    </div>
-  );
-}
-
-function ConfirmDialog({
-  title,
-  body,
-  actions,
-  onClose,
-}: {
-  title: string;
-  body: string;
-  actions: React.ReactNode;
-  onClose: () => void;
-}) {
-  useEffect(() => {
-    const onKey = (event: KeyboardEvent) => {
-      if (event.key === "Escape") onClose();
-    };
-    window.addEventListener("keydown", onKey);
-    return () => window.removeEventListener("keydown", onKey);
-  }, [onClose]);
-
-  return (
-    <div className="fixed inset-0 z-50 flex items-end justify-center p-4 sm:items-center">
-      <motion.button
-        type="button"
-        aria-label="Close dialog"
-        onClick={onClose}
-        initial={{ opacity: 0 }}
-        animate={{ opacity: 1 }}
-        transition={{ duration: 0.2 }}
-        className="absolute inset-0 cursor-default bg-black/40"
-      />
-      <motion.div
-        role="dialog"
-        aria-modal="true"
-        aria-label={title}
-        initial={{ opacity: 0, y: 16, scale: 0.97 }}
-        animate={{ opacity: 1, y: 0, scale: 1 }}
-        transition={{ duration: 0.3, ease: EASE }}
-        className="relative w-full max-w-md rounded-3xl border border-border bg-card p-6 shadow-xl"
-      >
-        <h2 className="font-display text-xl font-bold">{title}</h2>
-        <p className="mt-2 text-sm leading-relaxed text-muted">{body}</p>
-        <div className="mt-6 flex flex-wrap items-center gap-2">{actions}</div>
-      </motion.div>
     </div>
   );
 }

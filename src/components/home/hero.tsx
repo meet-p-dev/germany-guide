@@ -1,12 +1,13 @@
 "use client";
 
 import Image from "next/image";
+import Link from "next/link";
 import { motion } from "framer-motion";
 import {
   ArrowRight,
   CalendarClock,
   Compass,
-  Footprints,
+  Globe,
   MapPin,
 } from "lucide-react";
 import { ButtonLink } from "@/components/ui/button";
@@ -31,7 +32,7 @@ export function Hero() {
         <motion.div variants={item}>
           <span className="inline-flex items-center gap-2 rounded-full border border-border bg-card px-4 py-2 text-xs font-semibold uppercase tracking-[0.16em] text-muted">
             <MapPin className="h-3.5 w-3.5 text-primary" />
-            City-specific German bureaucracy
+            From first thought to fully settled
           </span>
         </motion.div>
 
@@ -48,8 +49,10 @@ export function Hero() {
           className="mt-6 max-w-xl text-lg leading-relaxed text-muted"
         >
           From your visa to your Anmeldung — a clear, personalised checklist
-          that knows the difference between doing it in Munich, Ingolstadt or
-          Nuremberg.
+          that knows the difference between doing it in{" "}
+          <HeroCityLink slug="munich">Munich</HeroCityLink>,{" "}
+          <HeroCityLink slug="berlin">Berlin</HeroCityLink> or{" "}
+          <HeroCityLink slug="frankfurt">Frankfurt</HeroCityLink>.
         </motion.p>
 
         <motion.div variants={item} className="mt-8 flex flex-wrap gap-3">
@@ -87,33 +90,57 @@ export function Hero() {
         </div>
 
         <Float className="absolute -left-3 bottom-10 sm:-left-8" duration={5.5}>
-          <div className="flex items-center gap-3 rounded-2xl border border-border bg-card p-3 pr-5 shadow-lg">
-            <span className="flex h-10 w-10 items-center justify-center rounded-xl bg-success-soft text-success">
-              <Footprints className="h-5 w-5" />
-            </span>
-            <span>
-              <span className="block text-sm font-bold">Munich</span>
-              <span className="block text-sm text-muted">
-                Walk-in registration ok
-              </span>
-            </span>
-          </div>
-        </Float>
-
-        <Float className="absolute -right-2 top-8 sm:-right-6" duration={6.5} delay={0.8}>
-          <div className="flex items-center gap-3 rounded-2xl border border-border bg-card p-3 pr-5 shadow-lg">
+          <Link
+            href="/cities/munich"
+            className="flex items-center gap-3 rounded-2xl border border-border bg-card p-3 pr-5 shadow-lg transition-shadow hover:shadow-xl"
+          >
             <span className="flex h-10 w-10 items-center justify-center rounded-xl bg-gold-soft text-gold">
               <CalendarClock className="h-5 w-5" />
             </span>
             <span>
-              <span className="block text-sm font-bold">Ingolstadt</span>
+              <span className="block text-sm font-bold">Munich</span>
               <span className="block text-sm text-muted">
-                Appointment required
+                Appointment only — no walk-ins
               </span>
             </span>
-          </div>
+          </Link>
+        </Float>
+
+        <Float className="absolute -right-2 top-8 sm:-right-6" duration={6.5} delay={0.8}>
+          <Link
+            href="/cities/berlin"
+            className="flex items-center gap-3 rounded-2xl border border-border bg-card p-3 pr-5 shadow-lg transition-shadow hover:shadow-xl"
+          >
+            <span className="flex h-10 w-10 items-center justify-center rounded-xl bg-success-soft text-success">
+              <Globe className="h-5 w-5" />
+            </span>
+            <span>
+              <span className="block text-sm font-bold">Berlin</span>
+              <span className="block text-sm text-muted">
+                Online with BundID works
+              </span>
+            </span>
+          </Link>
         </Float>
       </motion.div>
     </section>
+  );
+}
+
+/** City names in the hero copy link straight to that city's own page. */
+function HeroCityLink({
+  slug,
+  children,
+}: {
+  slug: string;
+  children: React.ReactNode;
+}) {
+  return (
+    <Link
+      href={`/cities/${slug}`}
+      className="font-semibold text-foreground underline decoration-primary/50 decoration-2 underline-offset-4 transition-colors hover:text-primary"
+    >
+      {children}
+    </Link>
   );
 }

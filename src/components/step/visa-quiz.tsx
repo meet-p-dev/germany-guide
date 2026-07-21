@@ -22,6 +22,8 @@ interface QuizResult {
   bullets: string[];
   officialUrl: string;
   officialLabel: string;
+  /** The path this route belongs to — pre-selects it in the plan wizard. */
+  persona: "student" | "worker";
 }
 
 const RESULTS: Record<string, QuizResult> = {
@@ -36,6 +38,7 @@ const RESULTS: Record<string, QuizResult> = {
     ],
     officialUrl: "https://www.daad.de/en/studying-in-germany/",
     officialLabel: "DAAD — official study portal",
+    persona: "student",
   },
   blue_card: {
     title: "You look like an EU Blue Card case",
@@ -49,6 +52,7 @@ const RESULTS: Record<string, QuizResult> = {
     officialUrl:
       "https://www.make-it-in-germany.com/en/visa-residence/types/eu-blue-card",
     officialLabel: "Make it in Germany — EU Blue Card",
+    persona: "worker",
   },
   work_visa: {
     title: "The standard work visa is your route",
@@ -62,6 +66,7 @@ const RESULTS: Record<string, QuizResult> = {
     officialUrl:
       "https://www.make-it-in-germany.com/en/visa-residence/types/work-qualified-professionals",
     officialLabel: "Make it in Germany — skilled workers",
+    persona: "worker",
   },
   chancenkarte: {
     title: "Consider the Chancenkarte",
@@ -75,6 +80,7 @@ const RESULTS: Record<string, QuizResult> = {
     officialUrl:
       "https://www.make-it-in-germany.com/en/visa-residence/types/chancenkarte",
     officialLabel: "Make it in Germany — Chancenkarte",
+    persona: "worker",
   },
   ausbildung: {
     title: "Look at Ausbildung — paid vocational training",
@@ -88,6 +94,7 @@ const RESULTS: Record<string, QuizResult> = {
     officialUrl:
       "https://www.make-it-in-germany.com/en/study-training/training-in-germany",
     officialLabel: "Make it in Germany — vocational training",
+    persona: "worker",
   },
 };
 
@@ -244,7 +251,7 @@ function QuizResultCard({
         ))}
       </ul>
       <div className="mt-5 flex flex-wrap items-center gap-2.5">
-        <ButtonLink href="/plan" size="sm">
+        <ButtonLink href={`/plan?persona=${result.persona}`} size="sm">
           Build my plan around this
           <ArrowRight className="h-4 w-4" />
         </ButtonLink>

@@ -1,8 +1,15 @@
 "use client";
 
-import { useState } from "react";
+import { useRef, useState } from "react";
 import { motion } from "framer-motion";
-import { Loader2, MailQuestion, MessageCircleQuestion, Send } from "lucide-react";
+import {
+  Camera,
+  Loader2,
+  MailQuestion,
+  MessageCircleQuestion,
+  Send,
+  X,
+} from "lucide-react";
 import { Markdown } from "@/components/markdown";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
@@ -23,6 +30,7 @@ function useAssist() {
     mode: "letter" | "step";
     text: string;
     stepSlug?: string;
+    imageDataUrl?: string;
   }) => {
     setState({ status: "loading" });
     try {
@@ -87,45 +95,156 @@ function AnswerPanel({ state }: { state: AssistState }) {
   );
 }
 
-/** Paste any official German letter → what it is, urgency, what to do. */
+/**
+ * Photos come in at phone-camera resolution; the model needs far less. Downscale
+ * on-device so the upload stays small and nothing bigger than needed leaves
+ * the browser. Re-encoding to JPEG also normalises whatever format came in.
+ */
+async function imageFileToDataUrl(file: File): Promise<string> {
+  const bitmap = await createImageBitmap(file);
+  const MAX_EDGE = 1600;
+  const scale = Math.min(1, MAX_EDGE / Math.max(bitmap.width, bitmap.height));
+  const canvas = document.createElement("canvas");
+  canvas.width = Math.max(1, Math.round(bitmap.width * scale));
+  canvas.height = Math.max(1, Math.round(bitmap.height * scale));
+  const ctx = canvas.getContext("2d");
+  if (!ctx) throw new Error("canvas unavailable");
+  ctx.drawImage(bitmap, 0, 0, canvas.width, canvas.height);
+  bitmap.close();
+  return canvas.toDataURL("image/jpeg", 0.85);
+}
+
+/** Paste, photograph or drop any official German letter → what it is, urgency, what to do. */
 export function LetterDecoder() {
   const { state, ask } = useAssist();
   const [text, setText] = useState("");
+  const [image, setImage] = useState<string | null>(null);
+  const [imageError, setImageError] = useState<string | null>(null);
+  const [dragging, setDragging] = useState(false);
+  const fileInputRef = useRef<HTMLInputElement>(null);
+
+  const acceptFile = async (file: File | undefined) => {
+    if (!file) return;
+    setImageError(null);
+    if (!file.type.startsWith("image/")) {
+      setImageError("That file isn't an image — drop a photo of the letter.");
+      return;
+    }
+    try {
+      setImage(await imageFileToDataUrl(file));
+    } catch {
+      setImageError(
+        "Couldn't read that image — try a JPG or PNG photo instead.",
+      );
+    }
+  };
+
+  const canDecode =
+    state.status !== "loading" && (image !== null || text.trim().length >= 40);
 
   return (
-    <section className="mt-10 rounded-3xl border border-gold/40 bg-gold-soft/40 p-6">
+    <section
+      onDragOver={(event) => {
+        event.preventDefault();
+        setDragging(true);
+      }}
+      onDragLeave={() => setDragging(false)}
+      onDrop={(event) => {
+        event.preventDefault();
+        setDragging(false);
+        void acceptFile(event.dataTransfer.files[0]);
+      }}
+      className={cn(
+        "mt-10 rounded-3xl border bg-gold-soft/40 p-6 transition-colors",
+        dragging ? "border-primary" : "border-gold/40",
+      )}
+    >
       <p className="flex items-center gap-2 font-display text-xl font-bold">
         <MailQuestion className="h-5 w-5 text-gold" />
         Decode your letter now
       </p>
       <p className="mt-1 text-sm leading-relaxed text-muted">
-        Type or paste the letter&apos;s text (German is fine) and get a plain
-        answer: what it is, how urgent, what to do.
+        Snap a photo of the letter, drop an image here, or paste its text
+        (German is fine) — and get a plain answer: what it is, how urgent,
+        what to do.
       </p>
-      <textarea
-        rows={5}
-        value={text}
-        onChange={(event) => setText(event.target.value)}
-        placeholder="Sehr geehrte(r) …"
-        className="mt-4 w-full resize-y rounded-2xl border border-border bg-background p-4 text-[15px] outline-none focus:border-primary"
-      />
-      <div className="mt-3 flex items-center justify-between gap-3">
-        <p className="text-xs text-muted">
-          Leave out personal data you&apos;d rather not share — it isn&apos;t
-          needed for the answer.
-        </p>
+
+      {image ? (
+        <div className="mt-4 flex items-start gap-3">
+          {/* eslint-disable-next-line @next/next/no-img-element -- transient local data URL, not an asset */}
+          <img
+            src={image}
+            alt="Your letter, ready to decode"
+            className="h-28 w-auto max-w-[10rem] rounded-xl border border-border object-cover"
+          />
+          <button
+            type="button"
+            onClick={() => setImage(null)}
+            className="inline-flex items-center gap-1.5 rounded-full border border-border bg-card px-3 py-1.5 text-xs font-medium text-muted transition-colors hover:text-foreground"
+          >
+            <X className="h-3.5 w-3.5" />
+            Remove photo
+          </button>
+        </div>
+      ) : (
+        <textarea
+          rows={5}
+          value={text}
+          onChange={(event) => setText(event.target.value)}
+          placeholder="Sehr geehrte(r) …"
+          className="mt-4 w-full resize-y rounded-2xl border border-border bg-background p-4 text-[15px] outline-none focus:border-primary"
+        />
+      )}
+
+      {imageError && (
+        <p className="mt-2 text-sm text-primary">{imageError}</p>
+      )}
+
+      <div className="mt-3 flex flex-wrap items-center justify-between gap-3">
+        <div className="flex items-center gap-3">
+          <input
+            ref={fileInputRef}
+            type="file"
+            accept="image/*"
+            capture="environment"
+            className="sr-only"
+            onChange={(event) => {
+              void acceptFile(event.target.files?.[0]);
+              event.target.value = "";
+            }}
+          />
+          <Button
+            variant="secondary"
+            size="sm"
+            onClick={() => fileInputRef.current?.click()}
+          >
+            <Camera className="h-4 w-4" />
+            {image ? "Retake photo" : "Scan or add a photo"}
+          </Button>
+        </div>
         <Button
           size="sm"
-          disabled={state.status === "loading" || text.trim().length < 40}
-          onClick={() => void ask({ mode: "letter", text })}
+          disabled={!canDecode}
+          onClick={() =>
+            void ask({
+              mode: "letter",
+              text: image ? text.trim() : text,
+              ...(image ? { imageDataUrl: image } : {}),
+            })
+          }
         >
           <Send className="h-4 w-4" />
           Decode
         </Button>
       </div>
+      <p className="mt-3 text-xs text-muted">
+        Cover or leave out personal data you&apos;d rather not share — it
+        isn&apos;t needed for the answer. Photos are analysed once and not
+        stored.
+      </p>
       <AnswerPanel state={state} />
       <p className="mt-4 text-xs text-muted">
-        AI-generated from your text — general information, not legal advice.
+        AI-generated from your letter — general information, not legal advice.
       </p>
     </section>
   );
