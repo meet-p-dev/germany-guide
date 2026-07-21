@@ -15,9 +15,12 @@ import { createContentClient } from "@/lib/supabase/content-client";
  */
 
 const GROQ_URL = "https://api.groq.com/openai/v1/chat/completions";
-const MODEL = "llama-3.3-70b-versatile";
+// Groq retires hosted models on a rolling basis (e.g. the Llama 4 vision
+// models were shut down in mid-2026), so both IDs are env-overridable — a
+// future deprecation can be fixed by setting the var, no code deploy needed.
+const MODEL = process.env.GROQ_MODEL ?? "llama-3.3-70b-versatile";
 /** Vision-capable model for photographed/scanned letters. */
-const VISION_MODEL = "meta-llama/llama-4-scout-17b-16e-instruct";
+const VISION_MODEL = process.env.GROQ_VISION_MODEL ?? "qwen/qwen3.6-27b";
 const MAX_INPUT_CHARS = 6000;
 /** Data-URL ceiling (~4.5 MB image after base64) — client downscales first. */
 const MAX_IMAGE_DATA_URL_CHARS = 6_000_000;
@@ -178,6 +181,12 @@ ${SHARED_RULES}
       );
     }
     if (!groqRes.ok) {
+      // Surface the real upstream reason in the server logs — a swallowed
+      // error here is what let a decommissioned vision model fail silently.
+      const detail = await groqRes.text().catch(() => "");
+      console.error(
+        `Groq ${groqRes.status} (${hasImage ? VISION_MODEL : MODEL}): ${detail.slice(0, 500)}`,
+      );
       return NextResponse.json(
         { error: "The helper hit a problem. Try again shortly." },
         { status: 502 },

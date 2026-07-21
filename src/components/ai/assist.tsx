@@ -4,6 +4,7 @@ import { useRef, useState } from "react";
 import { motion } from "framer-motion";
 import {
   Camera,
+  ImagePlus,
   Loader2,
   MailQuestion,
   MessageCircleQuestion,
@@ -121,7 +122,11 @@ export function LetterDecoder() {
   const [image, setImage] = useState<string | null>(null);
   const [imageError, setImageError] = useState<string | null>(null);
   const [dragging, setDragging] = useState(false);
-  const fileInputRef = useRef<HTMLInputElement>(null);
+  // Two inputs, not one: the camera input carries `capture` so phones open
+  // the camera straight away; the gallery input omits it so the same phones
+  // open the photo library / file picker instead.
+  const cameraInputRef = useRef<HTMLInputElement>(null);
+  const galleryInputRef = useRef<HTMLInputElement>(null);
 
   const acceptFile = async (file: File | undefined) => {
     if (!file) return;
@@ -201,9 +206,9 @@ export function LetterDecoder() {
       )}
 
       <div className="mt-3 flex flex-wrap items-center justify-between gap-3">
-        <div className="flex items-center gap-3">
+        <div className="flex flex-wrap items-center gap-2">
           <input
-            ref={fileInputRef}
+            ref={cameraInputRef}
             type="file"
             accept="image/*"
             capture="environment"
@@ -213,13 +218,31 @@ export function LetterDecoder() {
               event.target.value = "";
             }}
           />
+          <input
+            ref={galleryInputRef}
+            type="file"
+            accept="image/*"
+            className="sr-only"
+            onChange={(event) => {
+              void acceptFile(event.target.files?.[0]);
+              event.target.value = "";
+            }}
+          />
           <Button
             variant="secondary"
             size="sm"
-            onClick={() => fileInputRef.current?.click()}
+            onClick={() => cameraInputRef.current?.click()}
           >
             <Camera className="h-4 w-4" />
-            {image ? "Retake photo" : "Scan or add a photo"}
+            {image ? "Retake" : "Scan"}
+          </Button>
+          <Button
+            variant="secondary"
+            size="sm"
+            onClick={() => galleryInputRef.current?.click()}
+          >
+            <ImagePlus className="h-4 w-4" />
+            {image ? "Replace photo" : "Add photo"}
           </Button>
         </div>
         <Button
