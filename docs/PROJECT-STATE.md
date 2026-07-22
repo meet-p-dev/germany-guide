@@ -8,7 +8,9 @@
 > is the *living status* layer. **Keep it current — update it at the end of any
 > work session** (it is the one place a fresh Claude will trust).
 >
-> Last updated: 2026-07-22 (QA round 2: 5 mobile/nav/chat/scroll/footer fixes).
+> Last updated: 2026-07-22 (blueprint added: compact/full split gated by city
+> selection + real city hubs via a new `city_facts` table — see "Planned
+> direction" below; not built yet).
 
 ## What this site is (1-paragraph version)
 
@@ -77,11 +79,9 @@ These were explicitly rejected — don't re-litigate them.
   `public.admins` table (NOT a role on `profiles`, which is self-updatable).
   Grant via `/admin/admins` (add by email) or SQL insert into `public.admins`.
   `public.is_admin()` drives write RLS on every content table. Owner
-  patelmeet.2905@gmail.com is the first admin.
-  ⚠️ **As of 2026-07-22 the admin code is present in the working tree but
-  UNCOMMITTED** (`src/app/admin/`, `src/components/admin/`, `src/lib/admin/`,
-  `admin-nav-link.tsx` show as untracked in `git status`). Commit it so the work
-  is safe before relying on it.
+  patelmeet.2905@gmail.com is the first admin. **Committed** (all 14 admin files
+  are tracked in git as of 2026-07-22 — the earlier "uncommitted" warning is
+  resolved).
 - **SEO/traffic:** JSON-LD (Organization/WebSite/HowTo/Breadcrumb/FAQ), Vercel
   Analytics (cookieless), per-step `seo_title`/`seo_description`, canonicals.
   `/updates` = human-approved "what changed in Germany" items + RSS. Goal is
@@ -89,6 +89,65 @@ These were explicitly rejected — don't re-litigate them.
 - **AI features (Groq):** letter decoder on `/letters`, step Q&A, sitewide chat
   widget with a trust ladder (site → web → honest fallback). `GROQ_API_KEY` is
   set in Vercel. Web-search rung needs a `TAVILY_API_KEY` (still pending).
+
+## Planned direction — compact/full split + real city hubs (blueprint, 2026-07-22)
+
+> Agreed in a brainstorm on 2026-07-22. **Not built yet** — this is the design the
+> next build sessions should follow. It refines roadmap step ① (the two funnels)
+> into a concrete model. Nothing here overrides the scope guard or the hard rules.
+
+**The core idea: one source of content, shown two ways — and *city selection is
+the switch* between them.**
+
+- **No city selected (Explorer)** → show the **full / Explore** version: the
+  universal story, all cases, all cities. You can't personalise without a city.
+- **City selected (Committed)** → show the **compact "Build my plan"** version,
+  for *that city + that persona only*: action-only, e.g. "Buy from VGI · bring
+  student ID + enrolment cert · €43/mo student rate · [3 steps]." Committing to a
+  city (which people do right after they get admitted) flips the whole experience
+  automatically — it is NOT a toggle the user clicks. This maps exactly onto the
+  existing Explorer vs Committed split.
+
+**No duplicated content.** The facts are written once; the two views are two
+*lenses* on the same rows:
+
+| Field / table | Feeds | Notes |
+|---|---|---|
+| `steps.quick_action` *(NEW column)* | Build my plan (compact) | Hand-written **template per step** (~11 total), with blanks like `{operator}` `{price}` `{persona}` that auto-fill from data — so one template serves all 36 cities. Do NOT hand-write per city×persona (that's ~1,188 cards). |
+| `steps.content_md` | Explore (full) | The whole guide, already exists. |
+| `steps.documents` | both | "What to bring." Surface as a counter-day doc pack. |
+| `steps.depends_on` | Journey Map | Already rendered per-step ("Finish first" / "Unlocks"); the Map turns it into a whole-journey view. |
+| `steps.deadline_rule` / `due_offset_days` | Deadline clock | Move date → real dates → one calm countdown banner. |
+| `city_steps` | fills the compact blanks | VGI, €43, appointment-only, etc. **Today only 3 per city** — the big lift is expanding this to every relevant step, city by city. |
+| `city_facts` *(NEW table)* | Explore / city hub | Local info that is NOT a task: `city + category + content + source + last_verified`. Categories: `first_days`, `housing` (dorm link + how-to, or WG plan, + avg rent range), `insurance` (nearest offices), `banking` (student-friendly), `while_waiting`. Compact view borrows only the one relevant line. |
+
+**Two pages, linked (not one expandable page):** the compact step page links out to
+the full guide. Mapped to existing routes — minimal new routing, mostly repurpose +
+content:
+
+| View | Route | Action |
+|---|---|---|
+| Explore step (full, universal) | `/guide/[slug]` | exists |
+| Compact step (city + persona) | `/cities/[city]/[slug]` | **repurpose as the compact Build-my-plan card**; add "Read the full guide →" link to `/guide/[slug]` |
+| City hub | `/cities/[city]` | **expand** with the `city_facts` sections above |
+| Plan wizard | `/plan` | **gate**: capture city → route into compact |
+| Journey Map | `/journey` | **rebuild later** as the whole-journey map (done ▪ next ▪ locked, with "needs Anmeldung" reasons) |
+
+**Fallback rule:** if a step has no `city_steps` override for the selected city,
+the compact view falls back to the universal `quick_action` (blanks that can't fill
+are omitted) plus whatever `city_facts` exist — never a broken card.
+
+**Suggested build order:** ① add `steps.quick_action` + write the ~11 templates →
+② create `city_facts` table (public-read RLS, admin CRUD, regen types) → ③ fill
+**Munich** first: expand its `city_steps` to every relevant step + populate all
+`city_facts` categories (every figure cited + `last_verified`) → ④ compact step
+page + "full guide" link → ⑤ Deadline clock banner → ⑥ Journey Map hero. Munich
+becomes the template the other 35 cities clone.
+
+**Still bound by the hard rules:** every city fact carries `source` +
+`last_verified`; never fabricate rent/figures (avg rent = a cited *range* only);
+content stays in Supabase (both `quick_action` and `city_facts`); no emojis on the
+site; keep disclaimers + official links.
 
 ## Working model (how the owner wants to work)
 
