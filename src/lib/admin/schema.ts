@@ -55,6 +55,7 @@ export type TableName =
   | "phases"
   | "steps"
   | "city_steps"
+  | "city_facts"
   | "glossary_terms"
   | "problems"
   | "letters"
@@ -122,6 +123,12 @@ export const ADMIN_TABLES: TableConfig[] = [
       { name: "slug", label: "Slug", type: "text", required: true },
       { name: "title", label: "Title", type: "text", required: true },
       { name: "summary", label: "Summary", type: "textarea" },
+      {
+        name: "quick_action",
+        label: "Quick action (compact plan)",
+        type: "textarea",
+        help: "Short template for the Build-my-plan view. May use {placeholders} like {operator}, {cost}, {persona} — filled from city + persona at render. Blank falls back to Summary.",
+      },
       { name: "content_md", label: "Content (Markdown)", type: "markdown", required: true },
       {
         name: "applies_to",
@@ -200,6 +207,40 @@ export const ADMIN_TABLES: TableConfig[] = [
         suggestions: ["critical", "high", "medium", "low"],
       },
       { name: "lead_time", label: "Lead time", type: "text" },
+    ],
+  },
+  {
+    name: "city_facts",
+    label: "City facts",
+    singular: "City fact",
+    description:
+      "Per-city reference facts (not tasks): housing & rent, dorms, insurance & bank offices, first days, while-waiting. Every claim needs a source + last verified date.",
+    titleFields: ["city_id", "title"],
+    secondaryField: "category",
+    orderBy: { column: "updated_at", ascending: false },
+    fields: [
+      idField,
+      {
+        name: "city_id",
+        label: "City",
+        type: "fk",
+        required: true,
+        fk: { table: "cities", labelField: "name" },
+      },
+      {
+        name: "category",
+        label: "Category",
+        type: "text",
+        required: true,
+        suggestions: ["first_days", "housing", "insurance", "banking", "while_waiting"],
+        help: "Which city-hub section this fact belongs to.",
+      },
+      { name: "title", label: "Title", type: "text", required: true },
+      { name: "content_md", label: "Content (Markdown)", type: "markdown" },
+      { name: "links", label: "Links (JSON array)", type: "json", jsonShape: "array" },
+      { name: "source", label: "Source", type: "text", help: "Where this fact comes from (official site / stats). Required by project rules." },
+      { name: "last_verified", label: "Last verified", type: "date", help: "Required by project rules for city claims" },
+      { name: "sort_order", label: "Sort order", type: "number" },
     ],
   },
   {

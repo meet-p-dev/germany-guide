@@ -62,6 +62,56 @@ export type Database = {
         }
         Relationships: []
       }
+      city_facts: {
+        Row: {
+          category: string
+          city_id: string
+          content_md: string
+          created_at: string
+          id: string
+          last_verified: string | null
+          links: Json
+          sort_order: number
+          source: string | null
+          title: string
+          updated_at: string
+        }
+        Insert: {
+          category: string
+          city_id: string
+          content_md?: string
+          created_at?: string
+          id?: string
+          last_verified?: string | null
+          links?: Json
+          sort_order?: number
+          source?: string | null
+          title: string
+          updated_at?: string
+        }
+        Update: {
+          category?: string
+          city_id?: string
+          content_md?: string
+          created_at?: string
+          id?: string
+          last_verified?: string | null
+          links?: Json
+          sort_order?: number
+          source?: string | null
+          title?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "city_facts_city_id_fkey"
+            columns: ["city_id"]
+            isOneToOne: false
+            referencedRelation: "cities"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       city_steps: {
         Row: {
           address: string | null
@@ -335,6 +385,7 @@ export type Database = {
           official_links: Json
           persona_points: Json
           phase_id: string
+          quick_action: string | null
           seo_description: string | null
           seo_title: string | null
           slug: string
@@ -361,6 +412,7 @@ export type Database = {
           official_links?: Json
           persona_points?: Json
           phase_id: string
+          quick_action?: string | null
           seo_description?: string | null
           seo_title?: string | null
           slug: string
@@ -387,6 +439,7 @@ export type Database = {
           official_links?: Json
           persona_points?: Json
           phase_id?: string
+          quick_action?: string | null
           seo_description?: string | null
           seo_title?: string | null
           slug?: string
