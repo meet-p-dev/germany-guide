@@ -16,7 +16,7 @@ export function AuthButton() {
       <Link
         href="/signin"
         className={cn(
-          "hidden text-sm font-medium text-muted transition-colors hover:text-foreground sm:block",
+          "hidden whitespace-nowrap text-sm font-medium text-muted transition-colors hover:text-foreground sm:block",
           !ready && "invisible",
         )}
       >

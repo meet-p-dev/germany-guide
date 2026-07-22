@@ -63,12 +63,24 @@
 }
 
 html {
-  scroll-behavior: smooth;
+  /* No global smooth scroll on purpose: it fights this Next.js version's
+     App Router scroll restoration and can leave a freshly navigated page
+     parked with its heading under the sticky header (e.g. clicking a footer
+     link from the bottom of a long page). scroll-padding-top keeps in-page
+     anchor jumps (glossary A–Z index) clear of the 4rem sticky header. */
+  scroll-padding-top: 5rem;
 }
 
-@media (prefers-reduced-motion: reduce) {
-  html {
-    scroll-behavior: auto;
+/* iOS Safari zooms the whole page in when a focused form control has a
+   font-size below 16px, and frequently fails to zoom back out afterwards.
+   Guaranteeing >=16px on small screens prevents the zoom entirely. The
+   :not() attribute selectors carry enough specificity to win over Tailwind's
+   text-size utilities (e.g. text-[15px]) on the inputs. */
+@media (max-width: 640px) {
+  input:not([type="checkbox"]):not([type="radio"]):not([type="range"]),
+  textarea,
+  select {
+    font-size: 16px;
   }
 }
 

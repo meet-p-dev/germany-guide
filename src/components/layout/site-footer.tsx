@@ -1,5 +1,9 @@
+"use client";
+
 import Link from "next/link";
+import { usePathname } from "next/navigation";
 import { Logo } from "@/components/layout/logo";
+import { cn } from "@/lib/utils";
 
 const GUIDE_LINKS = [
   { href: "/process", label: "The process" },
@@ -63,22 +67,33 @@ function FooterColumn({
   title: string;
   links: { href: string; label: string }[];
 }) {
+  const pathname = usePathname();
   return (
     <div>
       <p className="text-xs font-semibold uppercase tracking-[0.18em] text-muted">
         {title}
       </p>
       <ul className="mt-4 space-y-2.5">
-        {links.map((link) => (
-          <li key={link.href}>
-            <Link
-              href={link.href}
-              className="text-sm text-foreground/80 transition-colors hover:text-foreground"
-            >
-              {link.label}
-            </Link>
-          </li>
-        ))}
+        {links.map((link) => {
+          const active =
+            pathname === link.href || pathname.startsWith(link.href + "/");
+          return (
+            <li key={link.href}>
+              <Link
+                href={link.href}
+                aria-current={active ? "page" : undefined}
+                className={cn(
+                  "text-sm transition-colors",
+                  active
+                    ? "font-semibold text-foreground"
+                    : "text-foreground/80 hover:text-foreground",
+                )}
+              >
+                {link.label}
+              </Link>
+            </li>
+          );
+        })}
       </ul>
     </div>
   );

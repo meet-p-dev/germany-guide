@@ -8,7 +8,7 @@
 > is the *living status* layer. **Keep it current — update it at the end of any
 > work session** (it is the one place a fresh Claude will trust).
 >
-> Last updated: 2026-07-22.
+> Last updated: 2026-07-22 (QA round 2: 5 mobile/nav/chat/scroll/footer fixes).
 
 ## What this site is (1-paragraph version)
 
@@ -127,6 +127,18 @@ Dashboard/account actions outside the code:
   `public/images/CREDITS.md` per the image-licensing rule.
 
 ## Known open bugs / gaps (from the 2026-07-20 walkthrough)
+
+**Fixed 2026-07-22 (QA round 2, shipped to main):** ① iOS Safari zoom on the
+Glossary/Cities search (all form inputs now >=16px on <=640px via a rule in
+`globals.css`) · ② chat widget now re-sends a request that failed offline —
+automatically on the `online` event, plus a manual "Retry now" button
+(`chat-widget.tsx`) · ③ laptop header no longer crushes/wraps "Sign in" +
+"Build my plan" — full nav moved to the `xl` breakpoint (clean hamburger below),
+tighter nav spacing, `whitespace-nowrap` on the buttons · ④ removed global
+`scroll-behavior: smooth` (it fought App Router scroll restoration, leaving a
+footer-navigated page parked under the sticky header) and added
+`scroll-padding-top` for anchor jumps · ⑤ footer now highlights the current
+page. Still open below:
 
 - **Signup error UX:** `friendlyAuthError` (`src/components/auth/sign-in-form.tsx`)
   returns the raw message for unmatched errors, so a server 500 renders literally

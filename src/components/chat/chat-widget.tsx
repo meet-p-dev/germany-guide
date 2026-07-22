@@ -1,8 +1,16 @@
 "use client";
 
-import { useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { AnimatePresence, motion } from "framer-motion";
-import { Globe, Loader2, MessageCircle, Send, ShieldCheck, X } from "lucide-react";
+import {
+  Globe,
+  Loader2,
+  MessageCircle,
+  RefreshCw,
+  Send,
+  ShieldCheck,
+  X,
+} from "lucide-react";
 import { Markdown } from "@/components/markdown";
 import { cn } from "@/lib/utils";
 
@@ -30,12 +38,17 @@ export function ChatWidget() {
   const [entries, setEntries] = useState<ChatEntry[]>([]);
   const [input, setInput] = useState("");
   const [loading, setLoading] = useState(false);
+  /** History of a request that failed because the network was down, kept so it
+   *  can be re-sent — automatically when the connection returns, or on demand. */
+  const [retry, setRetry] = useState<ChatEntry[] | null>(null);
   const scrollRef = useRef<HTMLDivElement>(null);
+  const retryRef = useRef<ChatEntry[] | null>(null);
+  const busyRef = useRef(false);
 
   useEffect(() => {
     const el = scrollRef.current;
     if (el) el.scrollTop = el.scrollHeight;
-  }, [entries, loading, open]);
+  }, [entries, loading, open, retry]);
 
   useEffect(() => {
     if (!open) return;
@@ -46,12 +59,13 @@ export function ChatWidget() {
     return () => window.removeEventListener("keydown", onKey);
   }, [open]);
 
-  const send = async (raw?: string) => {
-    const text = (raw ?? input).trim();
-    if (!text || loading) return;
-    setInput("");
-    const history = [...entries, { role: "user" as const, content: text }];
-    setEntries(history);
+  /** Runs one exchange against the API for an already-built history (its last
+   *  entry is the user's question). Separate from `send` so a retry re-runs the
+   *  same history without appending a duplicate user bubble. */
+  const run = useCallback(async (history: ChatEntry[]) => {
+    if (busyRef.current) return;
+    busyRef.current = true;
+    setRetry(null);
     setLoading(true);
     try {
       const res = await fetch("/api/chat", {
@@ -93,13 +107,37 @@ export function ChatWidget() {
             },
       ]);
     } catch {
-      setEntries((prev) => [
-        ...prev,
-        { role: "assistant", content: "Network hiccup — try again." },
-      ]);
+      // Network failure (offline / dropped connection). Don't spend a transcript
+      // bubble on it — remember the question and offer/trigger a retry instead.
+      setRetry(history);
     } finally {
+      busyRef.current = false;
       setLoading(false);
     }
+  }, []);
+
+  // Mirror `retry` into a ref so the once-registered online listener always sees
+  // the latest pending request without re-subscribing on every change.
+  useEffect(() => {
+    retryRef.current = retry;
+  }, [retry]);
+
+  // Connection came back: automatically re-send the question that failed offline.
+  useEffect(() => {
+    const onOnline = () => {
+      if (retryRef.current) void run(retryRef.current);
+    };
+    window.addEventListener("online", onOnline);
+    return () => window.removeEventListener("online", onOnline);
+  }, [run]);
+
+  const send = (raw?: string) => {
+    const text = (raw ?? input).trim();
+    if (!text || busyRef.current) return;
+    setInput("");
+    const history = [...entries, { role: "user" as const, content: text }];
+    setEntries(history);
+    void run(history);
   };
 
   return (
@@ -200,6 +238,23 @@ export function ChatWidget() {
                   <Loader2 className="h-4 w-4 animate-spin" />
                   Looking it up…
                 </p>
+              )}
+
+              {retry && !loading && (
+                <div className="mr-auto max-w-[88%] rounded-2xl border border-border bg-card-muted/70 px-4 py-3 text-sm">
+                  <p className="text-muted">
+                    You look offline — I&apos;ll re-send your question
+                    automatically the moment your connection is back.
+                  </p>
+                  <button
+                    type="button"
+                    onClick={() => void run(retry)}
+                    className="mt-2.5 inline-flex items-center gap-1.5 rounded-full bg-primary px-3.5 py-1.5 text-xs font-semibold text-primary-foreground transition-colors hover:bg-primary-hover"
+                  >
+                    <RefreshCw className="h-3.5 w-3.5" />
+                    Retry now
+                  </button>
+                </div>
               )}
             </div>
 
