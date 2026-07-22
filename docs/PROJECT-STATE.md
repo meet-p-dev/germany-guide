@@ -29,6 +29,14 @@ These were explicitly rejected — don't re-litigate them.
   from `main` via the Vercel GitHub app; feature branches make preview deploys
   only. **This is NOT the Next.js you know** — read `AGENTS.md`; middleware is
   `src/proxy.ts`, not `middleware.ts`.
+  - **Deploy gotcha (verified 2026-07-22):** commits can reach GitHub without
+    triggering a Vercel build — the last commit of a session often sits on
+    `origin/main` un-deployed. An explicit `git push` (add an
+    `--allow-empty` commit if HEAD is already pushed) fires the webhook and
+    Vercel builds within seconds. After finishing work, verify the tip commit
+    actually deployed: `list_deployments` (Vercel MCP) or the dashboard — don't
+    assume "committed" means "live." germanyguide.net is the production alias on
+    the latest READY `target: production` deploy.
 - **Supabase** (Postgres + RLS) holds ALL content — never hardcode content in
   code (the only exception is the small city/persona card config in
   `src/lib/site-config.ts`). Content tables are public-read; user tables are
