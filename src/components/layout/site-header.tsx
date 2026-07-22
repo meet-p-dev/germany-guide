@@ -9,6 +9,7 @@ import { Logo } from "@/components/layout/logo";
 import { PathSwitcher } from "@/components/layout/path-switcher";
 import { ThemeToggle } from "@/components/theme-toggle";
 import { AuthButton } from "@/components/auth/auth-button";
+import { AdminNavLink } from "@/components/layout/admin-nav-link";
 import { ButtonLink } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 
@@ -50,6 +51,7 @@ export function SiteHeader() {
               </Link>
             );
           })}
+          <AdminNavLink />
         </nav>
 
         <div className="flex items-center gap-2.5">
@@ -95,6 +97,7 @@ export function SiteHeader() {
                   {link.label}
                 </Link>
               ))}
+              <AdminNavLink variant="mobile" onNavigate={() => setOpen(false)} />
               <ButtonLink
                 href="/plan"
                 className="mt-2 sm:hidden"

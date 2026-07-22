@@ -14,6 +14,24 @@ export type Database = {
   }
   public: {
     Tables: {
+      admins: {
+        Row: {
+          added_at: string
+          note: string | null
+          user_id: string
+        }
+        Insert: {
+          added_at?: string
+          note?: string | null
+          user_id: string
+        }
+        Update: {
+          added_at?: string
+          note?: string | null
+          user_id?: string
+        }
+        Relationships: []
+      }
       cities: {
         Row: {
           created_at: string
@@ -428,22 +446,22 @@ export type Database = {
       }
       user_notes: {
         Row: {
-          reference_number: string | null
           note: string | null
+          reference_number: string | null
           step_id: string
           updated_at: string
           user_id: string
         }
         Insert: {
-          reference_number?: string | null
           note?: string | null
+          reference_number?: string | null
           step_id: string
           updated_at?: string
           user_id: string
         }
         Update: {
-          reference_number?: string | null
           note?: string | null
+          reference_number?: string | null
           step_id?: string
           updated_at?: string
           user_id?: string
@@ -492,7 +510,21 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
-      [_ in never]: never
+      admin_add_by_email: {
+        Args: { admin_note?: string; target_email: string }
+        Returns: string
+      }
+      admin_list_admins: {
+        Args: never
+        Returns: {
+          added_at: string
+          email: string
+          note: string
+          user_id: string
+        }[]
+      }
+      admin_remove: { Args: { target_id: string }; Returns: undefined }
+      is_admin: { Args: never; Returns: boolean }
     }
     Enums: {
       [_ in never]: never
