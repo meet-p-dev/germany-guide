@@ -92,9 +92,21 @@ These were explicitly rejected — don't re-litigate them.
 
 ## Planned direction — compact/full split + real city hubs (blueprint, 2026-07-22)
 
-> Agreed in a brainstorm on 2026-07-22. **Not built yet** — this is the design the
-> next build sessions should follow. It refines roadmap step ① (the two funnels)
-> into a concrete model. Nothing here overrides the scope guard or the hard rules.
+> Agreed in a brainstorm on 2026-07-22. It refines roadmap step ① (the two
+> funnels) into a concrete model. Nothing here overrides the scope guard or the
+> hard rules.
+>
+> **Progress (2026-07-22):** DATA LAYER DONE + committed (`2e4c4d9`), not yet
+> pushed/deployed. Live on the DB: `steps.quick_action` column + new `city_facts`
+> table (public-read / `is_admin()` write RLS, `set_updated_at` trigger), both
+> wired into `/admin` (schema.ts) and into `supabase/types.ts`. tsc clean,
+> security advisors show no new findings. STILL TODO: the UI (compact
+> Build-my-plan step page gated by city selection + "full guide" link; Munich
+> city-hub `city_facts` sections; deadline-clock banner; Journey Map hero) and the
+> Munich CONTENT (write the ~30 `quick_action` templates, expand Munich
+> `city_steps` beyond the current 3 — incl. flipping steps like `public-transport`
+> / `find-housing-remotely` to `city_variable`, and populate all `city_facts`
+> categories, every figure cited + `last_verified`).
 
 **The core idea: one source of content, shown two ways — and *city selection is
 the switch* between them.**
