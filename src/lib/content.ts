@@ -30,6 +30,19 @@ export const CITY_FACT_LABELS: Record<CityFactCategory, string> = {
   while_waiting: "While you wait",
 };
 
+/**
+ * Which city-fact category belongs *on* a given step's compact page, so the
+ * local detail (Munich's rents, its insurance offices…) shows up where the
+ * visitor actually needs it — not only buried in the city hub. A step not
+ * listed here simply shows no borrowed fact.
+ */
+export const STEP_FACT_CATEGORY: Record<string, CityFactCategory> = {
+  "find-housing-remotely": "housing",
+  "bank-account": "banking",
+  "activate-health-insurance": "insurance",
+  "health-insurance-from-home": "insurance",
+};
+
 export type Persona = "student" | "worker";
 export type Stage = "exploring" | "applied" | "moving" | "arrived";
 

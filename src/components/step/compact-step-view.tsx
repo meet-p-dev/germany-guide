@@ -26,7 +26,9 @@ import {
   parseTips,
   renderQuickAction,
   resolveStepMeta,
+  type CityFact,
 } from "@/lib/content";
+import { Markdown } from "@/components/markdown";
 import { Kicker } from "@/components/ui/kicker";
 import {
   NextStepButton,
@@ -87,11 +89,14 @@ export async function CompactStepView({
   cityName,
   citySlug,
   city,
+  facts = [],
 }: {
   step: StepWithRelations;
   cityName: string;
   citySlug: string;
   city: CityVariant | null;
+  /** City facts that belong on this step (e.g. rents on the housing step). */
+  facts?: CityFact[];
 }) {
   const meta = resolveStepMeta(step, city);
   const costLabel = formatCost(meta.costCents, meta.costType);
@@ -241,6 +246,17 @@ export async function CompactStepView({
             </p>
           )}
 
+          {/* The city fact that belongs on this step (e.g. Munich rents on the
+              housing step) — surfaced here so the visitor doesn't have to hunt
+              for it in the city hub. */}
+          {facts.length > 0 && (
+            <section className="space-y-4">
+              {facts.map((fact) => (
+                <LocalFact key={fact.id} fact={fact} cityName={cityName} />
+              ))}
+            </section>
+          )}
+
           {primaryAction && (
             <div className="space-y-3">
               <a
@@ -328,6 +344,48 @@ function Chip({
       <Icon className="h-4 w-4 shrink-0" />
       <span>{children}</span>
     </span>
+  );
+}
+
+function LocalFact({ fact, cityName }: { fact: CityFact; cityName: string }) {
+  const links = parseLinks(fact.links);
+  return (
+    <div className="rounded-2xl border border-border bg-card-muted/40 p-5">
+      <Kicker className="text-primary">In {cityName}</Kicker>
+      <h3 className="mt-1.5 font-display text-lg font-bold leading-snug">
+        {fact.title}
+      </h3>
+      {fact.content_md && (
+        <div className="mt-2 text-sm leading-relaxed text-foreground/85">
+          <Markdown>{fact.content_md}</Markdown>
+        </div>
+      )}
+      {links.length > 0 && (
+        <ul className="mt-3 flex flex-wrap gap-x-5 gap-y-1.5">
+          {links.map((link) => (
+            <li key={link.url}>
+              <a
+                href={link.url}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="inline-flex items-center gap-1.5 text-sm font-medium text-primary hover:underline"
+              >
+                <ExternalLink className="h-3.5 w-3.5 shrink-0" />
+                {link.label}
+              </a>
+            </li>
+          ))}
+        </ul>
+      )}
+      {(fact.source || fact.last_verified) && (
+        <p className="mt-3 flex flex-wrap items-center gap-x-2 gap-y-1 text-xs text-muted">
+          <ShieldCheck className="h-3.5 w-3.5 shrink-0 text-success" />
+          {fact.source && <span>{fact.source}</span>}
+          {fact.source && fact.last_verified && <span aria-hidden>·</span>}
+          {fact.last_verified && <span>verified {formatDate(fact.last_verified)}</span>}
+        </p>
+      )}
+    </div>
   );
 }
 

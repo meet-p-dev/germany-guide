@@ -2,9 +2,11 @@ import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import {
   getCities,
+  getCityFacts,
   getCityStepPairs,
   getStepBySlug,
   parseDocuments,
+  STEP_FACT_CATEGORY,
 } from "@/lib/content";
 import { CompactStepView } from "@/components/step/compact-step-view";
 import { JsonLd, howToJsonLd, breadcrumbJsonLd } from "@/components/seo/json-ld";
@@ -52,7 +54,13 @@ export default async function CityStepPage({
   params: Promise<{ city: string; slug: string }>;
 }) {
   const { city, slug } = await params;
-  const [step, cities] = await Promise.all([getStepBySlug(slug), getCities()]);
+  const factCategory = STEP_FACT_CATEGORY[slug];
+  const [step, cities, facts] = await Promise.all([
+    getStepBySlug(slug),
+    getCities(),
+    // Only this step's relevant local facts (e.g. rents on the housing step).
+    factCategory ? getCityFacts(city) : Promise.resolve([]),
+  ]);
   if (!step) notFound();
   const cityRow = cities.find((c) => c.slug === city);
   if (!cityRow) notFound();
@@ -61,6 +69,12 @@ export default async function CityStepPage({
   // to the universal quick_action + base figures (never a broken card).
   const variant =
     step.city_steps.find((cs) => cs.cities?.slug === city) ?? null;
+
+  // The city facts that belong on THIS step (rents on housing, offices on
+  // insurance…) so the local detail sits where the visitor needs it.
+  const relatedFacts = factCategory
+    ? facts.filter((f) => f.category === factCategory)
+    : [];
 
   const cityName = cityRow.name;
   const documents = parseDocuments(step.documents);
@@ -99,6 +113,7 @@ export default async function CityStepPage({
         cityName={cityName}
         citySlug={city}
         city={variant}
+        facts={relatedFacts}
       />
     </>
   );
