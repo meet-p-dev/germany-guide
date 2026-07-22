@@ -108,6 +108,9 @@ export async function CompactStepView({
   const cityLinks = city ? parseLinks(city.links) : [];
   const officialLinks = parseLinks(step.official_links);
   const primaryAction = cityLinks[0] ?? officialLinks[0] ?? null;
+  // Extra local links (e.g. WG-Gesucht, Kleinanzeigen alongside the dorm site)
+  // surface as a compact "where to look" list under the primary action.
+  const secondaryLinks = cityLinks.slice(1);
   const tips = city ? parseTips(city.tips) : [];
 
   // Fill the hand-written compact template from this city's real figures.
@@ -239,15 +242,34 @@ export async function CompactStepView({
           )}
 
           {primaryAction && (
-            <a
-              href={primaryAction.url}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="inline-flex h-11 items-center gap-2 rounded-full bg-primary px-5 text-[15px] font-medium text-primary-foreground transition-colors hover:bg-primary-hover"
-            >
-              <ExternalLink className="h-4 w-4" />
-              {primaryAction.label}
-            </a>
+            <div className="space-y-3">
+              <a
+                href={primaryAction.url}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="inline-flex h-11 items-center gap-2 rounded-full bg-primary px-5 text-[15px] font-medium text-primary-foreground transition-colors hover:bg-primary-hover"
+              >
+                <ExternalLink className="h-4 w-4" />
+                {primaryAction.label}
+              </a>
+              {secondaryLinks.length > 0 && (
+                <ul className="flex flex-wrap gap-x-5 gap-y-1.5">
+                  {secondaryLinks.map((link) => (
+                    <li key={link.url}>
+                      <a
+                        href={link.url}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="inline-flex items-center gap-1.5 text-sm font-medium text-primary hover:underline"
+                      >
+                        <ExternalLink className="h-3.5 w-3.5 shrink-0" />
+                        {link.label}
+                      </a>
+                    </li>
+                  ))}
+                </ul>
+              )}
+            </div>
           )}
 
           {/* The bridge to the full guide — the whole idea of the split. */}

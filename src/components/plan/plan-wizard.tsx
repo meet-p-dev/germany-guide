@@ -105,9 +105,14 @@ const PERSONAS: {
   },
 ];
 
-/** City is only asked once the visitor's stage makes it answerable. */
+/**
+ * City is asked once the visitor's stage makes it answerable — i.e. from
+ * admission onward. Most people pick their city the moment they're admitted
+ * (the "applied & waiting" stage), so we ask from there through arrival.
+ * "Just exploring" stays city-free — that's the Explorer lane.
+ */
 function cityMatters(stage: Stage | null): boolean {
-  return stage === "moving" || stage === "arrived";
+  return stage === "applied" || stage === "moving" || stage === "arrived";
 }
 
 export function PlanWizard({
