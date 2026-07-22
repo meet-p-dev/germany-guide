@@ -9,8 +9,9 @@ in Nuremberg) — Germany Guide is built around exactly that difference.
 ## Stack
 
 - **Next.js 16** (App Router, TypeScript strict, Tailwind CSS v4) on Vercel
-- **Supabase** (Postgres + RLS, Auth via email magic links) — all guide content
-  lives in the database and is editable without a redeploy
+- **Supabase** (Postgres + RLS, Auth via email + password and Google/Apple
+  OAuth) — all guide content lives in the database and is editable without a
+  redeploy, either in Supabase Studio or through the in-app `/admin` editor
 - **Framer Motion** for the animation system (scroll reveals, journey timeline,
   checklist micro-interactions), fully `prefers-reduced-motion`-aware
 
@@ -18,7 +19,7 @@ in Nuremberg) — Germany Guide is built around exactly that difference.
 
 | Path | Purpose |
 | --- | --- |
-| `src/app` | Routes: front page, `/process`, `/plan` (onboarding), `/journey` (checklist), `/guide/[slug]`, `/cities/[city]/[slug]`, `/problems`, `/letters`, `/glossary`, auth, legal |
+| `src/app` | Routes: front page, `/process`, `/plan` (onboarding), `/journey` (checklist), `/guide/[slug]`, `/cities/[city]/[slug]`, `/problems`, `/letters`, `/glossary`, `/costs`, `/why-germany`, `/updates`, `/admin` (content editor), `/account`, auth (`/signin`, `/reset-password`, `/auth`), legal (`/impressum`, `/privacy`) |
 | `src/lib/content.ts` | Typed content data layer (cached Supabase reads) |
 | `src/lib/profile-store.tsx` | Visitor profile + progress: localStorage-first, syncs to the account when signed in |
 | `src/lib/supabase/` | Generated DB types + browser/server/content clients |

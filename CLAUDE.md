@@ -1,4 +1,5 @@
 @AGENTS.md
+@docs/PROJECT-STATE.md
 
 # Germany Guide — project rules
 
