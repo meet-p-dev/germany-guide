@@ -10,6 +10,25 @@ export type GlossaryTerm = Tables<"glossary_terms">;
 export type Problem = Tables<"problems">;
 export type Letter = Tables<"letters">;
 export type Update = Tables<"updates">;
+export type CityFact = Tables<"city_facts">;
+
+/** The city-hub sections, in the order they should render. */
+export const CITY_FACT_CATEGORIES = [
+  "first_days",
+  "housing",
+  "insurance",
+  "banking",
+  "while_waiting",
+] as const;
+export type CityFactCategory = (typeof CITY_FACT_CATEGORIES)[number];
+
+export const CITY_FACT_LABELS: Record<CityFactCategory, string> = {
+  first_days: "Your first days",
+  housing: "Housing & rent",
+  insurance: "Health insurance",
+  banking: "Banking",
+  while_waiting: "While you wait",
+};
 
 export type Persona = "student" | "worker";
 export type Stage = "exploring" | "applied" | "moving" | "arrived";
@@ -118,6 +137,25 @@ export const getCityBySlug = cache(async (slug: string) => {
   return data;
 });
 
+/** Per-city reference facts (housing/rent, dorms, offices…), grouped for the hub. */
+export const getCityFacts = cache(
+  async (citySlug: string): Promise<CityFact[]> => {
+    const supabase = createContentClient();
+    const { data, error } = await supabase
+      .from("city_facts")
+      .select("*, cities!inner(slug)")
+      .eq("cities.slug", citySlug)
+      .order("sort_order");
+    if (error) throw error;
+    // Drop the joined `cities` shape so callers get plain CityFact rows.
+    return data.map((row) => {
+      const rec = { ...row } as Record<string, unknown>;
+      delete rec.cities;
+      return rec as unknown as CityFact;
+    });
+  },
+);
+
 export const getGlossaryTerms = cache(async (): Promise<GlossaryTerm[]> => {
   const supabase = createContentClient();
   const { data, error } = await supabase
@@ -198,6 +236,44 @@ export const getLatestUpdate = cache(async (): Promise<Update | null> => {
 export function stepAppliesTo(step: Step, persona: Persona | null): boolean {
   if (!persona) return true;
   return step.applies_to === "both" || step.applies_to === persona;
+}
+
+export const PERSONA_LABELS: Record<Persona, string> = {
+  student: "student",
+  worker: "skilled worker",
+};
+
+/**
+ * Fill a hand-written `quick_action` template with the visitor's real figures.
+ * One template per step serves all 36 cities: `{operator}` / `{cost}` / etc.
+ * resolve from the city variant + persona; any blank we can't fill is dropped
+ * (never shown as a literal `{token}`), and leftover punctuation is tidied.
+ */
+export function renderQuickAction(
+  template: string,
+  tokens: Record<string, string | null | undefined>,
+): string {
+  const has = (key: string) => {
+    const v = tokens[key];
+    return typeof v === "string" && v.trim().length > 0;
+  };
+  let out = template;
+  // Drop any (parenthetical) that leans on a blank we can't fill.
+  out = out.replace(/\s*\([^()]*\{(\w+)\}[^()]*\)/g, (m, key: string) =>
+    has(key) ? m : "",
+  );
+  // Substitute remaining tokens; an unfillable one takes its leading
+  // connector (" - ", " . ", " , ") with it so no orphan punctuation is left.
+  out = out.replace(/(\s*[-.,;:]?\s*)\{(\w+)\}/g, (_m, lead: string, key: string) => {
+    if (!has(key)) return "";
+    return `${lead}${tokens[key]!.trim()}`;
+  });
+  out = out
+    .replace(/\(\s*\)/g, "")
+    .replace(/[ \t]{2,}/g, " ")
+    .replace(/\s+([.,;:])/g, "$1")
+    .trim();
+  return out;
 }
 
 /** The phase a visitor at a given stage should start at. */

@@ -49,6 +49,13 @@ const STAGE_PHRASES: Record<string, string> = {
   arrived: "already in Germany",
 };
 
+/** "A", "A and B", "A, B and C" — for naming a step's blockers. */
+function formatList(items: string[]): string {
+  if (items.length <= 1) return items[0] ?? "";
+  if (items.length === 2) return `${items[0]} and ${items[1]}`;
+  return `${items.slice(0, -1).join(", ")} and ${items[items.length - 1]}`;
+}
+
 export function JourneyBoard({
   phases,
   cities,
@@ -122,6 +129,22 @@ export function JourneyBoard({
 
   const doneCount = (steps: Step[]) =>
     steps.filter((step) => progress[step.slug]).length;
+
+  // slug → title across the whole journey, for naming a step's blockers.
+  const stepTitleBySlug = useMemo(() => {
+    const map = new Map<string, string>();
+    for (const phase of phases) {
+      for (const step of phase.steps) map.set(step.slug, step.title);
+    }
+    return map;
+  }, [phases]);
+
+  // A step is locked while any prerequisite it depends on is still open — the
+  // chicken-and-egg ordering made visible ("Finish Anmeldung first").
+  const unmetPrereqsFor = (step: Step): string[] =>
+    (step.depends_on ?? [])
+      .filter((dep) => !progress[dep] && stepTitleBySlug.has(dep))
+      .map((dep) => stepTitleBySlug.get(dep)!);
 
   const totalSteps = visiblePhases.reduce(
     (sum, phase) => sum + phase.steps.length,
@@ -576,6 +599,8 @@ export function JourneyBoard({
                     <ul className="space-y-1 px-4 pb-5">
                       {phase.steps.map((step) => {
                         const isDone = Boolean(progress[step.slug]);
+                        const blockers = isDone ? [] : unmetPrereqsFor(step);
+                        const locked = blockers.length > 0;
                         const href =
                           step.city_variable && profile.citySlug
                             ? `/cities/${profile.citySlug}/${step.slug}`
@@ -583,7 +608,10 @@ export function JourneyBoard({
                         return (
                           <li
                             key={step.slug}
-                            className="flex items-start gap-3 rounded-2xl px-2 py-2.5 transition-colors hover:bg-card-muted/70"
+                            className={cn(
+                              "flex items-start gap-3 rounded-2xl px-2 py-2.5 transition-colors hover:bg-card-muted/70",
+                              locked && "opacity-70",
+                            )}
                           >
                             <motion.button
                               type="button"
@@ -626,6 +654,12 @@ export function JourneyBoard({
                                 )}
                               >
                                 {step.title}
+                                {locked && (
+                                  <Lock
+                                    className="h-3.5 w-3.5 shrink-0 text-muted"
+                                    aria-label="locked until prerequisites are done"
+                                  />
+                                )}
                                 {step.city_variable && (
                                   <MapPin
                                     className="h-3.5 w-3.5 shrink-0 text-primary"
@@ -634,10 +668,18 @@ export function JourneyBoard({
                                 )}
                                 <ArrowRight className="h-3.5 w-3.5 shrink-0 opacity-0 transition-opacity group-hover:opacity-100" />
                               </span>
-                              {step.summary && !isDone && (
-                                <span className="mt-0.5 block text-sm text-muted">
-                                  {step.summary}
+                              {locked ? (
+                                <span className="mt-0.5 flex items-center gap-1.5 text-sm text-muted">
+                                  <Lock className="h-3.5 w-3.5 shrink-0" aria-hidden />
+                                  Finish {formatList(blockers)} first
                                 </span>
+                              ) : (
+                                step.summary &&
+                                !isDone && (
+                                  <span className="mt-0.5 block text-sm text-muted">
+                                    {step.summary}
+                                  </span>
+                                )
                               )}
                             </Link>
                           </li>

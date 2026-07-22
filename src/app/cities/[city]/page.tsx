@@ -11,9 +11,10 @@ import {
   ShieldCheck,
 } from "lucide-react";
 import type { LucideIcon } from "lucide-react";
-import { getCities, getCityBySlug } from "@/lib/content";
+import { getCities, getCityBySlug, getCityFacts } from "@/lib/content";
 import { CITIES as CITY_CARDS } from "@/lib/site-config";
 import { CityPhoto } from "@/components/city/city-photo";
+import { CityFactsSections } from "@/components/city/city-facts-sections";
 import { JsonLd, breadcrumbJsonLd } from "@/components/seo/json-ld";
 import { Kicker } from "@/components/ui/kicker";
 
@@ -60,6 +61,7 @@ export default async function CityHubPage({
   const city = await getCityBySlug(citySlug);
   if (!city) notFound();
 
+  const facts = await getCityFacts(citySlug);
   const card = CITY_CARDS.find((c) => c.slug === city.slug);
   const citySteps = city.city_steps
     .filter((cs) => cs.steps)
@@ -197,6 +199,9 @@ export default async function CityHubPage({
           );
         })}
       </Stagger>
+
+      {/* Living here — the reference facts (housing, insurance, banking…) */}
+      <CityFactsSections cityName={city.name} facts={facts} />
 
       {/* Everything else */}
       <Reveal className="mt-16 rounded-[2.5rem] border border-border bg-card-muted/60 p-8 sm:p-10">
