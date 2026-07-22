@@ -96,17 +96,34 @@ These were explicitly rejected — don't re-litigate them.
 > funnels) into a concrete model. Nothing here overrides the scope guard or the
 > hard rules.
 >
-> **Progress (2026-07-22):** DATA LAYER DONE + committed (`2e4c4d9`), not yet
-> pushed/deployed. Live on the DB: `steps.quick_action` column + new `city_facts`
-> table (public-read / `is_admin()` write RLS, `set_updated_at` trigger), both
-> wired into `/admin` (schema.ts) and into `supabase/types.ts`. tsc clean,
-> security advisors show no new findings. STILL TODO: the UI (compact
-> Build-my-plan step page gated by city selection + "full guide" link; Munich
-> city-hub `city_facts` sections; deadline-clock banner; Journey Map hero) and the
-> Munich CONTENT (write the ~30 `quick_action` templates, expand Munich
-> `city_steps` beyond the current 3 — incl. flipping steps like `public-transport`
-> / `find-housing-remotely` to `city_variable`, and populate all `city_facts`
-> categories, every figure cited + `last_verified`).
+> **Progress (2026-07-22):** BUILT — committed locally (`2e4c4d9` data layer,
+> `c0c28ad` UI + content), **not yet pushed/deployed**. tsc + eslint + `next
+> build` all clean; compact page + city hub verified rendering (dark mode, no
+> console errors). What's done:
+> - **Data:** `steps.quick_action` column + `city_facts` table (public-read /
+>   `is_admin()` write RLS, trigger), both in `/admin` + `supabase/types.ts`.
+> - **UI:** compact `CompactStepView` at `/cities/[city]/[slug]` (fills
+>   `quick_action` from city+persona, what-to-bring, chips, "Read the full guide"
+>   → `/guide/[slug]`, graceful fallback when no override); `CityFactsSections`
+>   on `/cities/[city]`; `DeadlineClock` banner on `/journey`; Journey Map locked
+>   states + blocking reasons from `depends_on`.
+> - **Munich content:** 29 `quick_action` templates; `public-transport` +
+>   `find-housing-remotely` flipped to `city_variable` with cited Munich overrides
+>   (MVG €43 student ticket; Studierendenwerk dorms); 6 `city_facts` across all
+>   five categories, every figure sourced + `last_verified` 2026-07-22.
+>
+> **STILL TODO:** ① push/deploy (owner's call). ② persona-split cost isn't in the
+> data model yet, so the compact card is persona-neutral — the "€43 because
+> you're a student" split needs per-persona city_step figures later. ③ clone
+> Munich's depth to the other 35 cities. ④ small content polish: the `first_days`
+> fact renders its "1." oddly (inline ordered list) — cosmetic. ⑤ a couple of
+> Munich facts want the owner's local confirmation (see below).
+>
+> **Needs owner's local confirmation (Munich):** private-market rent figures are
+> from aggregators (wg-gesucht / Investropa), not an official index — fine as a
+> cited *range* but worth a local sanity-check; TK is only ONE insurer's office
+> (add AOK/others if you want more); banking names (N26/DKB/Sparkasse) are
+> editorial, not endorsements.
 
 **The core idea: one source of content, shown two ways — and *city selection is
 the switch* between them.**
