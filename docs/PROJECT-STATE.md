@@ -120,18 +120,45 @@ These were explicitly rejected — don't re-litigate them.
 >   (MVG €43 student ticket; Studierendenwerk dorms); 6 `city_facts` across all
 >   five categories, every figure sourced + `last_verified` 2026-07-22.
 >
-> **STILL TODO:** ① push/deploy (owner's call). ② persona-split cost isn't in the
-> data model yet, so the compact card is persona-neutral — the "€43 because
-> you're a student" split needs per-persona city_step figures later. ③ clone
-> Munich's depth to the other 35 cities. ④ small content polish: the `first_days`
-> fact renders its "1." oddly (inline ordered list) — cosmetic. ⑤ a couple of
-> Munich facts want the owner's local confirmation (see below).
+> **Ingolstadt + Nuremberg (2026-08-08, deployed):** both cloned to Munich's
+> depth — `city_steps` 3 → **5** each (added `public-transport`,
+> `find-housing-remotely`) plus **6 `city_facts`** each across all five
+> categories, every figure cited with `last_verified` 2026-08-08. So **3 of 36
+> cities are now "deep"** (Munich, Ingolstadt, Nuremberg); the other 33 still
+> have 3 city_steps and 0 facts.
+> - **Key finding:** Ingolstadt's *and* Nuremberg's student halls are both run by
+>   **Studierendenwerk Erlangen-Nürnberg** (NOT Munich's) — a common newcomer
+>   mistake, and worth checking per city before writing housing content.
+> - Dorm rents come from the Studierendenwerk's **own 2026 price-list PDFs**
+>   (Ingolstadt Münzbergstr. €334–370 / Beckerstr. €338–353; Nuremberg
+>   Dutzendteich €255–388 single, €340–417 WG). An aggregator had claimed
+>   "~€290" for Ingolstadt — **~€45 too low**. Lesson: fetch the official price
+>   list PDF (`werkswelt.de/data/uploads/wohnen/mietpreislisten/2026/…`) and read
+>   it, don't trust rent aggregators for dorm figures.
+> - Transport: all three Bavarian cities use the **€43/mo reduced
+>   Deutschlandticket** (regular €63). Ingolstadt = INVG buses in the VGI area
+>   (e-ticket appears next day, must be reordered each semester); Nuremberg = VAG
+>   U-Bahn/tram/bus in the VGN area, includes 600 VAG_Rad minutes/month.
 >
-> **Needs owner's local confirmation (Munich):** private-market rent figures are
-> from aggregators (wg-gesucht / Investropa), not an official index — fine as a
-> cited *range* but worth a local sanity-check; TK is only ONE insurer's office
-> (add AOK/others if you want more); banking names (N26/DKB/Sparkasse) are
-> editorial, not endorsements.
+> **STILL TODO:** ① persona-split cost isn't in the data model yet, so the compact
+> card is persona-neutral — the "€43 because you're a student" split needs
+> per-persona city_step figures later. ② clone this depth to the remaining 33
+> cities (one per chat). ③ small content polish: the `first_days` fact renders its
+> "1." oddly (inline ordered list) — cosmetic. ④ on the city hub, a step card
+> shows the **Germany-wide** `summary` (e.g. transport "€63/month") next to the
+> local method chip, so it can contradict the city's own €43 rate — consider
+> showing the city cost on the card. ⑤ a few facts want the owner's local
+> confirmation (below).
+>
+> **Needs owner's local confirmation:** private-market rent figures are from
+> asking-price aggregators / rent indices, not always an official Mietspiegel —
+> fine as a cited *range* but worth a local sanity-check (Nuremberg does cite the
+> city's own Mietenspiegel, €10.33/m² net cold). The Nuremberg WG-room figure
+> (~€425) is from a **2023** student rent index — dated, flagged as such in the
+> text. TK is only ONE insurer's office per city (add AOK/others if you want
+> more); banking names (N26/DKB/ING/Sparkasse) are editorial, not endorsements.
+> Ingolstadt's Canisiusstiftung is included as a second housing pool but its
+> capacity/prices were not confirmed on the foundation's own site.
 
 **The core idea: one source of content, shown two ways — and *city selection is
 the switch* between them.**
