@@ -4,6 +4,7 @@ import { notFound } from "next/navigation";
 import {
   ArrowRight,
   CalendarClock,
+  Coins,
   Footprints,
   Globe,
   Mail,
@@ -11,7 +12,14 @@ import {
   ShieldCheck,
 } from "lucide-react";
 import type { LucideIcon } from "lucide-react";
-import { getCities, getCityBySlug, getCityFacts } from "@/lib/content";
+import {
+  formatCost,
+  getCities,
+  getCityBySlug,
+  getCityFacts,
+  renderQuickAction,
+  resolveStepMeta,
+} from "@/lib/content";
 import { CITIES as CITY_CARDS } from "@/lib/site-config";
 import { CityPhoto } from "@/components/city/city-photo";
 import { CityFactsSections } from "@/components/city/city-facts-sections";
@@ -166,6 +174,24 @@ export default async function CityHubPage({
         {citySteps.map((cs) => {
           const meta = cs.method ? METHOD_META[cs.method] : null;
           const Icon = meta?.icon ?? Globe;
+          const step = cs.steps!;
+          // The city's own figures win. Otherwise the card quotes the
+          // Germany-wide summary (transport "€63/month") right next to the
+          // local method chip, contradicting the city's own rate.
+          const stepMeta = resolveStepMeta(step, cs);
+          const costLabel = formatCost(stepMeta.costCents, stepMeta.costType);
+          const description = step.quick_action
+            ? renderQuickAction(step.quick_action, {
+                city: city.name,
+                cost: costLabel,
+                method: meta?.label.toLowerCase(),
+                leadTime: stepMeta.leadTime,
+                deadline: stepMeta.deadlineRule,
+                // Deliberately no address: office addresses run long and would
+                // swamp a card. The step page carries them.
+                address: null,
+              })
+            : step.summary;
           return (
             <StaggerItem key={cs.id} className="h-full">
               <Link
@@ -185,10 +211,16 @@ export default async function CityHubPage({
                 <h3 className="font-display mt-5 text-xl font-bold leading-snug">
                   {cs.steps!.title}
                 </h3>
-                {cs.steps!.summary && (
+                {description && (
                   <p className="mt-2 text-sm leading-relaxed text-muted">
-                    {cs.steps!.summary}
+                    {description}
                   </p>
+                )}
+                {costLabel && (
+                  <span className="mt-3 inline-flex w-fit items-center gap-1.5 rounded-full border border-border bg-card-muted/60 px-3 py-1 text-xs font-semibold text-foreground/80">
+                    <Coins className="h-3.5 w-3.5" aria-hidden />
+                    {costLabel}
+                  </span>
                 )}
                 <span className="mt-auto inline-flex items-center gap-1.5 pt-4 text-sm font-semibold text-primary">
                   How it works here
