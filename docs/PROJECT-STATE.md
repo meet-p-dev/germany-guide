@@ -8,7 +8,8 @@
 > is the *living status* layer. **Keep it current — update it at the end of any
 > work session** (it is the one place a fresh Claude will trust).
 >
-> Last updated: 2026-07-22 (blueprint added: compact/full split gated by city
+> Last updated: 2026-09-03 (three `/updates` items added — see SEO/traffic
+> below). Earlier, 2026-07-22 (blueprint added: compact/full split gated by city
 > selection + real city hubs via a new `city_facts` table — see "Planned
 > direction" below; not built yet).
 
@@ -92,8 +93,14 @@ These were explicitly rejected — don't re-litigate them.
   resolved).
 - **SEO/traffic:** JSON-LD (Organization/WebSite/HowTo/Breadcrumb/FAQ), Vercel
   Analytics (cookieless), per-step `seo_title`/`seo_description`, canonicals.
-  `/updates` = human-approved "what changed in Germany" items + RSS. Goal is
-  **traffic first, monetization deferred** — do not push monetization yet.
+  `/updates` = human-approved "what changed in Germany" items + RSS (**10 items;
+  3 added 2026-09-03**: the Deutschlandticket price index — the 2027 price must
+  be announced by 30 Sept 2026 and applies 1 Jan — minimum wage €14.60/h +
+  Minijob €633/mo from 1 Jan 2027 (sourced to the VMK decision PDF and
+  bundesregierung.de), and a `city-guides-36-cities-2026-09` item that corrects
+  the stale `all-30-city-guides-live` note in prose rather than rewriting that
+  dated item). Goal is **traffic first, monetization deferred** — do not push
+  monetization yet.
 - **AI features (Groq):** letter decoder on `/letters`, step Q&A, sitewide chat
   widget with a trust ladder (site → web → honest fallback). `GROQ_API_KEY` is
   set in Vercel. Web-search rung needs a `TAVILY_API_KEY` (still pending).
