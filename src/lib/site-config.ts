@@ -332,6 +332,38 @@ export const CITIES: CityCard[] = [
     image: null,
     status: "live",
   },
+  {
+    slug: "augsburg",
+    name: "Augsburg",
+    state: "Bavaria",
+    tagline: "Roman roots, Fugger legacy, Bavarian calm.",
+    image: null,
+    status: "live",
+  },
+  {
+    slug: "wuerzburg",
+    name: "Würzburg",
+    state: "Bavaria",
+    tagline: "Franconian wine city on the Main.",
+    image: null,
+    status: "live",
+  },
+  {
+    slug: "goettingen",
+    name: "Göttingen",
+    state: "Lower Saxony",
+    tagline: "The small town that Nobel laureates built.",
+    image: null,
+    status: "live",
+  },
+  {
+    slug: "bochum",
+    name: "Bochum",
+    state: "North Rhine-Westphalia",
+    tagline: "The Ruhr reinvented as a student city.",
+    image: null,
+    status: "live",
+  },
 ];
 
 export type PersonaStatus = "live" | "coming_soon";
