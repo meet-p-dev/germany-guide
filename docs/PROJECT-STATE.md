@@ -8,7 +8,10 @@
 > is the *living status* layer. **Keep it current — update it at the end of any
 > work session** (it is the one place a fresh Claude will trust).
 >
-> Last updated: 2026-09-03 (three `/updates` items added — see SEO/traffic
+> Last updated: 2026-09-04 (4 cities added: Augsburg, Würzburg, Göttingen,
+> Bochum — roster now 40; also fixed the `quick_action` `{address}` separator
+> that rendered "…expires)Landesamt…" on every city's plan card). Earlier,
+> 2026-09-03 (three `/updates` items added — see SEO/traffic
 > below). Earlier, 2026-07-22 (blueprint added: compact/full split gated by city
 > selection + real city hubs via a new `city_facts` table — see "Planned
 > direction" below; not built yet).
@@ -66,15 +69,41 @@ These were explicitly rejected — don't re-litigate them.
   top stripe, real German city photography, German terms as first-class vocab.
 - Keep disclaimers (general info, not legal advice) and link official sources.
 
-## Current state (as of 2026-07-22)
+## Current state (as of 2026-09-04)
 
-- **Cities: all 36 live, 0 coming_soon, 108 `city_steps` (36 × 3:** anmeldung,
-  residence-permit, visa-extension). Full list + per-city office/quirk notes are
+- **Cities: all 40 live, 0 coming_soon, 126 `city_steps`** (every city has at
+  least the big three — anmeldung, residence-permit, visa-extension; Munich,
+  Ingolstadt and Nuremberg additionally have public-transport and
+  find-housing-remotely). Full list + per-city office/quirk notes are
   in Supabase; the roster is Munich, Nuremberg, Ingolstadt, Berlin, Frankfurt,
   Cologne, Heidelberg, Freiburg, Aachen, Münster, Bonn, Mannheim, Hamburg,
   Stuttgart, Düsseldorf, Leipzig, Dresden, Hanover, Bremen, Dortmund, Essen,
   Karlsruhe, Darmstadt, Mainz, Saarbrücken, Kiel, Rostock, Potsdam, Magdeburg,
-  Jena, Erlangen, Regensburg, Chemnitz, Wuppertal, Ulm, Kassel.
+  Jena, Erlangen, Regensburg, Chemnitz, Wuppertal, Ulm, Kassel, **Augsburg,
+  Würzburg, Göttingen, Bochum** (last four added 2026-09-04).
+- **Added 2026-09-04 — Augsburg, Würzburg, Göttingen, Bochum**, each verified
+  against the official city sites. Local quirks worth remembering:
+  - **Augsburg:** Bürgeramt is at *An der Blauen Kappe 18*, **not** the Rathaus;
+    permits sit in the Bürgeramt's *Sachgebiet Migration und Aufenthalt* —
+    appointment by **request only**, phone windows just Mon/Wed/Fri mornings.
+    **Landkreis Augsburg is a separate authority.**
+  - **Würzburg:** permits run through **walk-in Service-Points** (Rathaus
+    Rückermainstr. 2; issuance at Veitshöchheimer Str. 100, Geb. 325), with
+    caseworkers routed by the **first letter of your surname**. Bürgerbüro
+    booking is capped **7 weeks** ahead; eWA since 04/2024.
+  - **Göttingen:** Bürgerbüro in the Neues Rathaus offers an official
+    **emergency-ticket (Notfall-Ticket)** fallback when no slot exists, and eWA
+    since 01/06/2025. Permits are **in person by individual appointment only**
+    (phone hours **Mon 13:30–14:30**), arranged via auslaenderstelle@goettingen.de.
+    **Landkreis Göttingen runs its own Ausländerbehörde.**
+  - **Bochum:** Bürgerbüros are **appointment-mandatory** and **Querenburg — the
+    office nearest the RUB campus — is closed**; permits via the Ausländerbüro's
+    **online applications**, and the finished eAT is collected **without an
+    appointment** from the Historic Town Hall pickup box.
+- **Two-authority cities to watch** (going to the wrong office costs weeks):
+  Aachen (permits = StädteRegion Aachen), Göttingen and Augsburg (city vs
+  Landkreis), Hamburg (Welcome Center for workers vs Amt für Migration for
+  students).
 - **`/cities` renders coming_soon/live cards from the `cities` TABLE (getCities),
   not the config array** — new cities MUST be inserted into Supabase, not just
   `site-config.ts`.
@@ -130,9 +159,11 @@ These were explicitly rejected — don't re-litigate them.
 > **Ingolstadt + Nuremberg (2026-08-08, deployed):** both cloned to Munich's
 > depth — `city_steps` 3 → **5** each (added `public-transport`,
 > `find-housing-remotely`) plus **6 `city_facts`** each across all five
-> categories, every figure cited with `last_verified` 2026-08-08. So **3 of 36
-> cities are now "deep"** (Munich, Ingolstadt, Nuremberg); the other 33 still
-> have 3 city_steps and 0 facts.
+> categories, every figure cited with `last_verified` 2026-08-08. So **3 of 40
+> cities are "deep"** in the 5-step + facts sense (Munich, Ingolstadt,
+> Nuremberg); the other 37 have the big three `city_steps` and 0 facts.
+> (Corrected 2026-09-04: every city does have its three verified `city_steps` —
+> an earlier note here implying most cities had none was wrong.)
 > - **Key finding:** Ingolstadt's *and* Nuremberg's student halls are both run by
 >   **Studierendenwerk Erlangen-Nürnberg** (NOT Munich's) — a common newcomer
 >   mistake, and worth checking per city before writing housing content.
@@ -184,7 +215,7 @@ the switch* between them.**
 
 | Field / table | Feeds | Notes |
 |---|---|---|
-| `steps.quick_action` *(NEW column)* | Build my plan (compact) | Hand-written **template per step** (~11 total), with blanks like `{operator}` `{price}` `{persona}` that auto-fill from data — so one template serves all 36 cities. Do NOT hand-write per city×persona (that's ~1,188 cards). |
+| `steps.quick_action` *(NEW column)* | Build my plan (compact) | Hand-written **template per step** (~11 total), with blanks like `{operator}` `{price}` `{persona}` that auto-fill from data — so one template serves all 40 cities. Do NOT hand-write per city×persona (that's ~1,188 cards). |
 | `steps.content_md` | Explore (full) | The whole guide, already exists. |
 | `steps.documents` | both | "What to bring." Surface as a counter-day doc pack. |
 | `steps.depends_on` | Journey Map | Already rendered per-step ("Finish first" / "Unlocks"); the Map turns it into a whole-journey view. |
@@ -252,7 +283,7 @@ Dashboard/account actions outside the code:
   expat/university/city-subreddit pages (outreach, not code).
 - **Legal:** confirm real name/address in `/impressum` and contact email in
   `/privacy` before serious traffic.
-- **City photos:** most of the 36 cities render the branded placeholder
+- **City photos:** most of the 40 cities render the branded placeholder
   (`image: null`). Owner will send licensed photo links; each must be recorded in
   `public/images/CREDITS.md` per the image-licensing rule.
 
