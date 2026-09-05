@@ -1,0 +1,89 @@
+# To-do — what's left, in priority order
+
+> Rules are in [`rules.md`](rules.md); what already exists is in
+> [`status.md`](status.md). Keep this file honest: delete finished items rather
+> than marking them done, and move anything shipped into `status.md`.
+>
+> Last updated: **2026-09-04**
+
+---
+
+## 1. Blocked on the owner (Claude cannot do these)
+
+These are dashboard/account actions outside the codebase. The first two are the
+only genuinely **urgent** items on this page.
+
+- [ ] **Custom SMTP** (Supabase → Auth → Emails). The default sender is capped
+      around 2 emails/hour and rejects `@example.com` — **it will fail under real
+      traffic**, breaking signup and password reset. Set up Resend or Postmark.
+- [ ] **Auth URL config + email templates.** Site URL `https://germanyguide.net`,
+      redirect `https://germanyguide.net/**`. Recovery/confirm templates must link to
+      `{{ .SiteURL }}/auth/callback?token_hash={{ .TokenHash }}&type=recovery&next=/reset-password`
+      (and `type=email&next=/journey` for the signup confirmation).
+- [ ] **Enable leaked-password protection** and a minimum length of 8 (the
+      security advisor flags this).
+- [ ] **Legal check before serious traffic:** confirm the real name/address in
+      `/impressum` and the contact email in `/privacy`.
+- [ ] **Search Console:** click Verify, submit `sitemap.xml`. Traffic data lags by
+      days or weeks — don't act on an empty dashboard.
+- [ ] **`TAVILY_API_KEY`** in Vercel *Production* to switch on the AI web-search
+      rung. Vercel gotchas: exact name, tick Production, save **before** redeploy.
+- [ ] **Google OAuth consent screen:** set app name "Germany Guide" + logo in
+      Google Cloud (free) so the dialog stops showing the supabase.co domain.
+- [ ] **City photos.** Most of the 40 cities render the branded placeholder
+      (`image: null`). Send licensed photo links; each must be recorded in
+      `public/images/CREDITS.md` per the image-licensing rule.
+
+## 2. Important — real bugs and gaps
+
+- [ ] **Signup shows `{}` on an unexpected error.** `friendlyAuthError` in
+      `src/components/auth/sign-in-form.tsx` returns the raw message for
+      unmatched errors, so a server 500 renders literally as `{}`. Needs a
+      generic fallback string. *Small fix, bad first impression.*
+- [ ] **Persona mismatch.** The homepage advertises Refugee / EU citizen /
+      Joining family, but the `/plan` wizard only offers Student / Skilled worker
+      / Not sure yet. Either build those paths or stop advertising them.
+- [ ] **Accessibility:** several selectable cards (plan options, "Read the guide",
+      problem cards, city/letter chips) are buttons/links with **empty accessible
+      names**. Screen-reader users cannot tell them apart.
+- [ ] **Verify both AI features actually work in production.** They can read as
+      "not switched on" in some environments even with the key set — check before
+      demoing.
+
+## 3. Worth doing next (content depth)
+
+- [ ] **The two extra `city_steps`** (`public-transport`,
+      `find-housing-remotely`) exist only for Munich, Ingolstadt and Nuremberg.
+      Extend to the other 37 cities — needs the local operator and the real
+      student ticket price per city, plus the local Studierendenwerk for housing.
+      *This is the main remaining content lift.*
+- [ ] **Persona-split costs.** The data model has no per-persona figure, so the
+      compact card is persona-neutral. "€43 because you're a student" needs
+      per-persona `city_step` figures before it can be shown honestly.
+- [ ] **Re-verify every figure each January** — see the list in
+      [`status.md`](status.md). Searching content for "2026" finds them.
+- [ ] **Journey Map rebuild** as a whole-journey view (done ▪ next ▪ locked, with
+      "needs Anmeldung" reasons from `depends_on`). Partially in place.
+
+## 4. Nice to have / low priority
+
+- [ ] Owner sanity-check on a few local facts: private-market rents come from
+      asking-price indices rather than an official Mietspiegel (fine as a cited
+      range, but a local eye helps); the Nuremberg WG figure (~€425) is from a
+      **2023** index and flagged as dated in the text; TK is only one insurer per
+      city; bank names are editorial, not endorsements; Ingolstadt's
+      Canisiusstiftung capacity/prices were never confirmed on its own site.
+- [ ] More `city_facts` categories per city if a city warrants it (six is the
+      current shape, not a hard cap).
+- [ ] Backlinks are the biggest remaining traffic lever — expat forums, university
+      pages, city subreddits. **Outreach, not code.**
+
+## 5. Explicitly not doing
+
+Rejected on purpose. Do not resurrect without a deliberate decision:
+
+- City **comparison** tools, a forum, visa consultancy, a housing/job
+  marketplace, culture/tourism content (see the scope guard in `rules.md`).
+- **Monetization** — traffic first.
+- Hand-writing `quick_action` per city × persona (~1,188 cards). One template per
+  step, filled from data.

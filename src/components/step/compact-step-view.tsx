@@ -246,6 +246,21 @@ export async function CompactStepView({
             </p>
           )}
 
+          {/* The full local procedure — the flow, the documents and the red
+              flags specific to this city. Lives in `city_steps.content_md`,
+              which every one of the 40 cities has; rendered here because the
+              compact page is the only place a committed visitor sees their own
+              city's detail. */}
+          {city?.content_md?.trim() && (
+            <section>
+              <Kicker className="flex items-center gap-2">
+                <MapPin className="h-4 w-4" aria-hidden />
+                How it works in {cityName}
+              </Kicker>
+              <Markdown className="prose-sm mt-3.5">{city.content_md}</Markdown>
+            </section>
+          )}
+
           {/* The city fact that belongs on this step (e.g. Munich rents on the
               housing step) — surfaced here so the visitor doesn't have to hunt
               for it in the city hub. */}
