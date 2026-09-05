@@ -10,6 +10,26 @@
 
 ---
 
+## `tsc` fails with "Duplicate identifier" in `.next/types` after touching nothing
+**2026-09-05**
+
+- **Symptom:** `npx tsc --noEmit` fails on files that were never edited:
+  `.next/types/cache-life.d 2.ts(3,1): error TS6200 … conflict with those in
+  another file` and `routes.d 2.ts … Duplicate identifier 'LayoutProps'`.
+- **Cause:** the project lives under `~/Documents`, which **iCloud Drive syncs**.
+  When two machines (or a sync race) touch the same generated file, iCloud keeps
+  both and renames one `<name> 2.ts`. Those copies land inside `.next/types/`,
+  where `tsc` picks them up as real sources and sees every type declared twice.
+  Nothing is wrong with the code.
+- **Fix:** delete the duplicates — `.next/` is gitignored and fully regenerable:
+  ```bash
+  find .next -name "* 2.*" -delete
+  ```
+- **Next time:** the giveaway is a space-then-digit in the filename of a file you
+  never wrote. Check the whole repo, not just `.next`:
+  `find . -name "* 2.*" -not -path "./node_modules/*" -not -path "./.git/*"`.
+  A duplicate landing in `src/` would be worse — it would compile.
+
 ## Content written but invisible on the site
 **2026-09-04**
 

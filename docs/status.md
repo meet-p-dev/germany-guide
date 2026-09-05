@@ -4,7 +4,7 @@
 > [`todo.md`](todo.md). **Verify counts against the live DB before relying on
 > them** — see rules §4.
 >
-> Last updated: **2026-09-04**
+> Last updated: **2026-09-05**
 
 ## Where it stands
 
@@ -45,6 +45,14 @@ a trust ladder (site → web → honest fallback). `GROQ_API_KEY` is set in Verc
 The web-search rung still needs `TAVILY_API_KEY`.
 
 ## Changelog
+
+### 2026-09-05
+- **Real mailboxes on the domain.** `team@germanyguide.net` and
+  `kontakt@germanyguide.net` exist (iCloud+ Custom Email Domain, so the root
+  domain's MX records now point at Apple). `/impressum` and `/privacy` show
+  `kontakt@germanyguide.net` instead of the old Gmail address, as a `mailto:`
+  link. Anything that *sends* mail must verify a **subdomain**
+  (`send.germanyguide.net`) so it cannot collide with those MX records.
 
 ### 2026-09-04
 - **`city_steps.content_md` is now rendered.** It previously reached no page at

@@ -33,7 +33,13 @@ export default function ImpressumPage() {
         <section>
           <h2 className="font-display text-lg font-bold">Kontakt</h2>
           <p className="mt-2 text-muted">
-            E-Mail: germanyguide.net@gmail.com
+            E-Mail:{" "}
+            <a
+              href="mailto:kontakt@germanyguide.net"
+              className="font-medium text-primary hover:underline"
+            >
+              kontakt@germanyguide.net
+            </a>
           </p>
         </section>
 

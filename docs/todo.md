@@ -4,7 +4,7 @@
 > [`status.md`](status.md). Keep this file honest: delete finished items rather
 > than marking them done, and move anything shipped into `status.md`.
 >
-> Last updated: **2026-09-04**
+> Last updated: **2026-09-05**
 
 ---
 
@@ -16,6 +16,12 @@ only genuinely **urgent** items on this page.
 - [ ] **Custom SMTP** (Supabase → Auth → Emails). The default sender is capped
       around 2 emails/hour and rejects `@example.com` — **it will fail under real
       traffic**, breaking signup and password reset. Set up Resend or Postmark.
+      The domain now has real mailboxes (`team@` / `kontakt@germanyguide.net`,
+      iCloud+ custom domain), so sender identity is settled — what is missing is
+      a **sending** provider and its API key. **DNS caution:** the root domain's
+      MX records now point at iCloud; verify the sending domain on a
+      **subdomain** (`send.germanyguide.net`) so its records cannot collide with
+      the mailboxes, and set `Reply-To: team@germanyguide.net`.
 - [ ] **Auth URL config + email templates.** Site URL `https://germanyguide.net`,
       redirect `https://germanyguide.net/**`. Recovery/confirm templates must link to
       `{{ .SiteURL }}/auth/callback?token_hash={{ .TokenHash }}&type=recovery&next=/reset-password`
@@ -23,7 +29,8 @@ only genuinely **urgent** items on this page.
 - [ ] **Enable leaked-password protection** and a minimum length of 8 (the
       security advisor flags this).
 - [ ] **Legal check before serious traffic:** confirm the real name/address in
-      `/impressum` and the contact email in `/privacy`.
+      `/impressum`. The contact address is now `kontakt@germanyguide.net` on both
+      `/impressum` and `/privacy` (was a Gmail address) — that part is done.
 - [ ] **Search Console:** click Verify, submit `sitemap.xml`. Traffic data lags by
       days or weeks — don't act on an empty dashboard.
 - [ ] **`TAVILY_API_KEY`** in Vercel *Production* to switch on the AI web-search

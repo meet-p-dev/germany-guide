@@ -74,8 +74,14 @@ export default function PrivacyPage() {
             Under the GDPR you can request access to, correction of, or
             deletion of your data at any time. Deleting your account removes
             your profile and progress from our database. Without an account,
-            simply clearing your browser storage removes everything. Contact:
-            germanyguide.net@gmail.com.
+            simply clearing your browser storage removes everything. Contact:{" "}
+            <a
+              href="mailto:kontakt@germanyguide.net"
+              className="font-medium text-primary hover:underline"
+            >
+              kontakt@germanyguide.net
+            </a>
+            .
           </p>
         </section>
       </div>
