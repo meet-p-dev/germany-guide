@@ -2,6 +2,7 @@
 @docs/rules.md
 @docs/status.md
 @docs/todo.md
+@docs/solutions.md
 
 # Germany Guide — project rules
 
@@ -15,6 +16,9 @@ Everything is split into three files, all imported above:
   changelog, the verified 2026 figures, and the per-city traps.
 - **[`docs/todo.md`](docs/todo.md)** — what is left, in priority order, including
   what is deliberately *not* being done.
+- **[`docs/solutions.md`](docs/solutions.md)** — problems already solved, with the
+  real cause and fix. **Check it the moment something breaks or looks odd**, and
+  add an entry whenever you lose more than a few minutes to something.
 
 Two rules are important enough to repeat here:
 

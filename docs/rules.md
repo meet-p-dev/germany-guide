@@ -2,7 +2,9 @@
 
 > **Read this before writing anything.** These are not preferences; they are
 > constraints. If a task seems to require breaking one, stop and ask.
-> Status lives in [`status.md`](status.md), open work in [`todo.md`](todo.md).
+> Status lives in [`status.md`](status.md), open work in [`todo.md`](todo.md), and
+> problems we have already solved in [`solutions.md`](solutions.md) — check that
+> first when something breaks.
 
 ## 0. The goal and the scope guard (never drift)
 
@@ -90,6 +92,8 @@ Model: `phases` → `steps` → `city_steps` (per-city overrides) + `city_facts`
 
 ## 4. Database work — hard-won gotchas
 
+*Fuller write-ups, with symptoms and repair SQL, are in [`solutions.md`](solutions.md).*
+
 - **Check before you insert.** Query the live DB first; do not trust these docs
   for counts:
   `select c.slug, count(cs.id) from cities c left join city_steps cs on cs.city_id=c.id group by c.slug`
@@ -137,3 +141,5 @@ rather than asking the owner to check.
 - Traffic first; **monetization is deferred** — do not add it.
 - **Keep [`status.md`](status.md) and [`todo.md`](todo.md) current at the end of
   every session.** They are the only things a fresh Claude will trust.
+- **Log anything that cost you time in [`solutions.md`](solutions.md)** — that file
+  exists to stop the next session re-diagnosing a problem we already fixed.
