@@ -21,6 +21,7 @@ import { stepAppliesTo } from "@/lib/content";
 import { useVisitorProfile } from "@/lib/profile-store";
 import { getBrowserClient } from "@/lib/supabase/browser-client";
 import { ProfileSettings } from "@/components/account/profile-settings";
+import { NewsletterPreference } from "@/components/newsletter/newsletter-preference";
 import { Button, ButtonLink } from "@/components/ui/button";
 import { Kicker } from "@/components/ui/kicker";
 import { cn } from "@/lib/utils";
@@ -450,6 +451,8 @@ export function AccountDashboard({
           </div>
         </section>
       )}
+
+      <NewsletterPreference />
 
       <ProfileSettings session={session} />
 

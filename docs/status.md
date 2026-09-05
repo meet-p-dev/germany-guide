@@ -47,6 +47,18 @@ The web-search rung still needs `TAVILY_API_KEY`.
 ## Changelog
 
 ### 2026-09-05
+- **Opt-in newsletter built** (dormant until the owner sets two env vars).
+  Double opt-in throughout: `newsletter_subscribers` +  `newsletter_sends`
+  tables, RLS on with **no** anon/authenticated policy so addresses are
+  unreachable from the browser and every access goes through the service role.
+  Signup in the footer and on `/updates`, an opt-in toggle on `/account`,
+  `/newsletter/confirm` and `/newsletter/unsubscribe`, RFC 8058 one-click
+  unsubscribe at `/api/newsletter/unsubscribe`, and `/admin/newsletter` with
+  counts, the pending queue, test-send and send-now. A monthly Vercel cron
+  (`vercel.json`, 09:00 on the 1st) mails every update not yet delivered and
+  skips itself when nothing is new. **The 160 existing account holders are not
+  subscribers** — an account is not consent, so they only receive mail if they
+  opt in. `/privacy` gained a section covering exactly what is stored.
 - **Real mailboxes on the domain.** `team@germanyguide.net` and
   `kontakt@germanyguide.net` exist (iCloud+ Custom Email Domain, so the root
   domain's MX records now point at Apple). `/impressum` and `/privacy` show

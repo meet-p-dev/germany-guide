@@ -22,6 +22,25 @@ only genuinely **urgent** items on this page.
       MX records now point at iCloud; verify the sending domain on a
       **subdomain** (`send.germanyguide.net`) so its records cannot collide with
       the mailboxes, and set `Reply-To: team@germanyguide.net`.
+- [ ] **Switch the newsletter on.** All the code is built and deployed but
+      dormant; the forms tell visitors it is unavailable rather than losing
+      their address. Needed, in this order:
+      1. **Resend account** (free: 3,000/month, 100/day) and verify
+         **`send.germanyguide.net`** — a subdomain, so its records cannot
+         collide with the iCloud MX on the root. Add the DKIM/SPF records
+         Resend shows you.
+      2. **Turn Resend's open- and click-tracking OFF.** `/privacy` states that
+         we use neither; leaving them on makes that page untrue.
+      3. Vercel env vars, **Production**: `RESEND_API_KEY`,
+         `SUPABASE_SERVICE_ROLE_KEY` (Supabase → Settings → API), and
+         `CRON_SECRET` (any long random string — without it the cron route
+         refuses to run at all). Optional: `NEWSLETTER_FROM`,
+         `NEWSLETTER_REPLY_TO`, `NEWSLETTER_MAX_PER_RUN`.
+      4. Use the same Resend account for the **custom SMTP** item above — one
+         setup covers both.
+      5. Then check `/admin/newsletter`: it should stop saying "not switched
+         on". Subscribe yourself, confirm from the email, and press "Send a
+         test to me" before the first real digest.
 - [ ] **Auth URL config + email templates.** Site URL `https://germanyguide.net`,
       redirect `https://germanyguide.net/**`. Recovery/confirm templates must link to
       `{{ .SiteURL }}/auth/callback?token_hash={{ .TokenHash }}&type=recovery&next=/reset-password`

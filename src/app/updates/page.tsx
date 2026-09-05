@@ -13,6 +13,7 @@ import {
 } from "lucide-react";
 import { getUpdates, type Update } from "@/lib/content";
 import { Markdown } from "@/components/markdown";
+import { SubscribeForm } from "@/components/newsletter/subscribe-form";
 import { Kicker } from "@/components/ui/kicker";
 import { Stagger, StaggerItem } from "@/components/motion/reveal";
 
@@ -118,6 +119,18 @@ export default async function UpdatesPage() {
         <Rss className="h-4 w-4" />
         Subscribe via RSS
       </a>
+
+      <section className="mt-8 rounded-3xl border border-border bg-card p-6 sm:p-7">
+        <h2 className="font-display text-xl font-bold text-foreground">
+          Get these by email
+        </h2>
+        <p className="mt-2 max-w-lg text-sm leading-relaxed text-muted">
+          One short email when something on this page changes — roughly monthly,
+          never more. No news roundups, no marketing, no passing your address to
+          anyone.
+        </p>
+        <SubscribeForm source="updates" className="mt-5 max-w-lg" />
+      </section>
 
       <Stagger className="mt-10 grid gap-4">
         {updates.map((update) => (

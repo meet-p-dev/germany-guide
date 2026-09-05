@@ -54,6 +54,42 @@ export default function PrivacyPage() {
 
         <section>
           <h2 className="font-display text-lg font-bold text-foreground">
+            The update email
+          </h2>
+          <p className="mt-2">
+            The update email is entirely optional and separate from your
+            account. Nothing is sent until you click the confirmation link we
+            email you (double opt-in), and the date you confirmed is kept as the
+            record of that consent — Art. 6(1)(a) GDPR.
+          </p>
+          <ul className="mt-3 list-disc space-y-2 pl-5">
+            <li>
+              <strong>What we store:</strong> your email address, when you
+              subscribed and confirmed, and when we last wrote to you. If you
+              subscribed while signed in, the address is linked to your account
+              so the toggle on your account page reflects reality.
+            </li>
+            <li>
+              <strong>Who sends it:</strong> Resend, our email provider, which
+              processes your address in order to deliver the message.
+            </li>
+            <li>
+              <strong>Leaving:</strong> every email carries a one-click
+              unsubscribe link, and you can switch it off from your account page
+              at any time. We keep the record that the address unsubscribed —
+              that is how we make sure it is not written to again — and you can
+              ask us to erase it completely.
+            </li>
+            <li>
+              <strong>No tracking:</strong> we do not use open-tracking pixels
+              or rewritten click-tracking links, so we do not know whether you
+              opened it.
+            </li>
+          </ul>
+        </section>
+
+        <section>
+          <h2 className="font-display text-lg font-bold text-foreground">
             What we don&apos;t do
           </h2>
           <ul className="mt-2 list-disc space-y-2 pl-5">

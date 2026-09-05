@@ -10,6 +10,27 @@
 
 ---
 
+## Server Action 500s at runtime: "a 'use server' file can only export async functions"
+**2026-09-05**
+
+- **Symptom:** the page renders, but submitting the form throws a 500 and the
+  error boundary shows "Something went wrong". The server log reads
+  `Error: A "use server" file can only export async functions, found object`,
+  pointing at the closing brace of the actions file.
+- **Cause:** the `"use server"` module also exported a plain object — the
+  `initialSubscribeState` constant that `useActionState` needs as its starting
+  value. Only async functions may be exported from such a file; every other
+  export becomes a client-callable endpoint, which an object cannot be.
+- **The trap:** `npm run build` passes. The module is only evaluated when the
+  route actually runs, so the whole verification gate
+  (`tsc && eslint && build`) is green and the bug still reaches the browser.
+- **Fix:** keep Server Actions alone in the `"use server"` file and move state
+  shapes and their `initial…State` constants to an ordinary module —
+  `src/lib/newsletter-state.ts` here. Types are fine to export either way
+  (they are erased); values are not.
+- **Next time:** after adding any Server Action, actually submit the form in the
+  browser. Passing the build proves nothing about a `"use server"` boundary.
+
 ## `tsc` fails with "Duplicate identifier" in `.next/types` after touching nothing
 **2026-09-05**
 

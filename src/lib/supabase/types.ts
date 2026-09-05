@@ -259,6 +259,84 @@ export type Database = {
         }
         Relationships: []
       }
+      newsletter_sends: {
+        Row: {
+          error: string | null
+          failed_count: number
+          id: string
+          recipient_count: number
+          sent_at: string
+          status: string
+          subject: string
+          update_slugs: string[]
+        }
+        Insert: {
+          error?: string | null
+          failed_count?: number
+          id?: string
+          recipient_count?: number
+          sent_at?: string
+          status?: string
+          subject: string
+          update_slugs?: string[]
+        }
+        Update: {
+          error?: string | null
+          failed_count?: number
+          id?: string
+          recipient_count?: number
+          sent_at?: string
+          status?: string
+          subject?: string
+          update_slugs?: string[]
+        }
+        Relationships: []
+      }
+      newsletter_subscribers: {
+        Row: {
+          city_slug: string | null
+          confirm_token: string
+          confirmed_at: string | null
+          consent_source: string
+          created_at: string
+          email: string
+          id: string
+          last_sent_at: string | null
+          status: string
+          unsubscribe_token: string
+          unsubscribed_at: string | null
+          user_id: string | null
+        }
+        Insert: {
+          city_slug?: string | null
+          confirm_token?: string
+          confirmed_at?: string | null
+          consent_source?: string
+          created_at?: string
+          email: string
+          id?: string
+          last_sent_at?: string | null
+          status?: string
+          unsubscribe_token?: string
+          unsubscribed_at?: string | null
+          user_id?: string | null
+        }
+        Update: {
+          city_slug?: string | null
+          confirm_token?: string
+          confirmed_at?: string | null
+          consent_source?: string
+          created_at?: string
+          email?: string
+          id?: string
+          last_sent_at?: string | null
+          status?: string
+          unsubscribe_token?: string
+          unsubscribed_at?: string | null
+          user_id?: string | null
+        }
+        Relationships: []
+      }
       phases: {
         Row: {
           created_at: string

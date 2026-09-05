@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { Logo } from "@/components/layout/logo";
+import { SubscribeForm } from "@/components/newsletter/subscribe-form";
 import { cn } from "@/lib/utils";
 
 const GUIDE_LINKS = [
@@ -36,6 +37,10 @@ export function SiteFooter() {
               Your calm, step-by-step guide to German bureaucracy — tailored to
               your city and your situation.
             </p>
+            <p className="mt-7 text-xs font-semibold uppercase tracking-[0.18em] text-muted">
+              When the rules change
+            </p>
+            <SubscribeForm source="footer" compact className="mt-4" />
           </div>
           <div className="grid grid-cols-2 gap-10 sm:grid-cols-3">
             <FooterColumn title="Guides" links={GUIDE_LINKS} />

@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { ShieldCheck } from "lucide-react";
+import { Mail, ShieldCheck } from "lucide-react";
 import { cn } from "@/lib/utils";
 
 interface Props {
@@ -45,9 +45,22 @@ export function AdminTableNav({ tables }: Props) {
       })}
 
       <Link
-        href="/admin/admins"
+        href="/admin/newsletter"
         className={cn(
           "mt-1 flex items-center gap-1.5 rounded-xl border-t border-border px-3 py-2 pt-3 text-sm font-medium transition-colors",
+          pathname.startsWith("/admin/newsletter")
+            ? "text-foreground"
+            : "text-muted hover:text-foreground",
+        )}
+      >
+        <Mail className="h-3.5 w-3.5 text-primary" />
+        Newsletter
+      </Link>
+
+      <Link
+        href="/admin/admins"
+        className={cn(
+          "flex items-center gap-1.5 rounded-xl px-3 py-2 text-sm font-medium transition-colors",
           pathname.startsWith("/admin/admins")
             ? "text-foreground"
             : "text-muted hover:text-foreground",
