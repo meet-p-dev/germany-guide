@@ -30,15 +30,21 @@ only genuinely **urgent** items on this page.
       rung. Vercel gotchas: exact name, tick Production, save **before** redeploy.
 - [ ] **Google OAuth consent screen:** set app name "Germany Guide" + logo in
       Google Cloud (free) so the dialog stops showing the supabase.co domain.
-- [ ] **Two committed photos have no credits entry.**
-      `public/images/dji_fly_20250827_…jpg` and `dji_fly_20260121_…jpg` are tracked
-      in git but are **not listed in `public/images/CREDITS.md`**, are **not used
-      anywhere** in the site, are **9.2 MB and 8.5 MB** (the credited images are
-      1600px re-encodes), and still carry **APP metadata markers** that the
-      project's standard strips. They look like owner-original drone shots meant to
-      become city images. Decide: credit + resize + strip metadata + rename to
-      `city-<slug>.jpg`, or remove them from the repo. *This is the one live breach
-      of the image-licensing rule.*
+- [ ] **Owner's two drone photos: optimise and record, then use or remove.**
+      `public/images/dji_fly_20250827_…jpg` and `dji_fly_20260121_…jpg` are the
+      **owner's own photos**, so there is no attribution question — but they are
+      **8.8 MB / 8064×4536** and **8.1 MB / 6956×3913**, roughly 5× the project's
+      1600px standard, and nothing on the site references them, so ~17 MB sits in
+      the repo doing no work. Metadata check: **no GPS tags** (good), but camera
+      EXIF, an XMP block and an ICC profile remain, which the project's standard
+      strips. Both show the same white church with a pillared belfry over a flat
+      Bavarian-looking town (summer dusk and winter haze).
+      **Needs from the owner:** which city/place this is. Then: resize to 1600px,
+      strip metadata, rename `city-<slug>.jpg`, add a `CREDITS.md` line as an
+      owner-original (same wording as `city-ingolstadt.jpg` /
+      `city-erlangen.jpg` — provenance for future reference, not third-party
+      attribution), and wire into `site-config.ts`. If they are not meant for the
+      site, delete them so the repo stops carrying them.
 - [ ] **City photos.** Most of the 40 cities render the branded placeholder
       (`image: null`). Send licensed photo links; each must be recorded in
       `public/images/CREDITS.md` per the image-licensing rule.
