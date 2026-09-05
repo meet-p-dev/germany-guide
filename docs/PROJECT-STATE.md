@@ -8,7 +8,9 @@
 > is the *living status* layer. **Keep it current — update it at the end of any
 > work session** (it is the one place a fresh Claude will trust).
 >
-> Last updated: 2026-09-04 (4 cities added: Augsburg, Würzburg, Göttingen,
+> Last updated: 2026-09-04 (city_facts extended to ALL 40 cities — 240 facts;
+> also recorded that `city_steps.content_md` is not rendered anywhere. Earlier
+> the same day: 4 cities added: Augsburg, Würzburg, Göttingen,
 > Bochum — roster now 40; also fixed the `quick_action` `{address}` separator
 > that rendered "…expires)Landesamt…" on every city's plan card). Earlier,
 > 2026-09-03 (three `/updates` items added — see SEO/traffic
@@ -100,10 +102,23 @@ These were explicitly rejected — don't re-litigate them.
     office nearest the RUB campus — is closed**; permits via the Ausländerbüro's
     **online applications**, and the finished eAT is collected **without an
     appointment** from the Historic Town Hall pickup box.
-- **Two-authority cities to watch** (going to the wrong office costs weeks):
+- **`city_facts`: all 40 cities × 6 facts = 240** (as of 2026-09-04; was 3
+  cities). See "Planned direction" below for sourcing rules and the warning that
+  `city_steps.content_md` is not rendered anywhere.
+- **Two-authority / wrong-building traps** (going to the wrong place costs weeks):
   Aachen (permits = StädteRegion Aachen), Göttingen and Augsburg (city vs
   Landkreis), Hamburg (Welcome Center for workers vs Amt für Migration for
-  students).
+  students), **Saarbrücken (permits = ZAB at the LAVA in *Lebach*, ~30 km away)**,
+  **Cologne (permits split across 9 district offices by registered address)**,
+  Kiel and Wuppertal (registration and permit at different addresses; Wuppertal's
+  registration office **moved Dec 2025** to Döppersberg 41).
+- **Local wins worth surfacing:** Stuttgart does **Anmeldung + first permit in ONE
+  visit** at any Bürgerbüro *except* Mitte; **Ulm still takes walk-ins Mon–Fri**;
+  Leipzig allows walk-ins, drops slots weekdays 17:00, and updates your permit
+  address at the Bürgerbüro; Göttingen has an **emergency-ticket** fallback;
+  Magdeburg has an **08:00–09:00 walk-in window**; Dortmund **abolished its hall
+  waiting list** (Aug 2024); Bochum hands over the finished eAT with **no
+  appointment** (Historic Town Hall pickup box).
 - **`/cities` renders coming_soon/live cards from the `cities` TABLE (getCities),
   not the config array** — new cities MUST be inserted into Supabase, not just
   `site-config.ts`.
@@ -159,11 +174,30 @@ These were explicitly rejected — don't re-litigate them.
 > **Ingolstadt + Nuremberg (2026-08-08, deployed):** both cloned to Munich's
 > depth — `city_steps` 3 → **5** each (added `public-transport`,
 > `find-housing-remotely`) plus **6 `city_facts`** each across all five
-> categories, every figure cited with `last_verified` 2026-08-08. So **3 of 40
-> cities are "deep"** in the 5-step + facts sense (Munich, Ingolstadt,
-> Nuremberg); the other 37 have the big three `city_steps` and 0 facts.
-> (Corrected 2026-09-04: every city does have its three verified `city_steps` —
-> an earlier note here implying most cities had none was wrong.)
+> categories, every figure cited with `last_verified` 2026-08-08.
+>
+> **DONE 2026-09-04 — `city_facts` now cover ALL 40 cities (240 facts, was 18).**
+> Every city has the full six-fact set (first_days, Studierendenwerk halls,
+> private-market rents, insurance, banking, while_waiting). Dorm figures come
+> from each city's own Studierendenwerk; rent ranges cite empirica / Moses
+> Mendelssohn Institut **summer semester 2026** where a 2026 figure exists and
+> are **explicitly labelled 2024** where only that was available; insurance
+> facts name the correct **regional AOK** (11 of them) rather than inventing
+> branch addresses. Only the extra two `city_steps`
+> (`public-transport`, `find-housing-remotely`) remain Munich/Ingolstadt/
+> Nuremberg-only. Every city also has its three verified `city_steps`.
+>
+> **⚠️ `city_steps.content_md` IS NOT RENDERED ANYWHERE (verified 2026-09-04).**
+> `StepView` is the only component that renders it, it is used solely by
+> `/guide/[slug]`, and that route passes `activeCitySlug={null}` — so the city
+> branch never runs. `/cities/[city]/[slug]` uses `CompactStepView`, which
+> renders `city_facts` but never `city_steps.content_md`. Searching the served
+> HTML for a phrase from Munich's local content returns **zero hits**. So do NOT
+> invest in writing long per-city `content_md`: the surfaces that actually reach
+> visitors are `method`/`method_note`, `address`, `tips`, `links`, the filled
+> `quick_action`, and **`city_facts`**. Either render `content_md` (small UI
+> change, would instantly surface ~40 cities of existing verified writing) or
+> treat it as legacy — owner's call, deliberately deferred.
 > - **Key finding:** Ingolstadt's *and* Nuremberg's student halls are both run by
 >   **Studierendenwerk Erlangen-Nürnberg** (NOT Munich's) — a common newcomer
 >   mistake, and worth checking per city before writing housing content.
@@ -180,8 +214,9 @@ These were explicitly rejected — don't re-litigate them.
 >
 > **STILL TODO:** ① persona-split cost isn't in the data model yet, so the compact
 > card is persona-neutral — the "€43 because you're a student" split needs
-> per-persona city_step figures later. ② clone this depth to the remaining 33
-> cities (one per chat). ③ small content polish: the `first_days` fact renders its
+> per-persona city_step figures later. ② ~~clone this depth to the remaining
+> cities~~ — **DONE for `city_facts` (all 40 cities, 2026-09-04)**; only the two
+> extra `city_steps` are still Munich/Ingolstadt/Nuremberg-only. ③ small content polish: the `first_days` fact renders its
 > "1." oddly (inline ordered list) — cosmetic. ④ on the city hub, a step card
 > shows the **Germany-wide** `summary` (e.g. transport "€63/month") next to the
 > local method chip, so it can contradict the city's own €43 rate — consider
