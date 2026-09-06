@@ -6,7 +6,12 @@ export interface CoerceResult {
   errors: Record<string, string>;
 }
 
-function coerceField(field: FieldConfig, raw: FormDataEntryValue | null): unknown {
+/**
+ * Coerce one raw string into the type the column expects, throwing a
+ * human-readable reason when it cannot. Exported because the review gate
+ * applies a single proposed field value without a surrounding form.
+ */
+export function coerceValue(field: FieldConfig, raw: FormDataEntryValue | null): unknown {
   const value = typeof raw === "string" ? raw.trim() : "";
   const empty = value === "";
 
@@ -75,7 +80,7 @@ export function coercePayload(table: TableConfig, formData: FormData): CoerceRes
   for (const field of editableFields(table)) {
     let value: unknown;
     try {
-      value = coerceField(field, formData.get(field.name));
+      value = coerceValue(field, formData.get(field.name));
     } catch (err) {
       errors[field.name] = `${field.label} ${(err as Error).message}`;
       continue;

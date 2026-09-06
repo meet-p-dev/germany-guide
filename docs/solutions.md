@@ -10,6 +10,94 @@
 
 ---
 
+## "Register online" was wrong for our whole audience in 14 cities
+**2026-09-06**
+
+- **Symptom:** Erlangen's Anmeldung card said `method = online` and the content
+  led with "register online with a BayernID or BundID account (eID)". The owner
+  checked in person and found registration is walk-in, with first-time
+  registrants going to the counter.
+- **Cause:** the federal **elektronische Wohnsitzanmeldung** accepts only a German
+  *Personalausweis* with the online function, or an **eID-Karte, which is issued
+  to EU/EEA citizens only**. There is no route via an *elektronischer
+  Aufenthaltstitel*, and family registration additionally requires already being
+  in the Melderegister and moving *within* Germany. So a third-country national
+  arriving for the first time - this site's core reader - **cannot register
+  online anywhere in Germany**. Source:
+  https://wohnsitzanmeldung.gov.de/faq-servicekonto-und-ausweis
+- **Scale:** 14 of 40 cities were marked `method = online` for `anmeldung`
+  (aachen, bonn, darmstadt, dresden, erlangen, frankfurt, freiburg, heidelberg,
+  kassel, magdeburg, mannheim, munster, potsdam, regensburg). Every one of their
+  `method_note` values did mention an in-person alternative, but all led with
+  "Online", and none said who qualifies.
+- **Fix:** `method_note` rewritten for all 14 to lead with the in-person route and
+  name the eID limitation; Erlangen's `method` changed to `walk_in`. Queued
+  through the review gate as `run_id = 'ewa-eid-2026-09-06'`.
+- **Next time:** `method` is a claim about **what this site's reader will
+  actually do**, not about what the city technically offers. When a city offers an
+  online route, check the *requirements* section before setting `method = online`
+  - "the city has an online service" and "our reader can use it" are different
+  facts. A link sweep cannot catch this; only reading the procedure can.
+
+## Every jsonb proposal falsely reported "the live value has changed"
+**2026-09-06**
+
+- **Symptom:** the first real `/link-check` run queued nine `links` fixes and the
+  review screen refused all nine, showing "The live value has changed since this
+  was proposed - applying is blocked" with Approve greyed out. Nothing had
+  changed; the rows were untouched.
+- **Cause:** the drift guard compared the live column with the proposal's
+  `current_value` snapshot as **text**. Postgres renders jsonb with a space after
+  the colon - `[{"url": "x"}]` - while `JSON.stringify` renders `[{"url":"x"}]`.
+  A proposal naturally records its snapshot through Postgres (`links::text`), so
+  the two never matched and no `links` or `tips` proposal could ever be applied.
+- **Fix:** `valuesMatch()` in `src/lib/admin/proposals.ts`. When the live value
+  is an object, both sides are re-serialised through JSON before comparing, so
+  the check is about content rather than whitespace. Key order is safe to rely
+  on: both sides come from the same jsonb column, so Postgres has already
+  imposed its ordering on each.
+- **Next time:** any time a snapshot crosses the Postgres/JS boundary, compare
+  *parsed* values, never their text. And note what caught this - not the type
+  checker, not the build, but actually running the sweep and looking at the
+  result. A guard that always says "blocked" looks exactly like a guard that
+  works.
+
+## `eslint` dies with "ETIMEDOUT: connection timed out, read", and `tsc` crawls
+**2026-09-06**
+
+- **Symptom:** `npx eslint .` exits 2 with
+  `Error: ETIMEDOUT: connection timed out, read` thrown from `readFileSync`
+  inside `node_modules` (it named `globalthis/index.js`, but the file varies).
+  In the same run `npx tsc --noEmit` took **9 minutes** while using only ~3
+  seconds of CPU — almost entirely blocked on I/O.
+- **Cause:** the project lives under `~/Documents`, which iCloud Drive syncs.
+  iCloud **evicts** rarely-touched files to the cloud and leaves a dataless
+  placeholder behind. `node_modules` is a perfect eviction target: tens of
+  thousands of files nobody opens between installs. Reading one then blocks on
+  a network fetch, and slow fetches surface as `ETIMEDOUT` — from `readFileSync`,
+  which is why it looks like a broken package rather than a storage problem.
+  Same root cause as the `<name> 2.ts` duplicates below.
+- **Fix:** materialise the tree, then re-run:
+  ```bash
+  brctl download node_modules
+  ```
+  It returns immediately and fetches in the background, so the first retry may
+  still be slow — the second one is fast.
+- **Permanent fix — already applied 2026-09-06.** The owner set the project
+  folder to **Keep Downloaded** (right-click the folder in Finder → *Keep
+  Downloaded*), so iCloud may no longer evict its contents. If these symptoms
+  ever come back, check that setting first: it can be silently reset by moving
+  or re-syncing the folder.
+- **Next time:** the tell is an I/O error (`ETIMEDOUT`, `ENOENT` on a package
+  that is definitely installed) from inside `node_modules`, or a `tsc`/`eslint`
+  run whose wall time dwarfs its CPU time. Reach for `brctl download` before
+  `rm -rf node_modules && npm install` — the reinstall works, but it takes far
+  longer and treats the symptom.
+- **Unrelated trap while debugging this:** a wait loop written as
+  `while pgrep -f "tsc --noEmit"; do sleep 3; done` never exits — `pgrep -f`
+  matches the shell running that very loop. Wait on the PID (`kill -0 $pid`) or
+  bracket the pattern (`pgrep -f "[t]sc"`).
+
 ## Server Action 500s at runtime: "a 'use server' file can only export async functions"
 **2026-09-05**
 

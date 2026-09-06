@@ -3,6 +3,7 @@ import Link from "next/link";
 import { ArrowLeft, ShieldCheck } from "lucide-react";
 import { requireAdmin } from "@/lib/admin/auth";
 import { ADMIN_TABLES } from "@/lib/admin/schema";
+import { pendingProposalCount } from "@/lib/admin/proposals";
 import { AdminTableNav } from "@/components/admin/admin-table-nav";
 
 export const metadata: Metadata = {
@@ -20,6 +21,7 @@ export default async function AdminLayout({
 }) {
   // 404s for anyone who is not a signed-in admin: the area is invisible.
   const user = await requireAdmin();
+  const pendingReviews = await pendingProposalCount();
 
   return (
     <div className="mx-auto max-w-6xl px-4 py-10 sm:px-6">
@@ -45,7 +47,10 @@ export default async function AdminLayout({
       </div>
 
       <div className="grid gap-8 lg:grid-cols-[13rem_1fr]">
-        <AdminTableNav tables={ADMIN_TABLES.map((t) => ({ name: t.name, label: t.label }))} />
+        <AdminTableNav
+          tables={ADMIN_TABLES.map((t) => ({ name: t.name, label: t.label }))}
+          pendingReviews={pendingReviews}
+        />
         <div className="min-w-0">{children}</div>
       </div>
     </div>
