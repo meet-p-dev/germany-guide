@@ -54,6 +54,12 @@ The web-search rung still needs `TAVILY_API_KEY`.
 ## Changelog
 
 ### 2026-09-06
+- **Deployed to production.** The review gate went live, and with it two commits
+  that had been sitting **unpushed** since 2026-09-05: the whole opt-in
+  newsletter and the `kontakt@germanyguide.net` contact address. Production had
+  been running `791448d` — `status.md` and `todo.md` both described the
+  newsletter as "deployed", which was untrue. Watch for this: a local commit is
+  not a deploy, and `git log` alone will not tell you (check `origin/main`).
 - **First `/link-check` sweep run.** 204 URLs checked: 187 OK, 9 bot-blocked
   (ignored), **8 genuinely broken**. All nine resulting fixes reviewed and
   applied - Hamburg (Studierendenwerk moved to `stwhh.de`), Kiel (registration

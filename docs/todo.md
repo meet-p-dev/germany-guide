@@ -22,9 +22,15 @@ only genuinely **urgent** items on this page.
       MX records now point at iCloud; verify the sending domain on a
       **subdomain** (`send.germanyguide.net`) so its records cannot collide with
       the mailboxes, and set `Reply-To: team@germanyguide.net`.
-- [ ] **Switch the newsletter on.** All the code is built and deployed but
-      dormant; the forms tell visitors it is unavailable rather than losing
-      their address. Needed, in this order:
+- [ ] **Switch the newsletter on.** The code shipped to production on
+      2026-09-06 — before that it had been committed locally but **never
+      pushed**, so `main` was two commits behind `origin/main` and the last
+      production deploy was `791448d`. It is now deployed but dormant, and the
+      forms tell visitors it is unavailable rather than losing their address.
+      DNS checked 2026-09-06 against the authoritative Cloudflare nameservers:
+      the root MX is iCloud (mailboxes, correct) and **no Resend records exist
+      yet** — no `send.germanyguide.net` SPF/MX, no `resend._domainkey` DKIM.
+      Needed, in this order:
       1. **Resend account** (free: 3,000/month, 100/day) and verify
          **`send.germanyguide.net`** — a subdomain, so its records cannot
          collide with the iCloud MX on the root. Add the DKIM/SPF records
