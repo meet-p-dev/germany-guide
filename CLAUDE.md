@@ -3,10 +3,11 @@
 @docs/status.md
 @docs/todo.md
 @docs/solutions.md
+@docs/automation.md
 
 # Germany Guide — project rules
 
-Everything is split into three files, all imported above:
+Everything is split into the files imported above:
 
 - **[`docs/rules.md`](docs/rules.md)** — how to work here, strictly. The goal and
   scope guard, no-fabrication and sourcing rules, where content lives and which
@@ -19,11 +20,15 @@ Everything is split into three files, all imported above:
 - **[`docs/solutions.md`](docs/solutions.md)** — problems already solved, with the
   real cause and fix. **Check it the moment something breaks or looks odd**, and
   add an entry whenever you lose more than a few minutes to something.
+- **[`docs/automation.md`](docs/automation.md)** — the review gate: how a
+  scheduled agent proposes a content change and how a human applies it. **Read
+  it before running any sweep in `.claude/commands/`.**
 
 Two rules are important enough to repeat here:
 
 1. **Never fabricate a city fact, figure, address or fee.** Research the official
-   source; every claim carries `last_verified`.
+   source; every claim carries `last_verified`. Automated sweeps do not get an
+   exemption — they **queue** a proposal, a human approves it.
 2. **No emojis anywhere on the site.** Expression comes from lucide icons,
    typography, photography and motion.
 

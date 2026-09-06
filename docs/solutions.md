@@ -10,6 +10,42 @@
 
 ---
 
+## `eslint` dies with "ETIMEDOUT: connection timed out, read", and `tsc` crawls
+**2026-09-06**
+
+- **Symptom:** `npx eslint .` exits 2 with
+  `Error: ETIMEDOUT: connection timed out, read` thrown from `readFileSync`
+  inside `node_modules` (it named `globalthis/index.js`, but the file varies).
+  In the same run `npx tsc --noEmit` took **9 minutes** while using only ~3
+  seconds of CPU — almost entirely blocked on I/O.
+- **Cause:** the project lives under `~/Documents`, which iCloud Drive syncs.
+  iCloud **evicts** rarely-touched files to the cloud and leaves a dataless
+  placeholder behind. `node_modules` is a perfect eviction target: tens of
+  thousands of files nobody opens between installs. Reading one then blocks on
+  a network fetch, and slow fetches surface as `ETIMEDOUT` — from `readFileSync`,
+  which is why it looks like a broken package rather than a storage problem.
+  Same root cause as the `<name> 2.ts` duplicates below.
+- **Fix:** materialise the tree, then re-run:
+  ```bash
+  brctl download node_modules
+  ```
+  It returns immediately and fetches in the background, so the first retry may
+  still be slow — the second one is fast.
+- **Permanent fix — already applied 2026-09-06.** The owner set the project
+  folder to **Keep Downloaded** (right-click the folder in Finder → *Keep
+  Downloaded*), so iCloud may no longer evict its contents. If these symptoms
+  ever come back, check that setting first: it can be silently reset by moving
+  or re-syncing the folder.
+- **Next time:** the tell is an I/O error (`ETIMEDOUT`, `ENOENT` on a package
+  that is definitely installed) from inside `node_modules`, or a `tsc`/`eslint`
+  run whose wall time dwarfs its CPU time. Reach for `brctl download` before
+  `rm -rf node_modules && npm install` — the reinstall works, but it takes far
+  longer and treats the symptom.
+- **Unrelated trap while debugging this:** a wait loop written as
+  `while pgrep -f "tsc --noEmit"; do sleep 3; done` never exits — `pgrep -f`
+  matches the shell running that very loop. Wait on the PID (`kill -0 $pid`) or
+  bracket the pattern (`pgrep -f "[t]sc"`).
+
 ## Server Action 500s at runtime: "a 'use server' file can only export async functions"
 **2026-09-05**
 

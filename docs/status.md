@@ -4,7 +4,7 @@
 > [`todo.md`](todo.md). **Verify counts against the live DB before relying on
 > them** — see rules §4.
 >
-> Last updated: **2026-09-05**
+> Last updated: **2026-09-06**
 
 ## Where it stands
 
@@ -33,6 +33,13 @@ sign-up collects full name + home country; forgot/reset flow. Apple sign-in is
 built but hidden (owner's Apple Developer account inactive) — restore from git in
 `provider-buttons.tsx`.
 
+**Automation:** the **review gate** — agents research, humans publish. Sweeps
+live as slash commands in `.claude/commands/` (`/link-check`, `/verify-figures`,
+`/city-research`, `/updates-scout`, `/session-close`); findings queue in
+`proposed_changes` and are approved at `/admin/review`. Contract and SQL shapes
+in [`automation.md`](automation.md). Nothing an agent finds reaches the site
+without a human pressing Approve.
+
 **Admin:** full-CRUD editor at `/admin` over all content tables, schema-driven
 from `src/lib/admin/schema.ts`, writes via Server Actions. Access is gated by the
 **DB, not the UI**: admin membership lives in a dedicated `public.admins` table
@@ -45,6 +52,25 @@ a trust ladder (site → web → honest fallback). `GROQ_API_KEY` is set in Verc
 The web-search rung still needs `TAVILY_API_KEY`.
 
 ## Changelog
+
+### 2026-09-06
+- **Review gate built.** New `proposed_changes` table (admin-only both ways, no
+  public read) plus `/admin/review` with before/after, the source link, and
+  Approve / Reject. Scheduled agents queue proposals here instead of writing to
+  content tables, which is what keeps rule #1 true once the site updates itself.
+  Three guards: a **table+field whitelist** (an agent reading a hostile web page
+  still cannot aim a write at `admins` or `profiles`), **optimistic concurrency**
+  against a `current_value` snapshot (a stale finding is refused, not applied
+  over a newer human edit), and **NOT NULL `source_url`**. `last_verified` moves
+  only when the reviewer ticks "I checked the source" — never automatically.
+  Writes go through the admin's own cookie client so RLS authorizes them exactly
+  as a manual `/admin` edit; the service role is deliberately not used.
+- **Five slash commands** in `.claude/commands/` encoding the sweeps and the
+  project's hard rules, plus [`automation.md`](automation.md) as the contract.
+- `coerceValue` split out of `coercePayload` so one proposed field can be
+  coerced without a surrounding form.
+- Logged the **iCloud `node_modules` eviction** trap in `solutions.md`
+  (`ETIMEDOUT` from `readFileSync`, `tsc` at 9 min wall / 3 s CPU).
 
 ### 2026-09-05
 - **Opt-in newsletter built** (dormant until the owner sets two env vars).

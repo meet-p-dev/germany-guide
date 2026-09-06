@@ -444,6 +444,69 @@ export type Database = {
         }
         Relationships: []
       }
+      proposed_changes: {
+        Row: {
+          created_at: string
+          current_value: string | null
+          field: string | null
+          id: string
+          op: string
+          origin: string
+          payload: Json | null
+          proposed_value: string | null
+          rationale: string | null
+          review_note: string | null
+          reviewed_at: string | null
+          reviewed_by: string | null
+          run_id: string | null
+          source_name: string | null
+          source_url: string
+          status: string
+          target_id: string | null
+          target_table: string
+        }
+        Insert: {
+          created_at?: string
+          current_value?: string | null
+          field?: string | null
+          id?: string
+          op: string
+          origin?: string
+          payload?: Json | null
+          proposed_value?: string | null
+          rationale?: string | null
+          review_note?: string | null
+          reviewed_at?: string | null
+          reviewed_by?: string | null
+          run_id?: string | null
+          source_name?: string | null
+          source_url: string
+          status?: string
+          target_id?: string | null
+          target_table: string
+        }
+        Update: {
+          created_at?: string
+          current_value?: string | null
+          field?: string | null
+          id?: string
+          op?: string
+          origin?: string
+          payload?: Json | null
+          proposed_value?: string | null
+          rationale?: string | null
+          review_note?: string | null
+          reviewed_at?: string | null
+          reviewed_by?: string | null
+          run_id?: string | null
+          source_name?: string | null
+          source_url?: string
+          status?: string
+          target_id?: string | null
+          target_table?: string
+        }
+        Relationships: []
+      }
       steps: {
         Row: {
           applies_to: string

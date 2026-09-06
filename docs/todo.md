@@ -4,7 +4,7 @@
 > [`status.md`](status.md). Keep this file honest: delete finished items rather
 > than marking them done, and move anything shipped into `status.md`.
 >
-> Last updated: **2026-09-05**
+> Last updated: **2026-09-06**
 
 ---
 
@@ -91,7 +91,25 @@ only genuinely **urgent** items on this page.
       "not switched on" in some environments even with the key set — check before
       demoing.
 
-## 3. Worth doing next (content depth)
+## 3. Automation — the review gate is in, the sweeps are not scheduled
+
+The gate itself is built (see `status.md`), so these are safe to run: nothing
+they find can reach the site unreviewed.
+
+- [ ] **Schedule the sweeps.** `/link-check` monthly, `/verify-figures`
+      quarterly and hard every January, `/updates-scout` weekly. They exist as
+      commands but nothing runs them yet — today they are manual.
+- [ ] **First real run of `/link-check`** across all 40 cities. This has never
+      been done; the Munich walk-in and Nuremberg address errors both survived
+      months because nothing was watching. Expect real findings.
+- [ ] **Staleness surfacing.** Nothing yet flags a `last_verified` that has gone
+      old. A query on the `/admin` overview would make rot visible instead of
+      silent.
+- [ ] **Agent-facing runbook for `/city-research`** once the first few cities are
+      done — capture what a good `city_steps` row actually contains, so batch
+      runs stay consistent.
+
+## 4. Worth doing next (content depth)
 
 - [ ] **The two extra `city_steps`** (`public-transport`,
       `find-housing-remotely`) exist only for Munich, Ingolstadt and Nuremberg.
@@ -106,7 +124,7 @@ only genuinely **urgent** items on this page.
 - [ ] **Journey Map rebuild** as a whole-journey view (done ▪ next ▪ locked, with
       "needs Anmeldung" reasons from `depends_on`). Partially in place.
 
-## 4. Nice to have / low priority
+## 5. Nice to have / low priority
 
 - [ ] Owner sanity-check on a few local facts: private-market rents come from
       asking-price indices rather than an official Mietspiegel (fine as a cited
@@ -119,12 +137,21 @@ only genuinely **urgent** items on this page.
 - [ ] Backlinks are the biggest remaining traffic lever — expat forums, university
       pages, city subreddits. **Outreach, not code.**
 
-## 5. Explicitly not doing
+## 6. Explicitly not doing
 
 Rejected on purpose. Do not resurrect without a deliberate decision:
 
 - City **comparison** tools, a forum, visa consultancy, a housing/job
   marketplace, culture/tourism content (see the scope guard in `rules.md`).
-- **Monetization** — traffic first.
+- **Monetization** — traffic first. (Raised again 2026-09-06; still parked.
+  Note that running ads in the EEA requires a consent-management platform, which
+  would make `/privacy` untrue as written — so this is a real change, not a
+  switch to flip.)
+- **Moving the entity to India to escape GDPR** — considered 2026-09-06 and
+  rejected on the facts: GDPR Art. 3(2) follows the *users*, not the company, so
+  a site targeting people moving to Germany stays in scope. It would also add an
+  Art. 27 EU-representative duty and India's DPDP Act on top, while ad networks
+  demand a CMP for EEA traffic regardless. Confirm with a lawyer before ever
+  revisiting.
 - Hand-writing `quick_action` per city × persona (~1,188 cards). One template per
   step, filled from data.
