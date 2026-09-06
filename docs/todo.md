@@ -96,6 +96,10 @@ only genuinely **urgent** items on this page.
 The gate itself is built (see `status.md`), so these are safe to run: nothing
 they find can reach the site unreviewed.
 
+- [ ] **Per-city pass on the 13 remaining `method = online` cities.** Erlangen is
+      corrected; the other 13 still show an "online" chip that their first-time
+      readers cannot use. Each needs its real in-person route checked (walk-in vs
+      appointment) before `method` can be set honestly - see `solutions.md`.
 - [ ] **Schedule the sweeps.** `/link-check` monthly, `/verify-figures`
       quarterly and hard every January, `/updates-scout` weekly. They exist as
       commands but nothing runs them yet — today they are manual.

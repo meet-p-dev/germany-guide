@@ -10,6 +10,35 @@
 
 ---
 
+## "Register online" was wrong for our whole audience in 14 cities
+**2026-09-06**
+
+- **Symptom:** Erlangen's Anmeldung card said `method = online` and the content
+  led with "register online with a BayernID or BundID account (eID)". The owner
+  checked in person and found registration is walk-in, with first-time
+  registrants going to the counter.
+- **Cause:** the federal **elektronische Wohnsitzanmeldung** accepts only a German
+  *Personalausweis* with the online function, or an **eID-Karte, which is issued
+  to EU/EEA citizens only**. There is no route via an *elektronischer
+  Aufenthaltstitel*, and family registration additionally requires already being
+  in the Melderegister and moving *within* Germany. So a third-country national
+  arriving for the first time - this site's core reader - **cannot register
+  online anywhere in Germany**. Source:
+  https://wohnsitzanmeldung.gov.de/faq-servicekonto-und-ausweis
+- **Scale:** 14 of 40 cities were marked `method = online` for `anmeldung`
+  (aachen, bonn, darmstadt, dresden, erlangen, frankfurt, freiburg, heidelberg,
+  kassel, magdeburg, mannheim, munster, potsdam, regensburg). Every one of their
+  `method_note` values did mention an in-person alternative, but all led with
+  "Online", and none said who qualifies.
+- **Fix:** `method_note` rewritten for all 14 to lead with the in-person route and
+  name the eID limitation; Erlangen's `method` changed to `walk_in`. Queued
+  through the review gate as `run_id = 'ewa-eid-2026-09-06'`.
+- **Next time:** `method` is a claim about **what this site's reader will
+  actually do**, not about what the city technically offers. When a city offers an
+  online route, check the *requirements* section before setting `method = online`
+  - "the city has an online service" and "our reader can use it" are different
+  facts. A link sweep cannot catch this; only reading the procedure can.
+
 ## Every jsonb proposal falsely reported "the live value has changed"
 **2026-09-06**
 

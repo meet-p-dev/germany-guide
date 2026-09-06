@@ -54,6 +54,18 @@ The web-search rung still needs `TAVILY_API_KEY`.
 ## Changelog
 
 ### 2026-09-06
+- **First `/link-check` sweep run.** 204 URLs checked: 187 OK, 9 bot-blocked
+  (ignored), **8 genuinely broken**. All nine resulting fixes reviewed and
+  applied - Hamburg (Studierendenwerk moved to `stwhh.de`), Kiel (registration
+  page 500s, new service id), Mainz x2 (Ausländerbehörde page 404s), Erlangen
+  (linked a deleted news article), Dresden (deep CMS path 404s), Jena (English
+  path 500s), Berlin (dorm URL needs a trailing slash), and Munich - where
+  **MVV has suspended the Semesterticket**, so the card was offering a ticket
+  that is no longer sold.
+- **"Register online" was wrong for our whole audience in 14 cities.** The
+  federal eWA takes a German Personalausweis or an EU/EEA eID-Karte only, so no
+  first-time third-country arrival can use it. `method_note` rewritten for all
+  14; Erlangen's `method` corrected to `walk_in`. See `solutions.md`.
 - **Review gate built.** New `proposed_changes` table (admin-only both ways, no
   public read) plus `/admin/review` with before/after, the source link, and
   Approve / Reject. Scheduled agents queue proposals here instead of writing to
