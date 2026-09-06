@@ -76,14 +76,38 @@ async function adminDb(): Promise<SupabaseClient> {
 }
 
 /**
- * Render a database value the same way a proposal records it, so the two can be
- * compared as text. jsonb columns come back as objects; null and "" are the
- * same absence for this purpose.
+ * Render a database value as text for comparison. null and "" are the same
+ * absence for this purpose.
  */
 export function normalizeForCompare(value: unknown): string {
   if (value == null) return "";
   if (typeof value === "object") return JSON.stringify(value);
   return String(value).trim();
+}
+
+/**
+ * Does a live column value still match the snapshot a proposal recorded?
+ *
+ * jsonb needs care. Postgres renders `[{"url": "x"}]` with a space after the
+ * colon; `JSON.stringify` renders `[{"url":"x"}]` without one. A proposal
+ * naturally records the snapshot via Postgres (`links::text`), so comparing the
+ * two as raw text reports drift on *every* jsonb proposal and nothing on a
+ * `links` or `tips` column could ever be applied. Re-serialising both sides
+ * through JSON makes the check about content rather than whitespace.
+ *
+ * Key order is safe to rely on here: both sides originate from the same jsonb
+ * column, so Postgres has already imposed its own ordering on each.
+ */
+export function valuesMatch(live: unknown, snapshot: string | null): boolean {
+  if (live != null && typeof live === "object") {
+    try {
+      return JSON.stringify(live) === JSON.stringify(JSON.parse(snapshot ?? ""));
+    } catch {
+      // Snapshot is not JSON at all — it cannot describe this column.
+      return false;
+    }
+  }
+  return normalizeForCompare(live) === normalizeForCompare(snapshot);
 }
 
 export async function pendingProposalCount(): Promise<number> {
@@ -174,10 +198,7 @@ export async function decorateProposals(
       } else if (!row) {
         driftWarning = "The target row no longer exists.";
         applicable = false;
-      } else if (
-        normalizeForCompare(row[p.field as string]) !==
-        normalizeForCompare(p.current_value)
-      ) {
+      } else if (!valuesMatch(row[p.field as string], p.current_value)) {
         driftWarning =
           "The live value has changed since this was proposed — applying is blocked.";
         applicable = false;
@@ -271,10 +292,7 @@ export async function applyProposal(
     if (liveError) return { ok: false, message: liveError.message };
     if (!live) return markStale("The target row no longer exists.");
 
-    if (
-      normalizeForCompare((live as Row)[field.name]) !==
-      normalizeForCompare(p.current_value)
-    ) {
+    if (!valuesMatch((live as Row)[field.name], p.current_value)) {
       return markStale(
         "The live value changed since this was proposed. Re-run the check rather than overwriting the newer edit.",
       );

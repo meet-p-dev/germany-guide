@@ -10,6 +10,29 @@
 
 ---
 
+## Every jsonb proposal falsely reported "the live value has changed"
+**2026-09-06**
+
+- **Symptom:** the first real `/link-check` run queued nine `links` fixes and the
+  review screen refused all nine, showing "The live value has changed since this
+  was proposed - applying is blocked" with Approve greyed out. Nothing had
+  changed; the rows were untouched.
+- **Cause:** the drift guard compared the live column with the proposal's
+  `current_value` snapshot as **text**. Postgres renders jsonb with a space after
+  the colon - `[{"url": "x"}]` - while `JSON.stringify` renders `[{"url":"x"}]`.
+  A proposal naturally records its snapshot through Postgres (`links::text`), so
+  the two never matched and no `links` or `tips` proposal could ever be applied.
+- **Fix:** `valuesMatch()` in `src/lib/admin/proposals.ts`. When the live value
+  is an object, both sides are re-serialised through JSON before comparing, so
+  the check is about content rather than whitespace. Key order is safe to rely
+  on: both sides come from the same jsonb column, so Postgres has already
+  imposed its ordering on each.
+- **Next time:** any time a snapshot crosses the Postgres/JS boundary, compare
+  *parsed* values, never their text. And note what caught this - not the type
+  checker, not the build, but actually running the sweep and looking at the
+  result. A guard that always says "blocked" looks exactly like a guard that
+  works.
+
 ## `eslint` dies with "ETIMEDOUT: connection timed out, read", and `tsc` crawls
 **2026-09-06**
 
