@@ -3,10 +3,13 @@ import { getGlossaryTerms } from "@/lib/content";
 import { GlossaryBrowser } from "@/components/glossary/glossary-browser";
 import { Kicker } from "@/components/ui/kicker";
 
+const BASE_URL = "https://germanyguide.net";
+
 export const metadata: Metadata = {
-  title: "Glossary — German bureaucracy, translated",
+  title: "German Bureaucracy Terms, Translated",
   description:
     "Anmeldung, Ausländerbehörde, Wohnungsgeberbestätigung — every German bureaucracy term explained in plain English.",
+  alternates: { canonical: `${BASE_URL}/glossary` },
 };
 
 export const revalidate = 3600;

@@ -19,10 +19,13 @@ import { ButtonLink } from "@/components/ui/button";
 import { Kicker } from "@/components/ui/kicker";
 import { Reveal, Stagger, StaggerItem } from "@/components/motion/reveal";
 
+const BASE_URL = "https://germanyguide.net";
+
 export const metadata: Metadata = {
-  title: "Why Germany? The honest case for making the move",
+  title: "Why Germany? The Honest Case for Moving",
   description:
     "Free tuition, a skills-hungry job market, real healthcare, and a clear path to permanent residence — plus the hard parts, told straight. Why internationals choose Germany.",
+  alternates: { canonical: `${BASE_URL}/why-germany` },
 };
 
 interface Reason {

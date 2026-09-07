@@ -7,10 +7,13 @@ import { Kicker } from "@/components/ui/kicker";
 import { Stagger, StaggerItem } from "@/components/motion/reveal";
 import { cn } from "@/lib/utils";
 
+const BASE_URL = "https://germanyguide.net";
+
 export const metadata: Metadata = {
-  title: "Letter helper — understand your German mail",
+  title: "Decode Your German Official Mail",
   description:
     "Got an official German letter? Find out who sent it, what it means, how urgent it is, and exactly what to do — before you panic.",
+  alternates: { canonical: `${BASE_URL}/letters` },
 };
 
 export const revalidate = 3600;

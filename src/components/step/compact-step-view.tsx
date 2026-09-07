@@ -90,6 +90,8 @@ export async function CompactStepView({
   citySlug,
   city,
   facts = [],
+  faq = [],
+  siblings = [],
 }: {
   step: StepWithRelations;
   cityName: string;
@@ -97,6 +99,14 @@ export async function CompactStepView({
   city: CityVariant | null;
   /** City facts that belong on this step (e.g. rents on the housing step). */
   facts?: CityFact[];
+  /**
+   * Question/answer pairs built from this city row's verified fields. They are
+   * rendered here *and* emitted as FAQPage JSON-LD by the page, so the markup
+   * always describes visible content.
+   */
+  faq?: Array<{ question: string; answer: string }>;
+  /** Other steps documented for this city, for contextual internal links. */
+  siblings?: Array<{ slug: string; title: string; href: string }>;
 }) {
   const meta = resolveStepMeta(step, city);
   const costLabel = formatCost(meta.costCents, meta.costType);
@@ -301,6 +311,57 @@ export async function CompactStepView({
                 </ul>
               )}
             </div>
+          )}
+
+          {/* Common questions — every answer is a verified field from this
+              city's row, re-surfaced as the long-tail phrasing people search.
+              Nothing here is generated prose. Mirrored as FAQPage JSON-LD. */}
+          {faq.length > 0 && (
+            <section>
+              <h2 className="font-display text-lg font-bold leading-snug">
+                Common questions about {cityName}
+              </h2>
+              <dl className="mt-3.5 space-y-4">
+                {faq.map((item) => (
+                  <div key={item.question}>
+                    <dt className="text-sm font-semibold leading-snug">
+                      {item.question}
+                    </dt>
+                    <dd className="mt-1 text-sm leading-relaxed text-muted">
+                      {item.answer}
+                    </dd>
+                  </div>
+                ))}
+              </dl>
+            </section>
+          )}
+
+          {/* Contextual internal links: the rest of this city's plan, with the
+              step and city in the anchor text rather than a bare "next". */}
+          {siblings.length > 0 && (
+            <section>
+              <h2 className="font-display text-lg font-bold leading-snug">
+                The rest of your {cityName} plan
+              </h2>
+              <ul className="mt-3.5 space-y-2.5">
+                {siblings.map((sibling) => (
+                  <li key={sibling.slug}>
+                    <Link
+                      href={sibling.href}
+                      className="inline-flex items-start gap-2 text-sm font-medium leading-relaxed text-primary hover:underline"
+                    >
+                      <ArrowUpRight
+                        aria-hidden
+                        className="mt-0.5 h-4 w-4 shrink-0"
+                      />
+                      <span>
+                        {sibling.title} in {cityName}
+                      </span>
+                    </Link>
+                  </li>
+                ))}
+              </ul>
+            </section>
           )}
 
           {/* The bridge to the full guide — the whole idea of the split. */}

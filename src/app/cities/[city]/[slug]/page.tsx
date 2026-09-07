@@ -2,14 +2,22 @@ import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import {
   getCities,
+  getCityBySlug,
   getCityFacts,
   getCityStepPairs,
   getStepBySlug,
   parseDocuments,
+  resolveStepMeta,
   STEP_FACT_CATEGORY,
 } from "@/lib/content";
+import { cityStepDescription, cityStepFaq, cityStepTitle } from "@/lib/seo";
 import { CompactStepView } from "@/components/step/compact-step-view";
-import { JsonLd, howToJsonLd, breadcrumbJsonLd } from "@/components/seo/json-ld";
+import {
+  JsonLd,
+  howToJsonLd,
+  breadcrumbJsonLd,
+  faqPageJsonLd,
+} from "@/components/seo/json-ld";
 
 const BASE_URL = "https://germanyguide.net";
 
@@ -32,10 +40,16 @@ export async function generateMetadata({
   if (!step || !cityRow) return {};
   const variant = step.city_steps.find((cs) => cs.cities?.slug === city);
   const cityName = cityRow.name;
-  const title = `${step.title} in ${cityName}`;
-  const description = `Your ${cityName} plan for "${step.title}": ${
-    variant?.method_note ?? step.seo_description ?? step.summary ?? ""
-  }`.trim();
+  const title = cityStepTitle(step.slug, step.title, cityName, variant?.method);
+  const description = cityStepDescription({
+    stepSlug: step.slug,
+    stepTitle: step.title,
+    cityName,
+    method: variant?.method,
+    methodNote: variant?.method_note,
+    address: variant?.address,
+    fallback: step.seo_description ?? step.summary,
+  });
   return {
     title,
     description,
@@ -55,11 +69,13 @@ export default async function CityStepPage({
 }) {
   const { city, slug } = await params;
   const factCategory = STEP_FACT_CATEGORY[slug];
-  const [step, cities, facts] = await Promise.all([
+  const [step, cities, facts, cityDetail] = await Promise.all([
     getStepBySlug(slug),
     getCities(),
     // Only this step's relevant local facts (e.g. rents on the housing step).
     factCategory ? getCityFacts(city) : Promise.resolve([]),
+    // Siblings, so every city step links on to the rest of that city's plan.
+    getCityBySlug(city),
   ]);
   if (!step) notFound();
   const cityRow = cities.find((c) => c.slug === city);
@@ -78,6 +94,35 @@ export default async function CityStepPage({
 
   const cityName = cityRow.name;
   const documents = parseDocuments(step.documents);
+  const meta = resolveStepMeta(step, variant);
+
+  // Q&A drawn entirely from this row's verified fields — no generated answers.
+  // The same pairs render visibly below, which is what makes the FAQPage
+  // markup honest: it describes content that is actually on the page.
+  const faq = cityStepFaq({
+    stepSlug: step.slug,
+    stepTitle: step.title,
+    cityName,
+    variant,
+    meta,
+    step,
+  });
+
+  // The other steps documented for this city, in journey order — descriptive
+  // anchors ("Anmeldung in Munich") rather than a bare "next".
+  const siblings = (cityDetail?.city_steps ?? [])
+    .filter((cs) => cs.steps && cs.steps.slug !== step.slug)
+    .sort(
+      (a, b) =>
+        (a.steps!.phases?.sort_order ?? 0) - (b.steps!.phases?.sort_order ?? 0) ||
+        (a.steps!.sort_order ?? 0) - (b.steps!.sort_order ?? 0),
+    )
+    .slice(0, 3)
+    .map((cs) => ({
+      slug: cs.steps!.slug,
+      title: cs.steps!.title,
+      href: `/cities/${city}/${cs.steps!.slug}`,
+    }));
 
   return (
     <>
@@ -108,12 +153,15 @@ export default async function CityStepPage({
               ],
         })}
       />
+      {faq.length > 0 && <JsonLd data={faqPageJsonLd(faq)} />}
       <CompactStepView
         step={step}
         cityName={cityName}
         citySlug={city}
         city={variant}
         facts={relatedFacts}
+        faq={faq}
+        siblings={siblings}
       />
     </>
   );

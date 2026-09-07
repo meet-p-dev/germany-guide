@@ -6,10 +6,13 @@ import { CityBrowser, type BrowserCity } from "@/components/city/city-browser";
 import { Kicker } from "@/components/ui/kicker";
 import { Stagger, StaggerItem } from "@/components/motion/reveal";
 
+const BASE_URL = "https://germanyguide.net";
+
 export const metadata: Metadata = {
-  title: "Cities",
+  title: "German Cities: Bureaucracy, City by City",
   description:
-    "Every German city plays by its own rules. See exactly how registration, residence permits and visa extensions work in yours.",
+    "The same federal paperwork works differently at every counter. Pick your city and see exactly how registration, residence permits and visa extensions run there.",
+  alternates: { canonical: `${BASE_URL}/cities` },
 };
 
 export const revalidate = 3600;

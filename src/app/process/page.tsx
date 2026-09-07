@@ -5,10 +5,13 @@ import { Kicker } from "@/components/ui/kicker";
 import { ButtonLink } from "@/components/ui/button";
 import { ArrowRight } from "lucide-react";
 
+const BASE_URL = "https://germanyguide.net";
+
 export const metadata: Metadata = {
-  title: "The process",
+  title: "How Moving to Germany Works, Step by Step",
   description:
-    "The full journey to Germany in five phases — from the first thought to fully settled. Browse every step, no account needed.",
+    "Every step of the move to Germany, in five phases — visa, Anmeldung, residence permit, insurance, banking. Browse the whole journey free, no account needed.",
+  alternates: { canonical: `${BASE_URL}/process` },
 };
 
 export const revalidate = 3600;

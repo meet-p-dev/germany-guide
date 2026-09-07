@@ -3,10 +3,13 @@ import { Suspense } from "react";
 import { getCities, getPhasesWithSteps } from "@/lib/content";
 import { PlanWizard } from "@/components/plan/plan-wizard";
 
+const BASE_URL = "https://germanyguide.net";
+
 export const metadata: Metadata = {
-  title: "Build my plan",
+  title: "Build Your Germany Move Plan",
   description:
     "Answer up to three quick questions and get a personalised, city-aware roadmap for your move to Germany.",
+  alternates: { canonical: `${BASE_URL}/plan` },
 };
 
 export const revalidate = 3600;

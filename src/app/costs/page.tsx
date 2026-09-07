@@ -3,10 +3,13 @@ import { getPhasesWithSteps, type CostType } from "@/lib/content";
 import { Kicker } from "@/components/ui/kicker";
 import { CostExplorer, type CostItem } from "@/components/costs/cost-explorer";
 
+const BASE_URL = "https://germanyguide.net";
+
 export const metadata: Metadata = {
-  title: "What will Germany cost? A real first-year estimate",
+  title: "What Germany Costs in Your First Year",
   description:
     "Official fees, monthly living costs and the blocked account — a clear, personalised estimate of what your first year in Germany really costs, for students and workers.",
+  alternates: { canonical: `${BASE_URL}/costs` },
 };
 
 export const revalidate = 3600;

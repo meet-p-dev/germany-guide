@@ -20,7 +20,7 @@ import { Stagger, StaggerItem } from "@/components/motion/reveal";
 const BASE_URL = "https://germanyguide.net";
 
 export const metadata: Metadata = {
-  title: "Updates — what changed in Germany for internationals",
+  title: "What Changed in Germany for Internationals",
   description:
     "Fee changes, new rules and procedure updates that affect international students and workers in Germany — short, sourced and linked to the step they touch.",
   alternates: {

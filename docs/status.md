@@ -4,7 +4,7 @@
 > [`todo.md`](todo.md). **Verify counts against the live DB before relying on
 > them** — see rules §4.
 >
-> Last updated: **2026-09-06**
+> Last updated: **2026-09-07**
 
 ## Where it stands
 
@@ -52,6 +52,35 @@ a trust ladder (site → web → honest fallback). `GROQ_API_KEY` is set in Verc
 The web-search rung still needs `TAVILY_API_KEY`.
 
 ## Changelog
+
+### 2026-09-07
+- **On-page SEO pass, code only — no content table was touched.** New
+  `src/lib/seo.ts` composes every per-city title, description and FAQ from the
+  existing verified row; nothing was written to `city_steps` or `steps`.
+  - **60 of the 126 city-step pages had titles over 60 characters** and were
+    truncated in search, cutting off the city name. Search-first labels
+    ("Anmeldung in Munich: Appointment Only") bring all 126 to <=60, and every
+    description to <=160. Audited by fetching all 126 URLs, not by sampling.
+  - **Canonicals added to 12 routes that had none** — `/`, `/cities`,
+    `/cities/[city]` (40 pages), `/process`, `/problems`, `/costs`,
+    `/why-germany`, `/glossary`, `/letters`, `/plan`. Only `/guide/[slug]`,
+    `/cities/[city]/[slug]` and `/updates` had one before.
+  - **FAQPage JSON-LD on all 126 city-step pages**, plus a visible "Common
+    questions about <City>" section rendering the same pairs. Every answer is
+    an existing field (`method_note`, `address`, cost, `deadline_rule`) — no
+    generated prose, so the markup describes content that is really on the page.
+  - **Internal links:** each city-step page now links to up to 3 sibling steps
+    for the same city, with the step and city in the anchor text. Previously
+    these 126 pages linked only up to the city hub and across to the full guide.
+  - `/costs` and `/why-germany` **were missing from `sitemap.xml`** and are now in.
+  - Guarded against re-publishing the eWA/eID error: the stale
+    `method = 'online'` on 13 `anmeldung` rows is never rendered into a title,
+    snippet or FAQ answer. See `solutions.md`.
+- **The counts in this file are stale.** Live `count(*)` on 2026-09-07:
+  **41 cities** (40 with `city_steps`), **36 problems**, **141 glossary terms**,
+  **22 letters** — this file claimed 40 / 18 / 82 / 13. Steps and `city_steps`
+  (30 / 126) still match. Nobody has audited when the extra rows landed; treat
+  every count here as a hint and run the query (rules §4).
 
 ### 2026-09-06
 - **Deployed to production.** The review gate went live, and with it two commits

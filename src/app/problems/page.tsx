@@ -5,10 +5,13 @@ import { getProblems } from "@/lib/content";
 import { Kicker } from "@/components/ui/kicker";
 import { Stagger, StaggerItem } from "@/components/motion/reveal";
 
+const BASE_URL = "https://germanyguide.net";
+
 export const metadata: Metadata = {
-  title: "Problems & solutions",
+  title: "Stuck in German Bureaucracy? Common Fixes",
   description:
     "No appointment slots, landlord won't sign, visa expiring before your appointment — the classic newcomer crises in Germany, each with a calm way out.",
+  alternates: { canonical: `${BASE_URL}/problems` },
 };
 
 export const revalidate = 3600;

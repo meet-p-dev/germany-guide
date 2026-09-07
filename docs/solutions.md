@@ -10,6 +10,50 @@
 
 ---
 
+## Page titles were truncated on 60 of the 126 city-step pages
+**2026-09-07**
+
+- **Symptom:** nothing looked wrong on the page, but in search results the city
+  name — the one word these pages rank for — was cut off:
+  "Get your residence permit (Aufenthaltstitel) in Düssel…".
+- **Cause:** `generateMetadata` built the title as `${step.title} in ${cityName}`
+  and the root layout appends `· Germany Guide` (16 chars). `steps.title` is
+  editorial copy written for someone already on the page, so
+  `residence-permit` alone is 44 characters; every one of its 40 city pages
+  rendered a 71-75 character title. The DB was fine; the composition was not.
+- **Fix:** `src/lib/seo.ts`. A short search-first label per step slug
+  ("Residence Permit", "Anmeldung"), and the method hook is appended only when
+  the whole title still fits 60 **including the suffix**. Descriptions get the
+  same budget treatment.
+- **The trap worth remembering:** a title budget must be checked against the
+  *rendered* string. `title.template` in the root layout means the page's own
+  title is never what the user sees, so measuring `step.title` tells you
+  nothing. Measure what `curl | grep '<title>'` returns.
+- **Next time:** after any metadata change, sweep every URL rather than
+  spot-checking one. The audit that caught this was a loop over all 126 pages
+  comparing `len(title)` and `len(description)` — it found 60 bad titles that
+  four hand-checked pages had not.
+
+## A generated snippet re-published a claim the site had already corrected
+**2026-09-07**
+
+- **Symptom:** the first version of the new city-step meta description read
+  "Anmeldung in Aachen starts online." for 13 cities.
+- **Cause:** the description was built from `city_steps.method`, and those 13
+  rows still carry the stale `method = 'online'` that `todo.md` has open. The
+  page itself was fine — `method_note` was rewritten on 2026-09-06 to lead with
+  the in-person route — but the *generated* snippet went back to the raw field
+  and put the known-wrong claim into the search result, where it is more
+  visible than the chip.
+- **Fix:** `ONLINE_CLAIM_UNSAFE` in `src/lib/seo.ts`. For `anmeldung`, the
+  "online" method is never rendered in a title, snippet or FAQ answer; the
+  description falls back to the lead clause of `method_note` instead.
+- **Next time:** when you derive display text from a column, check whether that
+  column has a known-bad subset before shipping the derivation. A field that is
+  "wrong but visibly caveated on the page" becomes plainly wrong the moment
+  something re-renders it without the caveat. Grep `todo.md` for the column
+  name before building on it.
+
 ## "Register online" was wrong for our whole audience in 14 cities
 **2026-09-06**
 

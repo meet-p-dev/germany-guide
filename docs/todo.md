@@ -4,7 +4,7 @@
 > [`status.md`](status.md). Keep this file honest: delete finished items rather
 > than marking them done, and move anything shipped into `status.md`.
 >
-> Last updated: **2026-09-06**
+> Last updated: **2026-09-07**
 
 ---
 
@@ -112,6 +112,12 @@ they find can reach the site unreviewed.
 - [ ] **First real run of `/link-check`** across all 40 cities. This has never
       been done; the Munich walk-in and Nuremberg address errors both survived
       months because nothing was watching. Expect real findings.
+- [ ] **Reconcile the content counts in `status.md`.** A live `count(*)` on
+      2026-09-07 returned 41 cities, 36 problems, 141 glossary terms and 22
+      letters against the documented 40 / 18 / 82 / 13. Either the docs drifted
+      or rows landed without a changelog entry. Worth an hour: check the 41st
+      city has `city_steps` (only 40 do) and that the extra problems/glossary
+      rows are finished, not drafts.
 - [ ] **Staleness surfacing.** Nothing yet flags a `last_verified` that has gone
       old. A query on the `/admin` overview would make rot visible instead of
       silent.
@@ -126,6 +132,10 @@ they find can reach the site unreviewed.
       Extend to the other 37 cities — needs the local operator and the real
       student ticket price per city, plus the local Studierendenwerk for housing.
       *This is the main remaining content lift.*
+- [ ] **Per-step SEO labels for the remaining steps.** `CITY_STEP_SEARCH_LABEL`
+      in `src/lib/seo.ts` covers the five steps that have `city_steps` rows. Any
+      new city step falls back to the long editorial `steps.title`, which will
+      truncate again — add a short search label at the same time as the rows.
 - [ ] **Persona-split costs.** The data model has no per-persona figure, so the
       compact card is persona-neutral. "€43 because you're a student" needs
       per-persona `city_step` figures before it can be shown honestly.

@@ -54,9 +54,18 @@ export async function generateMetadata({
   const { city: citySlug } = await params;
   const city = await getCityBySlug(citySlug);
   if (!city) return {};
+  const title = `Moving to ${city.name}: Bureaucracy Guide`;
+  // Longest city name is Saarbrücken (11), which lands this at 156 characters.
+  const description = `Anmeldung, residence permit and visa extension in ${city.name} — the exact office, method and documents, verified from the city's own pages. Start yours.`;
   return {
-    title: `Moving to ${city.name}`,
-    description: `How German bureaucracy actually works in ${city.name}: registration, residence permits and visa extensions — verified local knowledge.`,
+    title,
+    description,
+    alternates: { canonical: `${BASE_URL}/cities/${citySlug}` },
+    openGraph: {
+      title: `${title} · Germany Guide`,
+      description,
+      url: `${BASE_URL}/cities/${citySlug}`,
+    },
   };
 }
 
