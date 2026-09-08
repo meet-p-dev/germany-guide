@@ -73,8 +73,14 @@ The web-search rung still needs `TAVILY_API_KEY`.
     Environments). The gate is `hasServiceRole() && emailConfigured()`, so the
     service-role half had always been the blocker. Anyone debugging this again:
     read *both* halves of the gate before blaming the newer-looking one.
-  - `CRON_SECRET` is **still not set**, so the monthly digest cron cannot run.
-    Signup and confirmation do not depend on it.
+  - `CRON_SECRET` was added 2026-09-08 too, so the **monthly digest cron is now
+    armed** (`vercel.json`: `0 9 1 * *` → `/api/cron/newsletter`, first firing
+    **1 October 2026, 09:00**). Verified as far as is possible without the
+    secret: the endpoint returns **401 `{"error":"Unauthorized"}`** to an
+    unauthenticated call, a wrong bearer token and an empty bearer. That the
+    *authorised* call succeeds cannot be proven from outside — Vercel supplies
+    the header — so the first real proof is the 1 October run. Check
+    `/admin/newsletter` or Resend's log that morning.
   - Env vars are read at build time on Vercel, so each change needed an
     `--allow-empty` rebuild before it took effect.
 - **Custom SMTP is live and proven.** Supabase Auth → Emails → SMTP Settings is

@@ -15,16 +15,18 @@ the most urgent item here — is done and proven** (2026-09-08, see `status.md`)
 so signup and password reset no longer sit on the default sender's ~2/hour cap.
 Nothing on this page is now urgent in that sense.
 
-- [ ] **Finish the newsletter: set `CRON_SECRET`.** The newsletter itself went
-      live 2026-09-08 (see `status.md`) — signup, confirmation email and delivery
-      all verified. What is left is the **monthly digest cron**, which refuses to
-      run without `CRON_SECRET` in Vercel Production. Generate one with
-      `openssl rand -base64 32`, add it, and redeploy (env vars are read at build
-      time). Then confirm the owner's own pending subscription from the email and
-      use `/admin/newsletter` → "Send a test to me" before the first real digest.
-      Note `NEXT_PUBLIC_SITE_URL` in Vercel predates the www move and is
-      referenced nowhere in `src/` — safe to delete, and worth deleting so it
-      stops looking meaningful.
+- [ ] **Confirm the newsletter's own subscription, then watch the first cron.**
+      All three env vars are set and the newsletter is live (2026-09-08, see
+      `status.md`). Two loose ends, neither urgent:
+      1. The owner's subscription is at status **`pending`** — open the
+         confirmation email and click the link, which is the one leg of the flow
+         nobody has exercised yet.
+      2. The monthly cron first fires **1 October 2026, 09:00**. Its authorised
+         path cannot be tested from outside (Vercel supplies the bearer token),
+         so check Resend's log or `/admin/newsletter` that morning. Before then,
+         `/admin/newsletter` → "Send a test to me" is the safe rehearsal.
+      Also worth deleting: `NEXT_PUBLIC_SITE_URL` in Vercel predates the www
+      move and is referenced nowhere in `src/`.
 - [ ] **Enable leaked-password protection** and a minimum length of 8 (the
       security advisor flags this).
 - [ ] **Legal check before serious traffic:** confirm the real name/address in
