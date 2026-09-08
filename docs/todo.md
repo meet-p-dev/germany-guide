@@ -94,18 +94,46 @@ they find can reach the site unreviewed.
 - [ ] **First real run of `/link-check`** across all 40 cities. This has never
       been done; the Munich walk-in and Nuremberg address errors both survived
       months because nothing was watching. Expect real findings.
-- [ ] **Reconcile the content counts in `status.md`.** A live `count(*)` on
-      2026-09-07 returned 41 cities, 36 problems, 141 glossary terms and 22
-      letters against the documented 40 / 18 / 82 / 13. Either the docs drifted
-      or rows landed without a changelog entry. Worth an hour: check the 41st
-      city has `city_steps` (only 40 do) and that the extra problems/glossary
-      rows are finished, not drafts.
+- [ ] **Build Fürth, or unpublish it.** The 41st city is **`fuerth`** (Bavaria,
+      added 2026-09-06). It is `status = 'live'` with **0 `city_steps` and 0
+      `city_facts`**, so `/cities/fuerth` is an empty shell in production today.
+      It needs the big three `city_steps` (anmeldung, residence-permit,
+      visa-extension) plus the standard six facts — or `status` set to
+      `coming_soon` until someone does. Note Fürth's Ausländerbehörde is the
+      **Stadt Fürth**, but its students commute to FAU or TH Nürnberg, so the
+      tuition fact already written for it points next door.
+- [ ] **Reconcile the rest of the counts in `status.md`.** A live `count(*)` on
+      2026-09-07 returned 36 problems, 141 glossary terms and 22 letters against
+      the documented 18 / 82 / 13. Either the docs drifted or rows landed
+      without a changelog entry — check the extra rows are finished, not drafts.
+      (The city count is resolved: 41 cities, 40 with content — see above.)
 - [ ] **Staleness surfacing.** Nothing yet flags a `last_verified` that has gone
       old. A query on the `/admin` overview would make rot visible instead of
       silent.
 - [ ] **Agent-facing runbook for `/city-research`** once the first few cities are
       done — capture what a good `city_steps` row actually contains, so batch
       runs stay consistent.
+
+## 3b. House-style cleanup (new, 2026-09-08)
+
+The standard now exists in [`writing.md`](writing.md); the corpus predates it.
+**Do not attempt one sweeping rewrite** — 595 prose rows is a rewrite of the
+site, and a bulk regex over em dashes produces comma splices at scale. Work in
+this order, highest visible return first. **The `src` UI pass is done**
+(2026-09-08, see `status.md`); what is left is the database:
+
+- [ ] **The 30 `steps.content_md` rows.** Every one has an em dash, averaging
+      7.8 each, and these carry the Germany-wide guides.
+- [ ] **The 86 `city_steps` rows opening `**The flow:**`**, highest-traffic
+      cities first. Also the ~20 bold spans per row.
+- [ ] **`city_facts`**, 240 rows — mostly a dash-and-bold fix, not a rewrite.
+- [ ] **`problems`, `letters`, `glossary_terms`** as they are next touched.
+- [ ] **A `/style-check` sweep** in `.claude/commands/`, running the §8
+      detectors and queueing rewrites through `proposed_changes` like any other
+      content change.
+
+Facts, figures and `last_verified` do not move during a style pass. If a plain
+rewrite needs a fact you cannot verify, leave the fact out.
 
 ## 4. Worth doing next (content depth)
 

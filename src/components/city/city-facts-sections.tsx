@@ -1,6 +1,7 @@
 import {
   Clock,
   ExternalLink,
+  GraduationCap,
   HeartPulse,
   Home,
   Landmark,
@@ -20,6 +21,7 @@ import { Kicker } from "@/components/ui/kicker";
 import { Reveal } from "@/components/motion/reveal";
 
 const CATEGORY_ICON: Record<CityFactCategory, LucideIcon> = {
+  study_costs: GraduationCap,
   first_days: Sunrise,
   housing: Home,
   insurance: HeartPulse,
@@ -51,11 +53,12 @@ export function CityFactsSections({
       <Reveal>
         <Kicker>Settling into {cityName}</Kicker>
         <h2 className="font-display mt-3 max-w-2xl text-3xl font-bold sm:text-4xl">
-          Beyond the paperwork — living here.
+          Beyond the paperwork: living here.
         </h2>
         <p className="mt-3 max-w-xl leading-relaxed text-muted">
-          The local things that aren&apos;t a form to file: where to live, who to
-          insure with, which bank, and what to do while you wait.
+          The local things that aren&apos;t a form to file: what studying here
+          costs, where to live, who to insure with, which bank, and what to do
+          while you wait.
         </p>
       </Reveal>
 

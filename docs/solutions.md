@@ -10,6 +10,38 @@
 
 ---
 
+## A university-fee aggregator invented a tuition fee that does not exist
+**2026-09-08**
+
+- **Symptom:** while researching non-EU tuition, a search summary sourced from
+  aggregator sites (mygermanuniversity and similar) reported that **THWS
+  Würzburg-Schweinfurt charges non-EU students €1,500 per semester for the
+  first seven semesters**. THWS's *own* international page says the opposite:
+  no tuition at all except on continuing-education (Weiterbildung) Masters.
+  The same aggregator gave Uni Augsburg "Master €0–1,333, LL.M. €0–19,750" and
+  TH Augsburg "Bachelor €0–2,300" — ranges wide enough to be useless and
+  unattributable to any statute.
+- **Cause:** these sites scrape and merge programme-level fee fields across
+  hundreds of universities, including private and continuing-education
+  programmes, then present the spread as if it were the institution's tuition
+  policy. Nothing is wrong with any single number; the *aggregation* is what
+  makes it false.
+- **Fix:** every figure now in the `study_costs` facts comes from the
+  institution's or the ministry's own page. Where an official page did not
+  state a policy (TH Augsburg), the fact says so explicitly instead of
+  inferring "no fee" from silence.
+- **Next time:** tuition is the same class of claim as a dorm rent (see the
+  Studierendenwerk entry below) — **take it from the body that levies it**, never
+  from a comparison site. Two specific traps here:
+  1. **Bavaria has no Land-wide answer.** Under the BayHIG each Hochschule sets
+     its own fee in its own Satzung, so "does Bavaria charge?" is not a
+     question with an answer. TUM charges up to €6,000/semester while LMU, in
+     the same city, charges nothing.
+  2. **An official page can be out of date in the other direction.** A
+     uni-wuerzburg.de page still said "there are currently no tuition fees for
+     non-EU students in Bavaria" — true of that university, false of the Land.
+     Scope every claim to the institution whose page you read.
+
 ## A provider dashboard said "Verified" for a DNS record that did not exist
 **2026-09-08**
 

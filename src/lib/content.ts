@@ -14,6 +14,7 @@ export type CityFact = Tables<"city_facts">;
 
 /** The city-hub sections, in the order they should render. */
 export const CITY_FACT_CATEGORIES = [
+  "study_costs",
   "first_days",
   "housing",
   "insurance",
@@ -23,6 +24,7 @@ export const CITY_FACT_CATEGORIES = [
 export type CityFactCategory = (typeof CITY_FACT_CATEGORIES)[number];
 
 export const CITY_FACT_LABELS: Record<CityFactCategory, string> = {
+  study_costs: "Tuition & study costs",
   first_days: "Your first days",
   housing: "Housing & rent",
   insurance: "Health insurance",
@@ -37,6 +39,7 @@ export const CITY_FACT_LABELS: Record<CityFactCategory, string> = {
  * listed here simply shows no borrowed fact.
  */
 export const STEP_FACT_CATEGORY: Record<string, CityFactCategory> = {
+  "university-enrollment": "study_costs",
   "find-housing-remotely": "housing",
   "bank-account": "banking",
   "activate-health-insurance": "insurance",

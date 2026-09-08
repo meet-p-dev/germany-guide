@@ -127,7 +127,7 @@ export const ADMIN_TABLES: TableConfig[] = [
         name: "quick_action",
         label: "Quick action (compact plan)",
         type: "textarea",
-        help: "Short template for the Build-my-plan view. May use {placeholders} like {operator}, {cost}, {persona} — filled from city + persona at render. Blank falls back to Summary.",
+        help: "Short template for the Build-my-plan view. May use {placeholders} like {operator}, {cost}, {persona}, filled from city + persona at render. Blank falls back to Summary.",
       },
       { name: "content_md", label: "Content (Markdown)", type: "markdown", required: true },
       {
@@ -214,7 +214,7 @@ export const ADMIN_TABLES: TableConfig[] = [
     label: "City facts",
     singular: "City fact",
     description:
-      "Per-city reference facts (not tasks): housing & rent, dorms, insurance & bank offices, first days, while-waiting. Every claim needs a source + last verified date.",
+      "Per-city reference facts (not tasks): tuition & study costs, housing & rent, dorms, insurance & bank offices, first days, while-waiting. Every claim needs a source + last verified date.",
     titleFields: ["city_id", "title"],
     secondaryField: "category",
     orderBy: { column: "updated_at", ascending: false },
@@ -232,7 +232,7 @@ export const ADMIN_TABLES: TableConfig[] = [
         label: "Category",
         type: "text",
         required: true,
-        suggestions: ["first_days", "housing", "insurance", "banking", "while_waiting"],
+        suggestions: ["study_costs", "first_days", "housing", "insurance", "banking", "while_waiting"],
         help: "Which city-hub section this fact belongs to.",
       },
       { name: "title", label: "Title", type: "text", required: true },
