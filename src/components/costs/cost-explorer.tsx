@@ -103,8 +103,8 @@ export function CostExplorer({ items }: { items: CostItem[] }) {
           className="mt-3 w-full accent-[var(--primary)]"
         />
         <div className="flex justify-between text-xs text-muted">
-          <span>€250 — shared room</span>
-          <span>€1,500 — own city flat</span>
+          <span>€250, shared room</span>
+          <span>€1,500, own city flat</span>
         </div>
       </div>
 
@@ -138,7 +138,7 @@ export function CostExplorer({ items }: { items: CostItem[] }) {
               Plus {formatCost(proof.costCents, "one_time")} in a blocked account
             </p>
             <p className="mt-1 text-sm leading-relaxed text-muted">
-              Shown as proof of funds for your visa — but it&apos;s your own money
+              Shown as proof of funds for your visa, but it is your own money
               to live on, released to you month by month once you arrive.
             </p>
             <Link
@@ -157,7 +157,7 @@ export function CostExplorer({ items }: { items: CostItem[] }) {
         <CostList
           icon={Receipt}
           title="One-off official fees"
-          empty="No fixed fees on your path — nice."
+          empty="No fixed fees on your path."
           items={oneOff}
           suffix=""
         />

@@ -66,13 +66,13 @@ export default async function AdminNewsletterPage() {
                 <code className="rounded bg-card-muted px-1.5 py-0.5 text-xs">
                   SUPABASE_SERVICE_ROLE_KEY
                 </code>{" "}
-                — {hasServiceRole() ? "set" : "missing"}
+                : {hasServiceRole() ? "set" : "missing"}
               </li>
               <li>
                 <code className="rounded bg-card-muted px-1.5 py-0.5 text-xs">
                   RESEND_API_KEY
                 </code>{" "}
-                — {emailConfigured() ? "set" : "missing"}
+                : {emailConfigured() ? "set" : "missing"}
               </li>
             </ul>
             <p className="mt-3 text-sm leading-relaxed text-muted">

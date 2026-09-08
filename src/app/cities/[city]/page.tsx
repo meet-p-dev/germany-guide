@@ -56,7 +56,7 @@ export async function generateMetadata({
   if (!city) return {};
   const title = `Moving to ${city.name}: Bureaucracy Guide`;
   // Longest city name is Saarbrücken (11), which lands this at 156 characters.
-  const description = `Anmeldung, residence permit and visa extension in ${city.name} — the exact office, method and documents, verified from the city's own pages. Start yours.`;
+  const description = `Anmeldung, residence permit and visa extension in ${city.name}: the exact office, method and documents, verified from the city's own pages. Start yours.`;
   return {
     title,
     description,
@@ -107,7 +107,7 @@ export default async function CityHubPage({
         <div className="relative h-72 sm:h-96">
           <CityPhoto
             image={card?.image ?? null}
-            alt={`${city.name} — ${city.tagline ?? city.state}`}
+            alt={`${city.name}, ${city.tagline ?? city.state}`}
             sizes="(max-width: 1152px) 100vw, 1152px"
             priority
           />
@@ -152,7 +152,7 @@ export default async function CityHubPage({
           <p className="mt-3 max-w-xl leading-relaxed text-muted">
             {city.name} is next in line. We add a city&apos;s registration,
             residence-permit and extension details only after checking them
-            first-hand — so nothing here is a guess. In the meantime, the
+            first-hand, so nothing here is a guess. In the meantime, the
             Germany-wide guide covers every step of your journey.
           </p>
           <Link
@@ -173,7 +173,7 @@ export default async function CityHubPage({
             The local way of doing the big three.
           </h2>
           <p className="mt-3 max-w-xl leading-relaxed text-muted">
-            These are the steps where {city.name} does things its own way — each
+            These are the steps where {city.name} does things its own way. Each
             card opens the full local guide.
           </p>
         </Reveal>
@@ -252,7 +252,7 @@ export default async function CityHubPage({
               Everything else works the same as anywhere in Germany.
             </h2>
             <p className="mt-2 leading-relaxed text-muted">
-              SIM cards, bank accounts, health insurance, taxes — the
+              SIM cards, bank accounts, health insurance, taxes: the
               Germany-wide guides cover the rest of your journey, step by step.
             </p>
           </div>

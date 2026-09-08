@@ -41,7 +41,7 @@ export async function GET() {
   const xml = `<?xml version="1.0" encoding="UTF-8"?>
 <rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
   <channel>
-    <title>Germany Guide — Updates</title>
+    <title>Germany Guide: Updates</title>
     <link>${BASE_URL}/updates</link>
     <atom:link href="${BASE_URL}/updates/feed.xml" rel="self" type="application/rss+xml"/>
     <description>Fee changes, new rules and procedure updates that affect international students and workers in Germany.</description>

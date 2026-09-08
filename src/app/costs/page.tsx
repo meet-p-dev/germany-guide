@@ -8,7 +8,7 @@ const BASE_URL = "https://www.germanyguide.net";
 export const metadata: Metadata = {
   title: "What Germany Costs in Your First Year",
   description:
-    "Official fees, monthly living costs and the blocked account — a clear, personalised estimate of what your first year in Germany really costs, for students and workers.",
+    "Official fees, monthly living costs and the blocked account. A clear, personalised estimate of what your first year in Germany really costs, for students and workers.",
   alternates: { canonical: `${BASE_URL}/costs` },
 };
 
@@ -36,7 +36,7 @@ export default async function CostsPage() {
         What will your first year in Germany really cost?
       </h1>
       <p className="mt-5 max-w-2xl text-lg leading-relaxed text-muted">
-        Pick your path and set your rent — the official fees and recurring costs
+        Pick your path and set your rent. The official fees and recurring costs
         come straight from this guide, so you get a real number instead of a
         guess.
       </p>

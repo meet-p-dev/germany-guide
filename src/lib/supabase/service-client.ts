@@ -18,7 +18,7 @@ export function createServiceClient() {
   const key = process.env.SUPABASE_SERVICE_ROLE_KEY;
   if (!key) {
     throw new Error(
-      "SUPABASE_SERVICE_ROLE_KEY is not set — newsletter features are unavailable.",
+      "SUPABASE_SERVICE_ROLE_KEY is not set, so newsletter features are unavailable.",
     );
   }
   return createClient<Database>(SUPABASE_URL, key, {

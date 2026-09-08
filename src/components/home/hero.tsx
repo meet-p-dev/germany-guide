@@ -48,7 +48,7 @@ export function Hero() {
           variants={item}
           className="mt-6 max-w-xl text-lg leading-relaxed text-muted"
         >
-          From your visa to your Anmeldung — a clear, personalised checklist
+          From your visa to your Anmeldung. A clear, personalised checklist
           that knows the difference between doing it in{" "}
           <HeroCityLink slug="munich">Munich</HeroCityLink>,{" "}
           <HeroCityLink slug="berlin">Berlin</HeroCityLink> or{" "}
@@ -100,7 +100,7 @@ export function Hero() {
             <span>
               <span className="block text-sm font-bold">Munich</span>
               <span className="block text-sm text-muted">
-                Appointment only — no walk-ins
+                Appointment only, no walk-ins
               </span>
             </span>
           </Link>

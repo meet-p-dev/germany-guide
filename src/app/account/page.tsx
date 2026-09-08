@@ -5,7 +5,7 @@ import { AccountDashboard } from "@/components/account/account-dashboard";
 export const metadata: Metadata = {
   title: "My account",
   description:
-    "Your personal command center for the move to Germany — deadlines, costs, documents, and the reference numbers you must never lose.",
+    "Your personal command center for the move to Germany: deadlines, costs, documents, and the reference numbers you must never lose.",
 };
 
 export const revalidate = 3600;

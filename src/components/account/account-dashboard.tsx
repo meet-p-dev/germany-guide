@@ -188,7 +188,7 @@ export function AccountDashboard({
       </h1>
       <p className="mt-2 text-muted">
         Signed in as <span className="font-medium text-foreground">{email}</span>
-        {" "}— everything here syncs across your devices.
+        . Everything here syncs across your devices.
       </p>
 
       {/* Anmeldung countdown — the deadline that actually fines people. */}
@@ -222,7 +222,7 @@ export function AccountDashboard({
                   : `${countdown.daysLeft} day${countdown.daysLeft === 1 ? "" : "s"} left to register your address`}
             </p>
             <p className="mt-1 text-sm leading-relaxed text-muted">
-              German law expects your Anmeldung within 14 days of moving in — by{" "}
+              German law expects your Anmeldung within 14 days of moving in, by{" "}
               <span className="font-semibold text-foreground">
                 {formatDate(countdown.dueDate)}
               </span>{" "}
@@ -380,7 +380,7 @@ export function AccountDashboard({
             Your records vault
           </p>
           <p className="mt-1 text-sm leading-relaxed text-muted">
-            Stash the case numbers and dates each office hands you — the
+            Stash the case numbers and dates each office hands you: the
             Aktenzeichen, your tax ID, appointment dates. They&apos;re private to
             you and synced to your devices.
           </p>
@@ -429,7 +429,7 @@ export function AccountDashboard({
                     <NotebookPen className="mt-0.5 h-4 w-4 shrink-0 text-muted" />
                     <textarea
                       rows={2}
-                      placeholder="Notes — appointment date, office, what's left to do…"
+                      placeholder="Notes: appointment date, office, what is left to do…"
                       value={rec.note}
                       onChange={(event) =>
                         setRecords((prev) => ({
@@ -499,7 +499,7 @@ function TimelineSection({
         Your first weeks, dated
       </p>
       <p className="mt-1 text-sm leading-relaxed text-muted">
-        Typical timing from your move-in day — the one in red is a legal
+        Typical timing from your move-in day. The one in red is a legal
         deadline, the rest are good rhythm.
       </p>
       <ol className="mt-5 space-y-0">
@@ -536,7 +536,7 @@ function TimelineSection({
                 >
                   {done
                     ? "Done"
-                    : `by ${formatDate(date)}${overdue ? " — overdue" : ""}`}
+                    : `by ${formatDate(date)}${overdue ? ", overdue" : ""}`}
                 </span>
                 <Link
                   href={hrefFor(step)}
@@ -553,7 +553,7 @@ function TimelineSection({
         })}
       </ol>
       <p className="text-xs leading-relaxed text-muted">
-        Typical rhythm, not appointments — the residence permit in particular
+        Typical rhythm rather than appointments. The residence permit in particular
         depends on your visa&apos;s expiry, not your move-in date.
       </p>
     </section>
@@ -565,7 +565,7 @@ function SignedOut() {
     {
       icon: AlertTriangle,
       title: "Deadline countdowns",
-      body: "Set your move-in date and see exactly how long you have to register — before a missed deadline costs you a fine.",
+      body: "Set your move-in date and see exactly how long you have to register, before a missed deadline costs you a fine.",
     },
     {
       icon: KeyRound,
@@ -575,7 +575,7 @@ function SignedOut() {
     {
       icon: ListChecks,
       title: "Progress that follows you",
-      body: "Tick steps on your laptop, pick up on your phone — your whole journey stays in sync.",
+      body: "Tick steps on your laptop, pick up on your phone. Your whole journey stays in sync.",
     },
   ];
   return (
@@ -585,8 +585,8 @@ function SignedOut() {
         Make Germany feel manageable.
       </h1>
       <p className="mt-3 max-w-xl leading-relaxed text-muted">
-        The guide is free to everyone. An account adds the personal layer — your
-        deadlines, your paperwork, your reference numbers — kept private and
+        The guide is free to everyone. An account adds the personal layer: your
+        deadlines, your paperwork, your reference numbers, kept private and
         synced across your devices.
       </p>
       <div className="mt-8 grid gap-4">
@@ -615,7 +615,7 @@ function SignedOut() {
         </ButtonLink>
       </div>
       <p className="mt-4 text-sm text-muted">
-        Sign up with your email or Google — free, no card, no spam.
+        Sign up with your email or Google. Free, no card, no spam.
       </p>
     </div>
   );

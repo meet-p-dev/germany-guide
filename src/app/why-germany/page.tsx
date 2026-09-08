@@ -24,7 +24,7 @@ const BASE_URL = "https://www.germanyguide.net";
 export const metadata: Metadata = {
   title: "Why Germany? The Honest Case for Moving",
   description:
-    "Free tuition, a skills-hungry job market, real healthcare, and a clear path to permanent residence — plus the hard parts, told straight. Why internationals choose Germany.",
+    "Free tuition, a skills-hungry job market, real healthcare, and a clear path to permanent residence, plus the hard parts, told straight. Why internationals choose Germany.",
   alternates: { canonical: `${BASE_URL}/why-germany` },
 };
 
@@ -43,7 +43,7 @@ const PILLARS: { kicker: string; heading: string; reasons: Reason[] }[] = [
       {
         icon: GraduationCap,
         title: "No tuition at public universities",
-        body: "Germany's public universities charge no tuition fees, even for international students — you pay only a modest semester fee (often €150–350) that usually includes local transport.",
+        body: "Germany's public universities charge no tuition fees, even for international students. You pay only a modest semester fee (often €150 to €350) that usually includes local transport.",
         link: { href: "/guide/choose-university-or-job", label: "Find your programme" },
       },
       {
@@ -61,7 +61,7 @@ const PILLARS: { kicker: string; heading: string; reasons: Reason[] }[] = [
       {
         icon: Briefcase,
         title: "A genuine skills shortage",
-        body: "Europe's largest economy is short of skilled people in IT, engineering, healthcare and the trades — so the immigration system is designed to bring qualified workers in, not keep them out.",
+        body: "Europe's largest economy is short of skilled people in IT, engineering, healthcare and the trades, so the immigration system is designed to bring qualified workers in rather than keep them out.",
         link: { href: "/guide/understand-your-paths", label: "Understand the work routes" },
       },
       {
@@ -73,7 +73,7 @@ const PILLARS: { kicker: string; heading: string; reasons: Reason[] }[] = [
       {
         icon: ShieldCheck,
         title: "Strong worker protections",
-        body: "A statutory minimum wage (€13.90/hour in 2026), at least 20 paid vacation days by law — commonly 28–30 — and a culture that takes evenings and weekends seriously.",
+        body: "A statutory minimum wage (€13.90 an hour in 2026), at least 20 paid vacation days by law (commonly 28 to 30), and a culture that takes evenings and weekends seriously.",
       },
     ],
   },
@@ -84,13 +84,13 @@ const PILLARS: { kicker: string; heading: string; reasons: Reason[] }[] = [
       {
         icon: HeartPulse,
         title: "Healthcare that has your back",
-        body: "Health insurance is mandatory and universal — from day one you're covered by one of the world's most reliable systems, whether public or private.",
+        body: "Health insurance is mandatory and universal. From day one you are covered by one of the world's most reliable systems, whether public or private.",
         link: { href: "/guide/health-insurance-from-home", label: "Sort your insurance" },
       },
       {
         icon: Train,
         title: "Get everywhere for €63 a month",
-        body: "The Deutschlandticket gives you nationwide regional trains, trams and buses for one flat monthly fare — cities are dense, walkable and genuinely car-optional.",
+        body: "The Deutschlandticket gives you nationwide regional trains, trams and buses for one flat monthly fare. Cities are dense, walkable and car-optional.",
         link: { href: "/guide/public-transport", label: "Sort your transport" },
       },
       {
@@ -107,12 +107,12 @@ const PILLARS: { kicker: string; heading: string; reasons: Reason[] }[] = [
       {
         icon: Sprout,
         title: "Room to stay and grow",
-        body: "Graduates get 18 months to find a job after finishing — one of Europe's most generous post-study offers — and skilled workers can bring their families.",
+        body: "Graduates get 18 months to find a job after finishing, one of Europe's most generous post-study offers, and skilled workers can bring their families.",
         link: { href: "/guide/residence-permit", label: "Your residence permit" },
       },
       {
         icon: Home,
-        title: "Toward permanent residence — and a passport",
+        title: "Toward permanent residence, and a passport",
         body: "Time in Germany counts toward permanent residence, and naturalisation is now possible after as few as five years (three with exceptional integration).",
         link: { href: "/guide/visa-extension", label: "Staying long-term" },
       },
@@ -130,13 +130,13 @@ const HARD_PARTS: Reason[] = [
   {
     icon: TriangleAlert,
     title: "The bureaucracy is a lot",
-    body: "Appointments, forms, and letters in formal German — exactly the maze this whole site exists to walk you through, city by city.",
+    body: "Appointments, forms, and letters in formal German: exactly the maze this whole site exists to walk you through, city by city.",
     link: { href: "/problems", label: "Common problems, solved" },
   },
   {
     icon: Home,
     title: "Housing is competitive",
-    body: "In big cities, finding a first flat takes patience and a tidy application — start early and know the process.",
+    body: "In big cities, finding a first flat takes patience and a tidy application. Start early and learn the process.",
     link: { href: "/guide/find-housing-remotely", label: "Finding your first place" },
   },
 ];
@@ -151,7 +151,7 @@ export default function WhyGermanyPage() {
         </h1>
         <p className="mt-6 max-w-2xl text-lg leading-relaxed text-muted">
           Before the forms, the appointments and the formal letters, it&apos;s
-          fair to ask what you get in return. The answer starts with a story —
+          fair to ask what you get in return. The answer starts with a story,
           because you are not the first to make this journey.
         </p>
       </Reveal>
@@ -168,7 +168,7 @@ export default function WhyGermanyPage() {
               </h2>
               <p className="mt-4 leading-relaxed text-muted">
                 After 1945, Germany rebuilt itself from rubble into Europe&apos;s
-                largest economy — and it could not have done so alone. From 1955
+                largest economy, and it could not have done so alone. From 1955
                 it signed recruitment agreements with Italy, then Greece, Spain
                 and Turkey, and millions of so-called guest workers
                 (Gastarbeiter) arrived by train with one bag and a work
@@ -203,7 +203,7 @@ export default function WhyGermanyPage() {
                 made modern Germany one of the world&apos;s great immigration
                 countries. More than a quarter of the people living here have
                 immigration in their family story. The country you are
-                considering is not a closed club — it is a place that has been
+                considering is not a closed club. It is a place that has been
                 absorbing newcomers, imperfectly but persistently, for seventy
                 years.
               </p>
@@ -214,13 +214,13 @@ export default function WhyGermanyPage() {
         <Reveal>
           <div className="grid items-center gap-8 lg:grid-cols-2">
             <div>
-              <Kicker>Now — deliberately open</Kicker>
+              <Kicker>Now: deliberately open</Kicker>
               <h2 className="font-display mt-3 text-3xl font-bold sm:text-4xl">
                 The door isn&apos;t ajar. It&apos;s held open.
               </h2>
               <p className="mt-4 leading-relaxed text-muted">
                 An ageing workforce means Germany needs hundreds of thousands
-                of skilled newcomers every year — so the rules keep bending
+                of skilled newcomers every year, so the rules keep bending
                 toward you: the Skilled Immigration Act opened more routes, the
                 EU Blue Card thresholds came down, the Chancenkarte lets
                 qualified people come and search from inside the country, and
@@ -230,7 +230,7 @@ export default function WhyGermanyPage() {
               <p className="mt-4 leading-relaxed text-muted">
                 What hasn&apos;t changed since the Gastarbeiter era: the
                 counters, the forms, and the letters in formal German. Every
-                generation of newcomers has faced that same maze — the
+                generation of newcomers has faced that same maze: the
                 Anmeldung, the Ausländerbehörde, the Krankenkasse. That maze is
                 exactly why this site exists. You walk the same road they did,
                 but with a guide that knows your city.
@@ -251,7 +251,7 @@ export default function WhyGermanyPage() {
               So what do you actually get?
             </h2>
             <p className="mt-2 max-w-xl leading-relaxed text-muted">
-              The concrete case — study, work, daily life and the long game —
+              The concrete case (study, work, daily life and the long game),
               plus the hard parts told straight.
             </p>
           </div>
@@ -294,7 +294,7 @@ export default function WhyGermanyPage() {
           </h2>
           <p className="mt-3 max-w-2xl leading-relaxed text-muted">
             Germany rewards patience and preparation. These are the parts people
-            find hardest — and every one of them has a page here to help.
+            find hardest, and every one of them has a page here to help.
           </p>
           <div className="mt-8 grid gap-5 sm:grid-cols-3">
             {HARD_PARTS.map((reason) => (
@@ -330,7 +330,7 @@ export default function WhyGermanyPage() {
 
       <p className="mt-10 text-xs leading-relaxed text-muted">
         General information, not legal or immigration advice. Figures reflect
-        2026 and can change — verify specifics on the linked guide steps and
+        2026 and can change. Verify specifics on the linked guide steps and
         their official sources.
       </p>
     </div>

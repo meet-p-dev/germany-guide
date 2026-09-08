@@ -133,7 +133,7 @@ export function confirmationEmail(confirmUrl: string): {
     title: subject,
     bodyHtml: `
 <p style="margin:0 0 14px 0;font-size:19px;font-weight:700;letter-spacing:-0.01em;">One click and you are subscribed</p>
-<p style="margin:0 0 4px 0;">Someone — we hope you — asked for the Germany Guide update email at this address. Confirm below and you will get a short monthly note when fees, rules or city procedures change.</p>
+<p style="margin:0 0 4px 0;">Someone (we hope you) asked for the Germany Guide update email at this address. Confirm below and you will get a short monthly note when fees, rules or city procedures change.</p>
 ${button(confirmUrl, "Confirm my subscription")}
 <p style="margin:0 0 14px 0;color:${COLORS.muted};font-size:13px;">If the button does not work, paste this into your browser:<br>
 <span style="word-break:break-all;color:${COLORS.primary};">${escapeHtml(confirmUrl)}</span></p>
@@ -144,7 +144,7 @@ ${button(confirmUrl, "Confirm my subscription")}
 
   const text = `One click and you are subscribed
 
-Someone — we hope you — asked for the Germany Guide update email at this address. Confirm to get a short monthly note when fees, rules or city procedures change:
+Someone (we hope you) asked for the Germany Guide update email at this address. Confirm to get a short monthly note when fees, rules or city procedures change:
 
 ${confirmUrl}
 
@@ -222,7 +222,7 @@ export function digestEmail({
 ${itemsHtml}
 </table>
 <div style="height:1px;background:${COLORS.border};line-height:1px;font-size:0;margin:24px 0;">&nbsp;</div>
-<p style="margin:0;font-size:13px;color:${COLORS.muted};">Every figure on the site carries a last-verified date and links to the official source. This is general information, not legal advice — always check the authority's own page before you act.</p>`,
+<p style="margin:0;font-size:13px;color:${COLORS.muted};">Every figure on the site carries a last-verified date and links to the official source. This is general information, not legal advice. Always check the authority's own page before you act.</p>`,
     footerHtml: `<p style="margin:0 0 6px 0;">You are getting this because you confirmed your subscription at germanyguide.net. <a href="${unsubscribeUrl}" style="color:${COLORS.muted};text-decoration:underline;">Unsubscribe</a> at any time.</p>
 <p style="margin:0 0 6px 0;">${IMPRESSUM_LINE}</p>
 <p style="margin:0;"><a href="${BASE_URL}/impressum" style="color:${COLORS.muted};">Impressum</a> &middot; <a href="${BASE_URL}/privacy" style="color:${COLORS.muted};">Privacy</a> &middot; <a href="${BASE_URL}/updates" style="color:${COLORS.muted};">All updates</a></p>`,

@@ -297,7 +297,7 @@ export function JourneyBoard({
         )}
         <span className="inline-flex items-center gap-1.5 rounded-full border border-border bg-card px-3 py-1">
           <MapPin className="h-3.5 w-3.5 text-primary" />
-          {city ? city.name : "No city yet — showing the Germany-wide guide"}
+          {city ? city.name : "No city yet, showing the Germany-wide guide"}
         </span>
       </div>
 
@@ -369,7 +369,7 @@ export function JourneyBoard({
           </span>
           <div>
             <p className="font-display font-bold">
-              Quick check — {behindDone} earlier{" "}
+              Quick check: {behindDone} earlier{" "}
               {behindDone === 1 ? "step is" : "steps are"} ticked as done.
             </p>
             <p className="mt-1 text-sm leading-relaxed text-muted">
@@ -486,7 +486,7 @@ export function JourneyBoard({
               )}
             </div>
             <p className="mt-4 text-xs leading-relaxed text-muted">
-              Estimates that adapt to your path — check each step for the exact,
+              Estimates that adapt to your path. Check each step for the exact,
               locally-verified figure.
             </p>
           </div>
@@ -506,7 +506,7 @@ export function JourneyBoard({
             <ChevronDown className="h-5 w-5 shrink-0 text-muted transition-transform group-open:rotate-180" />
           </summary>
           <p className="mt-2 text-sm leading-relaxed text-muted">
-            Everything the road ahead asks for, pulled into one place — prepare
+            Everything the road ahead asks for, pulled into one place. Prepare
             these before the appointment maze begins.
           </p>
           <ul className="mt-4 space-y-3">
@@ -521,7 +521,7 @@ export function JourneyBoard({
                 />
                 <span>
                   <span className="font-medium">{doc.name}</span>
-                  {doc.note && <span className="text-muted"> — {doc.note}</span>}
+                  {doc.note && <span className="text-muted"> ({doc.note})</span>}
                   <span className="mt-0.5 block text-xs text-muted">
                     for “{doc.stepTitle}”
                   </span>
@@ -576,7 +576,7 @@ export function JourneyBoard({
                   </span>
                   <span className="mt-0.5 block text-sm text-muted">
                     {done}/{phase.steps.length} done
-                    {phase.subtitle ? ` — ${phase.subtitle}` : ""}
+                    {phase.subtitle ? ` · ${phase.subtitle}` : ""}
                   </span>
                 </span>
                 <ChevronDown
@@ -737,7 +737,7 @@ function UnlockJourney({
       </h1>
       <p className="mt-3 max-w-xl leading-relaxed text-muted">
         {answered
-          ? "One step left: create your free account and your personalised roadmap — with progress that follows you across devices — unlocks instantly."
+          ? "One step left. Create your free account and your personalised roadmap unlocks instantly, with progress that follows you across devices."
           : "Answer three quick questions, create a free account, and get a roadmap shaped around your stage, your path and your city."}
       </p>
 
@@ -773,7 +773,7 @@ function UnlockJourney({
           <ul className="mt-2 space-y-1.5 text-sm leading-relaxed text-muted">
             <li className="flex gap-2">
               <Check className="mt-0.5 h-4 w-4 shrink-0 text-success" />
-              Your checklist, costs and deadlines — synced everywhere
+              Your checklist, costs and deadlines, synced everywhere
             </li>
             <li className="flex gap-2">
               <Check className="mt-0.5 h-4 w-4 shrink-0 text-success" />
@@ -786,7 +786,7 @@ function UnlockJourney({
           </ul>
           <div className="mt-4 flex flex-wrap items-center gap-3">
             <ButtonLink href="/signin" size="sm">
-              Unlock my plan — free
+              Unlock my plan, free
               <ArrowRight className="h-4 w-4" />
             </ButtonLink>
             {!answered && (

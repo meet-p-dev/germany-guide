@@ -22,7 +22,7 @@ export default function PrivacyPage() {
             journey settings (your situation, city and ticked steps) are stored
             in your own browser. If you choose to sign in, that same data is
             additionally stored in our database so it can sync across your
-            devices — nothing else is collected.
+            devices. Nothing else is collected.
           </p>
         </section>
 
@@ -60,7 +60,7 @@ export default function PrivacyPage() {
             The update email is entirely optional and separate from your
             account. Nothing is sent until you click the confirmation link we
             email you (double opt-in), and the date you confirmed is kept as the
-            record of that consent — Art. 6(1)(a) GDPR.
+            record of that consent (Art. 6(1)(a) GDPR).
           </p>
           <ul className="mt-3 list-disc space-y-2 pl-5">
             <li>
@@ -76,9 +76,9 @@ export default function PrivacyPage() {
             <li>
               <strong>Leaving:</strong> every email carries a one-click
               unsubscribe link, and you can switch it off from your account page
-              at any time. We keep the record that the address unsubscribed —
-              that is how we make sure it is not written to again — and you can
-              ask us to erase it completely.
+              at any time. We keep the record that the address unsubscribed, which is
+              how we make sure it is not written to again, and you can ask us to
+              erase it completely.
             </li>
             <li>
               <strong>No tracking:</strong> we do not use open-tracking pixels
@@ -96,7 +96,7 @@ export default function PrivacyPage() {
             <li>No advertising, no selling of data, no data brokers.</li>
             <li>No third-party tracking cookies.</li>
             <li>
-              No profiling — your answers exist to render your checklist, not
+              No profiling. Your answers exist to render your checklist, not
               to analyse you.
             </li>
           </ul>

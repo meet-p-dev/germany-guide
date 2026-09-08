@@ -143,7 +143,7 @@ export default async function CityStepPage({
           steps: documents.length
             ? documents.map((doc) => ({
                 name: doc.name,
-                text: doc.note ? `${doc.name} — ${doc.note}` : doc.name,
+                text: doc.note ? `${doc.name} (${doc.note})` : doc.name,
               }))
             : [
                 {

@@ -63,7 +63,7 @@ export default async function StepPage({
           steps: documents.length
             ? documents.map((doc) => ({
                 name: doc.name,
-                text: doc.note ? `${doc.name} — ${doc.note}` : doc.name,
+                text: doc.note ? `${doc.name} (${doc.note})` : doc.name,
               }))
             : [{ name: step.title, text: step.summary ?? step.title }],
         })}

@@ -48,13 +48,13 @@ function useAssist() {
       if (!res.ok || !data.answer) {
         setState({
           status: "error",
-          message: data.error ?? "Something went wrong — try again.",
+          message: data.error ?? "Something went wrong. Try again.",
         });
         return;
       }
       setState({ status: "answer", answer: data.answer });
     } catch {
-      setState({ status: "error", message: "Network hiccup — try again." });
+      setState({ status: "error", message: "Network problem. Try again." });
     }
   };
 
@@ -83,7 +83,7 @@ function AnswerPanel({ state }: { state: AssistState }) {
       )}
       {state.status === "unavailable" && (
         <p className="rounded-2xl bg-card-muted/70 p-4 text-sm text-muted">
-          The AI helper isn&apos;t switched on yet — everything else on this
+          The AI helper is not switched on yet. Everything else on this
           page works without it.
         </p>
       )}
@@ -132,14 +132,14 @@ export function LetterDecoder() {
     if (!file) return;
     setImageError(null);
     if (!file.type.startsWith("image/")) {
-      setImageError("That file isn't an image — drop a photo of the letter.");
+      setImageError("That file is not an image. Drop a photo of the letter.");
       return;
     }
     try {
       setImage(await imageFileToDataUrl(file));
     } catch {
       setImageError(
-        "Couldn't read that image — try a JPG or PNG photo instead.",
+        "Could not read that image. Try a JPG or PNG photo instead.",
       );
     }
   };
@@ -170,7 +170,7 @@ export function LetterDecoder() {
       </p>
       <p className="mt-1 text-sm leading-relaxed text-muted">
         Snap a photo of the letter, drop an image here, or paste its text
-        (German is fine) — and get a plain answer: what it is, how urgent,
+        (German is fine), and get a plain answer: what it is, how urgent,
         what to do.
       </p>
 
@@ -261,13 +261,13 @@ export function LetterDecoder() {
         </Button>
       </div>
       <p className="mt-3 text-xs text-muted">
-        Cover or leave out personal data you&apos;d rather not share — it
+        Cover or leave out personal data you would rather not share. It
         isn&apos;t needed for the answer. Photos are analysed once and not
         stored.
       </p>
       <AnswerPanel state={state} />
       <p className="mt-4 text-xs text-muted">
-        AI-generated from your letter — general information, not legal advice.
+        AI-generated from your letter. General information, not legal advice.
       </p>
     </section>
   );
@@ -304,7 +304,7 @@ export function StepAsk({ stepSlug }: { stepSlug: string }) {
         Ask about this step
       </p>
       <p className="mt-1 text-sm leading-relaxed text-muted">
-        Answers come only from this guide page — anything beyond it, we&apos;ll
+        Answers come only from this guide page. For anything beyond it, we will
         point you to the official source instead of guessing.
       </p>
       <div className="mt-4 flex items-start gap-2">
@@ -329,7 +329,7 @@ export function StepAsk({ stepSlug }: { stepSlug: string }) {
       </div>
       <AnswerPanel state={state} />
       <p className="mt-4 text-xs text-muted">
-        AI-generated — general information, not legal advice.
+        AI-generated. General information, not legal advice.
       </p>
     </section>
   );

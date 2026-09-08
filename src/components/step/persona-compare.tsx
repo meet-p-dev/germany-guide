@@ -72,7 +72,7 @@ export function PersonaCompare({ points }: { points: PersonaPoints }) {
 
       {!persona && cards.length > 1 && (
         <p className="mt-2 text-sm text-muted">
-          Which one are you? Pick your path once — the whole site tailors
+          Which one are you? Pick your path once and the whole site tailors
           itself to it, and you can change it anytime from the switcher in the
           header.
         </p>

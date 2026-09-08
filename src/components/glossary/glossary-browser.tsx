@@ -54,7 +54,7 @@ export function GlossaryBrowser({ terms }: { terms: GlossaryTerm[] }) {
             type="search"
             value={query}
             onChange={(event) => setQuery(event.target.value)}
-            placeholder="Search a term — Anmeldung, tax ID, Vollmacht…"
+            placeholder="Search a term: Anmeldung, tax ID, Vollmacht…"
             aria-label="Search the glossary"
             className="h-11 w-full rounded-full border border-border bg-card pl-11 pr-4 text-[15px] outline-none transition-colors focus:border-primary"
           />
@@ -81,7 +81,7 @@ export function GlossaryBrowser({ terms }: { terms: GlossaryTerm[] }) {
             {filtered.length === 0
               ? "No terms match"
               : `${filtered.length} ${filtered.length === 1 ? "term" : "terms"} match`}
-            {" — "}
+            {" · "}
             <button
               type="button"
               onClick={() => setQuery("")}
@@ -100,7 +100,7 @@ export function GlossaryBrowser({ terms }: { terms: GlossaryTerm[] }) {
             Nothing here for &ldquo;{query.trim()}&rdquo;
           </p>
           <p className="max-w-sm text-sm leading-relaxed text-muted">
-            Try the German spelling (ä, ö, ü matter) or a shorter fragment —
+            Try the German spelling (ä, ö, ü matter) or a shorter fragment:
             &ldquo;meld&rdquo; finds Anmeldung, Abmeldung and Ummeldung.
           </p>
         </div>

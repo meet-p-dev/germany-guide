@@ -73,7 +73,7 @@ export default async function AdminReviewPage({
         <h1 className="font-display text-2xl font-bold">Review queue</h1>
         <p className="mt-2 max-w-2xl text-sm leading-relaxed text-muted">
           Scheduled agents research changes from official sources and queue them
-          here. Nothing reaches the site until you approve it — read the source,
+          here. Nothing reaches the site until you approve it. Read the source,
           then publish or reject.
         </p>
       </div>

@@ -13,7 +13,7 @@ export default async function AdminOverviewPage() {
     <div>
       <h1 className="font-display text-2xl font-bold">Content</h1>
       <p className="mt-1 max-w-prose text-sm text-muted">
-        Edit anything on the site. Changes go live immediately after saving —
+        Edit anything on the site. Changes go live immediately after saving;
         the affected pages are revalidated for you.
       </p>
 

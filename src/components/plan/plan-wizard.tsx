@@ -57,25 +57,25 @@ const STAGES: { value: Stage; icon: LucideIcon; title: string; hint: string }[] 
     value: "exploring",
     icon: Sprout,
     title: "Just exploring",
-    hint: "Germany is an idea — I want to understand what it takes.",
+    hint: "Germany is an idea. I want to understand what it takes.",
   },
   {
     value: "applied",
     icon: CalendarCheck,
     title: "Applied & waiting",
-    hint: "Application or visa in progress — preparing for the yes.",
+    hint: "Application or visa in progress. Preparing for the yes.",
   },
   {
     value: "moving",
     icon: Plane,
     title: "Moving soon",
-    hint: "Admission or contract in hand — departure is getting real.",
+    hint: "Admission or contract in hand. Departure is getting real.",
   },
   {
     value: "arrived",
     icon: Building2,
     title: "Already in Germany",
-    hint: "I'm here — help me settle in properly.",
+    hint: "I am here. Help me settle in properly.",
   },
 ];
 
@@ -101,7 +101,7 @@ const PERSONAS: {
     value: null,
     icon: HelpCircle,
     title: "Not sure yet",
-    hint: "Compare the two paths — a five-tap quiz points you to your route.",
+    hint: "Compare the two paths. A five-tap quiz points you to your route.",
   },
 ];
 
@@ -266,7 +266,7 @@ function PlanFlow({
           transition={{ duration: 0.4, ease: EASE }}
         >
           <h1 className="mt-3 font-display text-3xl font-bold sm:text-4xl">
-            Welcome back — your plan is saved.
+            Welcome back. Your plan is saved.
           </h1>
           <p className="mt-3 leading-relaxed text-muted">
             Pick up where you left off, adjust your answers, or wipe the slate
@@ -376,7 +376,7 @@ function PlanFlow({
           {current === "stage" && (
             <StepShell
               title="Where are you right now?"
-              subtitle="We open your roadmap at the right chapter — no reading about visas you already have."
+              subtitle="We open your roadmap at the right chapter, so you skip the visas you already have."
             >
               {STAGES.map((option) => (
                 <ChoiceCard
@@ -397,7 +397,7 @@ function PlanFlow({
           {current === "persona" && (
             <StepShell
               title="What brings you to Germany?"
-              subtitle="Students and workers walk different paths — we show you yours."
+              subtitle="Students and workers walk different paths. We show you yours."
             >
               {PERSONAS.map((option) => (
                 <ChoiceCard
@@ -433,7 +433,7 @@ function PlanFlow({
           {current === "city" && (
             <StepShell
               title="Which city are you headed to?"
-              subtitle="This is where it gets personal — the same paperwork works differently in every city."
+              subtitle="This is where it gets personal: the same paperwork works differently in every city."
             >
               {cities
                 .filter((city) => city.status === "live")
@@ -453,7 +453,7 @@ function PlanFlow({
               <ChoiceCard
                 icon={Compass}
                 title="Another city / don't know yet"
-                hint="You'll get the full Germany-wide guide — set your city anytime later."
+                hint="You will get the full Germany-wide guide. Set your city anytime later."
                 selected={false}
                 onSelect={() => finish({ citySlug: null })}
               />
@@ -494,7 +494,7 @@ function PlanFlow({
             profile.persona as Persona
           ].toLowerCase()} and have ${doneCount} ${
             doneCount === 1 ? "step" : "steps"
-          } ticked — some may belong to that path. Start the new path with a clean checklist, or keep your ticks if they still apply.`}
+          } ticked. Some may belong to that path. Start the new path with a clean checklist, or keep your ticks if they still apply.`}
           onClose={() => setPendingProfile(null)}
           actions={
             <>

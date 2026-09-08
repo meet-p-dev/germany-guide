@@ -145,7 +145,7 @@ export function PathSwitcher({ className }: { className?: string }) {
           } path?`}
           body={`You have ${doneCount} ${
             doneCount === 1 ? "step" : "steps"
-          } ticked — some may belong to your current path. Start the new path with a clean checklist, or keep your ticks if they still apply.`}
+          } ticked. Some may belong to your current path. Start the new path with a clean checklist, or keep your ticks if they still apply.`}
           onClose={() => setPendingPersona(null)}
           actions={
             <>

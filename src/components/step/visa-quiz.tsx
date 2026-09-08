@@ -30,14 +30,14 @@ const RESULTS: Record<string, QuizResult> = {
   student: {
     title: "The study route fits you",
     paragraph:
-      "University admission is your door into Germany — the visa follows the admission letter.",
+      "University admission is your door into Germany. The visa follows the admission letter.",
     bullets: [
       "Student visa (§16b) with a blocked account as proof of funds",
-      "No tuition at public universities — just the semester fee",
+      "No tuition at public universities, just the semester fee",
       "18 months to find a job after graduating",
     ],
     officialUrl: "https://www.daad.de/en/studying-in-germany/",
-    officialLabel: "DAAD — official study portal",
+    officialLabel: "DAAD: official study portal",
     persona: "student",
   },
   blue_card: {
@@ -45,13 +45,13 @@ const RESULTS: Record<string, QuizResult> = {
     paragraph:
       "A qualifying offer plus a recognised degree is the fastest, most privileged work route.",
     bullets: [
-      "Blue Card (§18g) from €50,700 gross — €45,934.20 in shortage professions",
+      "Blue Card (§18g) from €50,700 gross, or €45,934.20 in shortage professions",
       "Family joins easily; spouses may work without restriction",
       "Permanent residence after as little as 21 months",
     ],
     officialUrl:
       "https://www.make-it-in-germany.com/en/visa-residence/types/eu-blue-card",
-    officialLabel: "Make it in Germany — EU Blue Card",
+    officialLabel: "Make it in Germany: EU Blue Card",
     persona: "worker",
   },
   work_visa: {
@@ -59,13 +59,13 @@ const RESULTS: Record<string, QuizResult> = {
     paragraph:
       "With a job offer and a recognised qualification you qualify for the skilled-worker visa.",
     bullets: [
-      "Work visa (§18a/b) — no fixed salary floor like the Blue Card",
-      "Your qualification must be recognised — start with anabin",
+      "Work visa (§18a/b), with no fixed salary floor like the Blue Card",
+      "Your qualification must be recognised. Start with anabin",
       "Your employer can fast-track the process (~€411)",
     ],
     officialUrl:
       "https://www.make-it-in-germany.com/en/visa-residence/types/work-qualified-professionals",
-    officialLabel: "Make it in Germany — skilled workers",
+    officialLabel: "Make it in Germany: skilled workers",
     persona: "worker",
   },
   chancenkarte: {
@@ -79,13 +79,13 @@ const RESULTS: Record<string, QuizResult> = {
     ],
     officialUrl:
       "https://www.make-it-in-germany.com/en/visa-residence/types/chancenkarte",
-    officialLabel: "Make it in Germany — Chancenkarte",
+    officialLabel: "Make it in Germany: Chancenkarte",
     persona: "worker",
   },
   ausbildung: {
-    title: "Look at Ausbildung — paid vocational training",
+    title: "Look at Ausbildung: paid vocational training",
     paragraph:
-      "Without a degree, Germany's dual training system is a real, official route — you earn while you learn.",
+      "Without a degree, Germany's dual training system is a real, official route. You earn while you learn.",
     bullets: [
       "2–3 years of paid, structured training with a company",
       "Leads to a recognised qualification and a work permit",
@@ -93,7 +93,7 @@ const RESULTS: Record<string, QuizResult> = {
     ],
     officialUrl:
       "https://www.make-it-in-germany.com/en/study-training/training-in-germany",
-    officialLabel: "Make it in Germany — vocational training",
+    officialLabel: "Make it in Germany: vocational training",
     persona: "worker",
   },
 };
@@ -274,7 +274,7 @@ function QuizResultCard({
         </button>
       </div>
       <p className="mt-4 text-xs text-muted">
-        A quick orientation, not an eligibility decision — verify with the
+        A quick orientation rather than an eligibility decision. Verify with the
         official source.
       </p>
     </div>

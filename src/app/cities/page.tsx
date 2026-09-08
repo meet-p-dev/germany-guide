@@ -41,7 +41,7 @@ export default async function CitiesPage() {
       </h1>
       <p className="mt-4 max-w-xl leading-relaxed text-muted">
         {liveCities.length} cities covered so far. The same federal law, wildly
-        different counters — search or browse A–Z to see how the paperwork
+        different counters. Search or browse A–Z to see how the paperwork
         actually works where you live, verified and dated.
       </p>
 
@@ -68,7 +68,7 @@ export default async function CitiesPage() {
                     <div className="relative h-40 overflow-hidden">
                       <CityPhoto
                         image={card?.image ?? null}
-                        alt={`${city.name} — ${city.tagline ?? city.state}`}
+                        alt={`${city.name}, ${city.tagline ?? city.state}`}
                         sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw"
                       />
                       <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-black/10 to-transparent" />

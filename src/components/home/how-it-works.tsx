@@ -8,7 +8,7 @@ const STEPS = [
     icon: UserRound,
     title: "Tell us your story",
     description:
-      "Student or worker, exploring or already here — pick your situation, and your city once you know it.",
+      "Student or worker, exploring or already here. Pick your situation, and your city once you know it.",
     href: "/plan",
     cta: "Build my plan",
   },

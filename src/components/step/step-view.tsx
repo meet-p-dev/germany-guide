@@ -272,7 +272,7 @@ export async function StepView({
                 >
                   <span className="font-semibold">{costLabel}</span>
                   {costNote && (
-                    <span className="text-muted"> — {costNote}</span>
+                    <span className="text-muted"> ({costNote})</span>
                   )}
                 </FactChip>
               )}
@@ -322,7 +322,7 @@ export async function StepView({
             <section className="rounded-2xl border border-gold/35 bg-gold-soft/40 p-5 sm:p-6">
               <div className="flex flex-wrap items-center justify-between gap-3">
                 <Kicker className="text-gold">
-                  For this city — {active.cities!.name}
+                  For this city: {active.cities!.name}
                 </Kicker>
                 {active.method && METHOD_META[active.method] && (
                   <MethodChip method={active.method} note={active.method_note} />
@@ -346,7 +346,7 @@ export async function StepView({
                     <CityFact icon={Euro}>
                       <span className="font-semibold">{costLabel}</span>
                       {costNote && (
-                        <span className="text-muted"> — {costNote}</span>
+                        <span className="text-muted"> ({costNote})</span>
                       )}
                     </CityFact>
                   )}
@@ -483,7 +483,7 @@ export async function StepView({
                         <span>
                           <span className="font-medium">{doc.name}</span>
                           {doc.note && (
-                            <span className="text-muted"> — {doc.note}</span>
+                            <span className="text-muted"> ({doc.note})</span>
                           )}
                         </span>
                       </li>
@@ -528,7 +528,7 @@ export async function StepView({
       <StepAsk stepSlug={step.slug} />
 
       <p className="mt-12 border-t border-border pt-6 text-xs leading-relaxed text-muted">
-        General information, not legal advice. Procedures change — verify with
+        General information, not legal advice. Procedures change, so verify with
         the official source before acting.
       </p>
     </article>

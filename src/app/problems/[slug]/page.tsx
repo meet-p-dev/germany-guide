@@ -97,7 +97,7 @@ export default async function ProblemPage({
       <p className="mt-12 border-t border-border pt-6 text-xs leading-relaxed text-muted">
         General information, not legal advice. If your case has deadlines or
         legal stakes, free migration counselling (Migrationsberatung) exists in
-        every city — use it.
+        every city. Use it.
       </p>
     </article>
   );

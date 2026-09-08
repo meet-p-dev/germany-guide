@@ -23,9 +23,9 @@ const URGENCY_STYLES: Record<string, string> = {
 };
 
 const URGENCY_LABELS: Record<string, string> = {
-  high: "Act now — this one has real deadlines",
-  medium: "Respond soon — routine but not ignorable",
-  low: "No rush — file it and relax",
+  high: "Act now. This one has real deadlines",
+  medium: "Respond soon. Routine, but do not ignore it",
+  low: "No rush. File it and move on",
 };
 
 export async function generateStaticParams() {
@@ -42,7 +42,7 @@ export async function generateMetadata({
   const letter = await getLetterBySlug(slug);
   if (!letter) return {};
   return {
-    title: `${letter.name} — what it means`,
+    title: `${letter.name}: what it means`,
     description: `Received "${letter.german_name ?? letter.name}"${letter.sender ? ` from ${letter.sender}` : ""}? What it is, how urgent it is, and what to do.`,
   };
 }

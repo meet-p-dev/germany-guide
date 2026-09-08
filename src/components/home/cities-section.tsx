@@ -41,7 +41,7 @@ export function CitiesSection() {
               <div className="relative h-44 overflow-hidden">
                 <CityPhoto
                   image={city.image}
-                  alt={`${city.name} — ${city.tagline}`}
+                  alt={`${city.name}, ${city.tagline}`}
                   sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 25vw"
                 />
                 <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-black/10 to-transparent" />
@@ -69,7 +69,7 @@ export function CitiesSection() {
               {liveCityCount - featuredCities.length}+ more cities
             </p>
             <p className="text-sm leading-relaxed text-muted">
-              Search the full list — everywhere else still gets the Germany-wide
+              Search the full list. Everywhere else still gets the Germany-wide
               guide.
             </p>
             <span className="mt-1 inline-flex items-center gap-1.5 text-sm font-semibold text-primary">

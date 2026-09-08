@@ -40,7 +40,7 @@ export interface SubscribeResult {
 }
 
 const CHECK_INBOX =
-  "Almost there — check your inbox and open the confirmation link. Nothing is sent to you until you do.";
+  "Almost there. Check your inbox and open the confirmation link. Nothing is sent to you until you do.";
 
 export function newsletterConfigured(): boolean {
   return hasServiceRole() && emailConfigured();
@@ -79,7 +79,7 @@ export async function subscribe({
     return {
       ok: false,
       message:
-        "Email sending is not switched on yet. Please try again shortly — nothing was saved.",
+        "Email sending is not switched on yet. Please try again shortly; nothing was saved.",
     };
   }
 

@@ -20,12 +20,12 @@ const COPY: Record<
 > = {
   confirm: {
     heading: "Confirm your subscription",
-    lead: "One press and you are on the list. You will get a short note when German fees, rules or city procedures change — roughly monthly, and you can leave in one click from any email.",
+    lead: "One press and you are on the list. You will get a short note when German fees, rules or city procedures change, roughly monthly, and you can leave in one click from any email.",
     cta: "Confirm my subscription",
     outcomes: {
       confirmed: {
         heading: "You are subscribed",
-        body: "We will write when something actually changes — fee updates, new rules, procedures that move. Nothing else.",
+        body: "We will write when something actually changes: fee updates, new rules, procedures that move. Nothing else.",
       },
       already: {
         heading: "Already confirmed",

@@ -12,7 +12,7 @@ const BASE_URL = "https://www.germanyguide.net";
 export const metadata: Metadata = {
   title: "Decode Your German Official Mail",
   description:
-    "Got an official German letter? Find out who sent it, what it means, how urgent it is, and exactly what to do — before you panic.",
+    "Got an official German letter? Find out who sent it, what it means, how urgent it is, and exactly what to do.",
   alternates: { canonical: `${BASE_URL}/letters` },
 };
 
@@ -41,7 +41,7 @@ export default async function LettersPage() {
       </h1>
       <p className="mt-4 max-w-xl leading-relaxed text-muted">
         Germany communicates by post, and every newcomer knows the small dread
-        of a formal envelope. Find your letter below — who sent it, what it
+        of a formal envelope. Find your letter below: who sent it, what it
         really says, and what to do about it.
       </p>
 

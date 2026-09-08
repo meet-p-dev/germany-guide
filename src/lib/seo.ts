@@ -253,7 +253,7 @@ export function cityStepFaq(params: {
         : null;
     faq.push({
       question: `What does ${label} cost in ${cityName}?`,
-      answer: costNote ? `${cost} — ${costNote}.` : cost,
+      answer: costNote ? `${cost} (${costNote}).` : cost,
     });
   }
 

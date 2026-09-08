@@ -10,7 +10,7 @@ const BASE_URL = "https://www.germanyguide.net";
 export const metadata: Metadata = {
   title: "How Moving to Germany Works, Step by Step",
   description:
-    "Every step of the move to Germany, in five phases — visa, Anmeldung, residence permit, insurance, banking. Browse the whole journey free, no account needed.",
+    "Every step of the move to Germany, in five phases: visa, Anmeldung, residence permit, insurance, banking. Browse the whole journey free, no account needed.",
   alternates: { canonical: `${BASE_URL}/process` },
 };
 
@@ -26,7 +26,7 @@ export default async function ProcessPage() {
         From first thought to fully settled.
       </h1>
       <p className="mt-4 max-w-xl leading-relaxed text-muted">
-        The whole journey, laid out in order. Every step links to a full guide —
+        The whole journey, laid out in order. Every step links to a full guide,
         and the ones marked with a pin change depending on your city.
       </p>
       <div className="mt-6">

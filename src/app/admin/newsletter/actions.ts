@@ -23,7 +23,7 @@ export async function sendTestDigestAction(): Promise<DigestActionState> {
   if (result.status === "skipped") {
     return {
       ok: false,
-      message: "Nothing new to send — every update has already gone out.",
+      message: "Nothing new to send. Every update has already gone out.",
       submitted: true,
     };
   }

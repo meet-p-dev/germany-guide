@@ -10,7 +10,7 @@ const BASE_URL = "https://www.germanyguide.net";
 export const metadata: Metadata = {
   title: "Stuck in German Bureaucracy? Common Fixes",
   description:
-    "No appointment slots, landlord won't sign, visa expiring before your appointment — the classic newcomer crises in Germany, each with a calm way out.",
+    "No appointment slots, landlord will not sign, visa expiring before your appointment: the classic newcomer crises in Germany, each with a calm way out.",
   alternates: { canonical: `${BASE_URL}/problems` },
 };
 
@@ -26,9 +26,8 @@ export default async function ProblemsPage() {
         Stuck? You&apos;re not the first.
       </h1>
       <p className="mt-4 max-w-xl leading-relaxed text-muted">
-        Every one of these situations feels like an emergency the first time —
-        and every one of them has a known way out. Find yours, breathe, follow
-        the steps.
+        Every one of these situations has a known way out. Find yours, then
+        follow the steps.
       </p>
 
       <Stagger className="mt-10 grid gap-4">

@@ -24,13 +24,13 @@ function friendlyAuthError(message: string): string {
     return "That email and password don't match. Try again, or reset your password below.";
   }
   if (lower.includes("email not confirmed")) {
-    return "Your email isn't confirmed yet — check your inbox for our confirmation link first.";
+    return "Your email is not confirmed yet. Check your inbox for our confirmation link first.";
   }
   if (lower.includes("already registered")) {
     return "An account with this email already exists. Sign in instead.";
   }
   if (lower.includes("rate limit") || lower.includes("too many")) {
-    return "Too many attempts — wait a minute and try again.";
+    return "Too many attempts. Wait a minute and try again.";
   }
   return message;
 }
@@ -51,7 +51,7 @@ export function SignInForm() {
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState(
     searchParams.get("error")
-      ? "That link didn't work — it may have expired. Sign in below or request a new one."
+      ? "That link did not work; it may have expired. Sign in below or request a new one."
       : "",
   );
 
@@ -91,7 +91,7 @@ export function SignInForm() {
 
     if (mode === "signup") {
       if (fullName.trim().length < 2) {
-        setError("Please tell us your name — it personalises your journey.");
+        setError("Please tell us your name. It personalises your journey.");
         return;
       }
       if (!passwordMeetsRules(password)) {
@@ -160,7 +160,7 @@ export function SignInForm() {
             <>
               We sent a confirmation link to{" "}
               <span className="font-semibold text-foreground">{email}</span>.
-              Click it to activate your account — then your journey syncs on
+              Click it to activate your account. Your journey then syncs on
               every device.
             </>
           ) : (
@@ -228,7 +228,7 @@ export function SignInForm() {
           : "One account for your whole move."}
       </h1>
       <p className="mt-3 leading-relaxed text-muted">
-        Your steps, deadlines and records — private to you and synced across
+        Your steps, deadlines and records, private to you and synced across
         your phone and laptop. Free, no card, no spam.
       </p>
 
@@ -355,8 +355,8 @@ export function SignInForm() {
         {mode === "signup" ? (
           <>
             By creating an account you agree this is general information, not
-            legal advice. Your local progress on this device is kept and merged
-            — nothing is lost.
+            legal advice. Your local progress on this device is kept and merged,
+            so nothing is lost.
           </>
         ) : (
           <>
@@ -367,8 +367,7 @@ export function SignInForm() {
               className="font-medium text-primary hover:underline"
             >
               Create a free account
-            </button>{" "}
-            — your local progress on this device is kept and merged.
+            </button>. Your local progress on this device is kept and merged.
           </>
         )}
       </p>

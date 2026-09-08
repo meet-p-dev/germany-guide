@@ -21,7 +21,7 @@ export function Logo({ className }: { className?: string }) {
     <Link
       href="/"
       className={cn("flex items-center gap-2.5", className)}
-      aria-label="Germany Guide — home"
+      aria-label="Germany Guide, home"
     >
       <LogoMark />
       <span className="text-[17px] tracking-tight">

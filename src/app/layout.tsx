@@ -39,11 +39,11 @@ const cabinetGrotesk = localFont({
 export const metadata: Metadata = {
   metadataBase: new URL("https://www.germanyguide.net"),
   title: {
-    default: "Germany Guide — bureaucracy explained for internationals",
+    default: "Germany Guide: bureaucracy explained for internationals",
     template: "%s · Germany Guide",
   },
   description:
-    "From your visa to your Anmeldung — a clear, personalised checklist for moving to Germany that knows how your exact city works.",
+    "From your visa to your Anmeldung. A clear, personalised checklist for moving to Germany that knows how your exact city works.",
   icons: {
     icon: "/logo-icon.svg",
     apple: "/apple-icon.png",
@@ -51,7 +51,7 @@ export const metadata: Metadata = {
   openGraph: {
     type: "website",
     siteName: "Germany Guide",
-    title: "Germany Guide — arrive in Germany without the chaos",
+    title: "Germany Guide: arrive in Germany without the chaos",
     description:
       "A clear, personalised checklist for moving to Germany that knows how your exact city works.",
     url: "https://www.germanyguide.net",

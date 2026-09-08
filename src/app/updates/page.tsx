@@ -22,7 +22,7 @@ const BASE_URL = "https://www.germanyguide.net";
 export const metadata: Metadata = {
   title: "What Changed in Germany for Internationals",
   description:
-    "Fee changes, new rules and procedure updates that affect international students and workers in Germany — short, sourced and linked to the step they touch.",
+    "Fee changes, new rules and procedure updates that affect international students and workers in Germany: short, sourced and linked to the step they touch.",
   alternates: {
     canonical: `${BASE_URL}/updates`,
     types: { "application/rss+xml": `${BASE_URL}/updates/feed.xml` },
@@ -109,7 +109,7 @@ export default async function UpdatesPage() {
       </h1>
       <p className="mt-4 max-w-xl leading-relaxed text-muted">
         Fees rise, rules shift, cities change their procedures. Everything here
-        is a change that actually affects internationals — short, sourced, and
+        is a change that actually affects internationals: short, sourced, and
         linked to the step it touches. No general news.
       </p>
       <a
@@ -125,7 +125,7 @@ export default async function UpdatesPage() {
           Get these by email
         </h2>
         <p className="mt-2 max-w-lg text-sm leading-relaxed text-muted">
-          One short email when something on this page changes — roughly monthly,
+          One short email when something on this page changes, roughly monthly and
           never more. No news roundups, no marketing, no passing your address to
           anyone.
         </p>
@@ -141,7 +141,7 @@ export default async function UpdatesPage() {
       </Stagger>
 
       <p className="mt-10 rounded-2xl border border-border bg-card-muted/60 p-5 text-sm leading-relaxed text-muted">
-        Spotted a change we missed — a fee, a rule, a city switching to
+        Spotted a change we missed: a fee, a rule, a city switching to
         appointment-only? The guide gets better when people tell us. Every item
         above is checked against an official source before it appears here.
       </p>

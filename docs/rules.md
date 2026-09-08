@@ -36,6 +36,11 @@ settling in — never tourism.
   AOK Bayern") over a specific address you cannot.
 - Keep the disclaimers: general information, **not legal advice**; link the
   official source.
+- **How it is written is a rule too, not a preference.** Every reader-facing
+  string follows [`writing.md`](writing.md): plain English on the GOV.UK model,
+  **no em dashes**, bold rationed to two spans per 150 words, no scaffolding
+  labels (`**The flow:**`), no idiom or editorial adverbs. Content that reads as
+  machine-written costs us the trust that `last_verified` was supposed to buy.
 
 ## 2. Where content lives, and which fields actually render
 
@@ -72,6 +77,8 @@ Model: `phases` → `steps` → `city_steps` (per-city overrides) + `city_facts`
 
 - **No emojis anywhere on the site.** Expression comes from lucide icons,
   typography, photography and motion.
+- **No em dashes in UI copy either** — titles, buttons, empty states, error
+  messages and meta descriptions all follow [`writing.md`](writing.md).
 - **Unmistakably German at first glance:** flag palette
   (cream/black/crimson/gold), the tricolor top stripe, real German city
   photography, and German terms (Anmeldung, Ausländerbehörde…) as first-class
@@ -115,7 +122,9 @@ Model: `phases` → `steps` → `city_steps` (per-city overrides) + `city_facts`
 npx tsc --noEmit && npx eslint . && npm run build
 ```
 
-All three must pass. For UX changes, walk **both** visitor types — an Explorer
+All three must pass. If the change touched any reader-facing string, also run
+the style detectors in [`writing.md`](writing.md) §8 — the build cannot see an
+em dash. For UX changes, walk **both** visitor types — an Explorer
 (no city, "just exploring") and a Committed visitor ("moving soon" + a city) —
 through plan → journey → step, in **light and dark** mode. Verify in the browser
 rather than asking the owner to check.

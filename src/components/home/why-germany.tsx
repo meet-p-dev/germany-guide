@@ -20,14 +20,14 @@ const REASONS: {
     icon: GraduationCap,
     title: "World-class study, little to no tuition",
     description:
-      "Public universities charge no tuition — just a small semester fee — and a German degree travels the world.",
+      "Public universities charge no tuition, just a small semester fee, and a German degree travels the world.",
     href: "/guide/choose-university-or-job",
   },
   {
     icon: Briefcase,
     title: "A job market hungry for talent",
     description:
-      "Europe's largest economy has a real skills shortage — the EU Blue Card and Chancenkarte are built to bring you in.",
+      "Europe's largest economy has a real skills shortage. The EU Blue Card and Chancenkarte are built to bring you in.",
     href: "/guide/understand-your-paths",
   },
   {

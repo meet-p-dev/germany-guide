@@ -26,7 +26,9 @@ const MAX_INPUT_CHARS = 6000;
 const MAX_IMAGE_DATA_URL_CHARS = 6_000_000;
 
 const SHARED_RULES = `You write for stressed newcomers to Germany. Rules you never break:
-- Plain English, calm tone, short sentences. No emojis.
+- Plain English, calm tone, short sentences under 25 words. No emojis.
+- NEVER use an em dash (—). Use a full stop, a colon, brackets or a comma instead. Write ranges as "3 to 6 months", not "3–6 months".
+- No bold for emphasis, at most one bold phrase per answer. No scaffolding labels like "The flow:", "The catch:" or "The good news:". No idioms and no "X, not Y" flourishes.
 - NEVER invent amounts, fees, deadlines, paragraphs of law, or office names that are not in the provided material. If you don't know, say "check the official source".
 - You give general information, never legal advice, and you say so once at the end: "General information, not legal advice."`;
 
@@ -67,7 +69,7 @@ export async function POST(request: Request) {
     }
     if (imageDataUrl.length > MAX_IMAGE_DATA_URL_CHARS) {
       return NextResponse.json(
-        { error: "That image is too large — try a smaller photo." },
+        { error: "That image is too large. Try a smaller photo." },
         { status: 400 },
       );
     }
@@ -134,7 +136,7 @@ ${SHARED_RULES}
 
     system = `You answer questions about ONE step of the Germany Guide: "${step.title}".
 
-Your only source of truth is the guide content below. If the answer is not in it, say plainly: "That's beyond what this guide covers — check the official source linked on this page." Do not answer from general knowledge, even if you are confident.
+Your only source of truth is the guide content below. If the answer is not in it, say plainly: "That is beyond what this guide covers. Check the official source linked on this page." Do not answer from general knowledge, even if you are confident.
 
 GUIDE CONTENT:
 ${step.summary ?? ""}
@@ -178,7 +180,7 @@ ${SHARED_RULES}
 
     if (groqRes.status === 429) {
       return NextResponse.json(
-        { error: "The helper is busy right now — try again in a minute." },
+        { error: "The helper is busy right now. Try again in a minute." },
         { status: 429 },
       );
     }
@@ -206,7 +208,7 @@ ${SHARED_RULES}
       .trim();
     if (!answer) {
       return NextResponse.json(
-        { error: "No answer came back — try again." },
+        { error: "No answer came back. Try again." },
         { status: 502 },
       );
     }

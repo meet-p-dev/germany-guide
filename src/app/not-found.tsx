@@ -12,7 +12,7 @@ export default function NotFound() {
         This page doesn&apos;t exist.
       </h1>
       <p className="mt-3 max-w-md leading-relaxed text-muted">
-        Wrong turn — it happens in a new country. The journey overview has
+        Wrong turn. The journey overview has
         everything, or jump straight back to your plan.
       </p>
       <div className="mt-8 flex flex-wrap justify-center gap-3">

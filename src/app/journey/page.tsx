@@ -9,7 +9,7 @@ import {
 export const metadata: Metadata = {
   title: "My journey",
   description:
-    "Your personalised, phase-by-phase checklist for moving to Germany — adapted to your situation and your city.",
+    "Your personalised, phase-by-phase checklist for moving to Germany, adapted to your situation and your city.",
 };
 
 export const revalidate = 3600;

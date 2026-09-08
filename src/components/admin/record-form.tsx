@@ -67,7 +67,7 @@ function Field({
     case "fk":
       control = (
         <select name={field.name} defaultValue={value} className={inputCls}>
-          {!field.required && <option value="">— none —</option>}
+          {!field.required && <option value="">None</option>}
           {(options ?? []).map((o) => (
             <option key={o.value} value={o.value}>
               {o.label}

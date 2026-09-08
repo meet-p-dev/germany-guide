@@ -34,7 +34,7 @@ export function SiteFooter() {
           <div className="max-w-sm">
             <Logo />
             <p className="mt-4 text-sm leading-relaxed text-muted">
-              Your calm, step-by-step guide to German bureaucracy — tailored to
+              Your calm, step-by-step guide to German bureaucracy, tailored to
               your city and your situation.
             </p>
             <p className="mt-7 text-xs font-semibold uppercase tracking-[0.18em] text-muted">
@@ -51,7 +51,7 @@ export function SiteFooter() {
         <div className="mt-12 space-y-1.5 border-t border-border pt-6 text-xs leading-relaxed text-muted">
           <p>
             This is general information, not legal advice. Rules and procedures
-            change — always verify with the linked official source before
+            change. Always verify with the linked official source before
             acting.
           </p>
           <p>

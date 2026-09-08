@@ -400,7 +400,7 @@ export const PERSONAS: PersonaCard[] = [
     slug: "eu-citizen",
     title: "EU citizen",
     description:
-      "One of the shortest paths — mostly getting set up and settling in.",
+      "One of the shortest paths, mostly getting set up and settling in.",
     status: "coming_soon",
   },
   {

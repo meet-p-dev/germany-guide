@@ -189,7 +189,7 @@ export async function decorateProposals(
     let driftWarning: string | null = null;
 
     if (!table) {
-      driftWarning = "Unknown target table — this proposal cannot be applied.";
+      driftWarning = "Unknown target table. This proposal cannot be applied.";
       applicable = false;
     } else if (p.op === "update") {
       if (!field) {
@@ -200,7 +200,7 @@ export async function decorateProposals(
         applicable = false;
       } else if (!valuesMatch(row[p.field as string], p.current_value)) {
         driftWarning =
-          "The live value has changed since this was proposed — applying is blocked.";
+          "The live value has changed since this was proposed, so applying is blocked.";
         applicable = false;
       }
     }

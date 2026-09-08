@@ -117,7 +117,7 @@ export function CityBrowser({ cities }: { cities: BrowserCity[] }) {
           </>
         ) : (
           <p className="mt-10 rounded-3xl border border-dashed border-border bg-card-muted/50 p-8 text-center text-muted">
-            No city called &ldquo;{query.trim()}&rdquo; yet — but every step&apos;s
+            No city called &ldquo;{query.trim()}&rdquo; yet, but every step&apos;s
             Germany-wide guide still applies wherever you land.
           </p>
         )
@@ -153,7 +153,7 @@ function CityCard({ city }: { city: BrowserCity }) {
       <div className="relative h-44 overflow-hidden">
         <CityPhoto
           image={city.image}
-          alt={`${city.name} — ${city.tagline ?? city.state}`}
+          alt={`${city.name}, ${city.tagline ?? city.state}`}
           sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw"
         />
         <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-black/10 to-transparent" />

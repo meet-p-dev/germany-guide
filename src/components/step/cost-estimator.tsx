@@ -44,7 +44,7 @@ export function CostEstimator({
         Your first-year estimate
       </p>
       <p className="mt-1 text-sm leading-relaxed text-muted">
-        Official fees and recurring costs come straight from this guide — set
+        Official fees and recurring costs come straight from this guide. Set
         your expected rent and see the whole year.
       </p>
 
@@ -91,14 +91,14 @@ export function CostEstimator({
           className="mt-2 w-full accent-[var(--primary)]"
         />
         <div className="flex justify-between text-xs text-muted">
-          <span>€250 — shared room</span>
-          <span>€1,500 — own city flat</span>
+          <span>€250, shared room</span>
+          <span>€1,500, own city flat</span>
         </div>
       </div>
 
       <div className="mt-6 grid gap-4 sm:grid-cols-3">
         <EstimateTile
-          value={formatCost(monthlyAll, "one_time") ?? "—"}
+          value={formatCost(monthlyAll, "one_time") ?? "n/a"}
           label="per month, all in"
         />
         <EstimateTile
@@ -106,7 +106,7 @@ export function CostEstimator({
           label="one-off official fees"
         />
         <EstimateTile
-          value={formatCost(firstYear, "one_time") ?? "—"}
+          value={formatCost(firstYear, "one_time") ?? "n/a"}
           label="first year, total"
           highlight
         />
@@ -115,13 +115,13 @@ export function CostEstimator({
       {persona === "student" && t.proofCents > 0 && (
         <p className="mt-4 rounded-2xl bg-gold-soft/60 p-4 text-sm leading-relaxed">
           <span className="font-semibold">Plus the blocked account:</span>{" "}
-          {formatCost(t.proofCents, "one_time")} shown as proof of funds — it
+          {formatCost(t.proofCents, "one_time")} shown as proof of funds. It
           stays your own money and pays you back monthly while you study.
         </p>
       )}
 
       <p className="mt-4 text-xs leading-relaxed text-muted">
-        A planning estimate, not a quote — rents vary hugely by city and luck.
+        A planning estimate rather than a quote. Rents vary hugely by city.
       </p>
     </section>
   );

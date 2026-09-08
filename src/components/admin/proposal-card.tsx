@@ -183,7 +183,7 @@ export function ProposalCard({ data }: { data: ProposalCardData }) {
                   defaultChecked
                   className="size-4 accent-[var(--primary)]"
                 />
-                I checked the source — set today as{" "}
+                I checked the source. Set today as{" "}
                 <code className="rounded bg-card-muted px-1 py-0.5 text-xs">
                   last_verified
                 </code>

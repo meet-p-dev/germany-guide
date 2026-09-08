@@ -100,7 +100,7 @@ export function StepDoneButton({ stepSlug }: { stepSlug: string }) {
           </motion.span>
         )}
       </AnimatePresence>
-      {done ? "Done — nice work" : "Mark as done"}
+      {done ? "Done" : "Mark as done"}
     </motion.button>
   );
 }
@@ -192,8 +192,8 @@ export function YourCityHint({
       className="mt-4 flex items-center justify-between gap-3 rounded-2xl border border-primary/30 bg-primary-soft p-4 text-sm font-medium transition-all hover:shadow-md"
     >
       <span>
-        You set <span className="font-bold">{cityName}</span> as your city —
-        see exactly how this works there.
+        You set <span className="font-bold">{cityName}</span> as your city. See
+        exactly how this works there.
       </span>
       <ArrowRight className="h-4 w-4 shrink-0 text-primary" />
     </Link>

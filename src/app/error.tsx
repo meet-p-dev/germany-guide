@@ -24,7 +24,7 @@ export default function ErrorPage({
         Something went wrong.
       </h1>
       <p className="mt-3 max-w-md leading-relaxed text-muted">
-        Not your fault — the page hit an error. Try again; if it keeps
+        Not your fault. The page hit an error. Try again; if it keeps
         happening, the start page always works.
       </p>
       <div className="mt-8 flex flex-wrap justify-center gap-3">

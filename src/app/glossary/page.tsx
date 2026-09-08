@@ -8,7 +8,7 @@ const BASE_URL = "https://www.germanyguide.net";
 export const metadata: Metadata = {
   title: "German Bureaucracy Terms, Translated",
   description:
-    "Anmeldung, Ausländerbehörde, Wohnungsgeberbestätigung — every German bureaucracy term explained in plain English.",
+    "Anmeldung, Ausländerbehörde, Wohnungsgeberbestätigung: every German bureaucracy term explained in plain English.",
   alternates: { canonical: `${BASE_URL}/glossary` },
 };
 
@@ -24,7 +24,7 @@ export default async function GlossaryPage() {
         German bureaucracy, translated.
       </h1>
       <p className="mt-4 max-w-xl leading-relaxed text-muted">
-        The words on your letters, forms and office doors — each one in plain
+        The words on your letters, forms and office doors, each one in plain
         English. The German terms are worth learning; officials will use them,
         and now they won&apos;t scare you.
       </p>

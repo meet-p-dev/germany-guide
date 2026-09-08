@@ -85,7 +85,7 @@ async function buildIndex(): Promise<IndexEntry[]> {
   for (const s of steps.data ?? []) {
     index.push({
       path: `/guide/${s.slug}`,
-      label: `${s.title}${s.summary ? ` — ${s.summary}` : ""}`,
+      label: `${s.title}${s.summary ? `: ${s.summary}` : ""}`,
     });
   }
   for (const l of letters.data ?? []) {
@@ -101,7 +101,7 @@ async function buildIndex(): Promise<IndexEntry[]> {
     if (!cs.steps || !cs.cities) continue;
     index.push({
       path: `/cities/${cs.cities.slug}/${cs.steps.slug}`,
-      label: `${cs.steps.title} — how it works in ${cs.cities.name}`,
+      label: `${cs.steps.title}: how it works in ${cs.cities.name}`,
     });
   }
   return index;
@@ -119,7 +119,7 @@ async function fetchPage(path: string): Promise<string | null> {
       .eq("slug", guide[1])
       .maybeSingle();
     if (!data) return null;
-    return `PAGE ${path} — ${data.title}\n${data.summary ?? ""}\n${clip(data.content_md)}`;
+    return `PAGE ${path}: ${data.title}\n${data.summary ?? ""}\n${clip(data.content_md)}`;
   }
 
   const letter = path.match(/^\/letters\/([\w-]+)$/);
@@ -130,7 +130,7 @@ async function fetchPage(path: string): Promise<string | null> {
       .eq("slug", letter[1])
       .maybeSingle();
     if (!data) return null;
-    return `PAGE ${path} — ${data.name}\nWhat it is: ${clip(data.what_it_is_md)}\nWhat to do: ${clip(data.what_to_do_md)}`;
+    return `PAGE ${path}: ${data.name}\nWhat it is: ${clip(data.what_it_is_md)}\nWhat to do: ${clip(data.what_to_do_md)}`;
   }
 
   const problem = path.match(/^\/problems\/([\w-]+)$/);
@@ -141,7 +141,7 @@ async function fetchPage(path: string): Promise<string | null> {
       .eq("slug", problem[1])
       .maybeSingle();
     if (!data) return null;
-    return `PAGE ${path} — ${data.title}\nProblem: ${clip(data.problem_md)}\nSolution: ${clip(data.solution_md)}`;
+    return `PAGE ${path}: ${data.title}\nProblem: ${clip(data.problem_md)}\nSolution: ${clip(data.solution_md)}`;
   }
 
   const city = path.match(/^\/cities\/([\w-]+)\/([\w-]+)$/);
@@ -155,7 +155,7 @@ async function fetchPage(path: string): Promise<string | null> {
       .eq("steps.slug", city[2])
       .maybeSingle();
     if (!data) return null;
-    return `PAGE ${path} — ${data.steps!.title} in ${data.cities!.name} (method: ${data.method ?? "unknown"}${data.method_note ? `, ${data.method_note}` : ""}; last verified ${data.last_verified ?? "n/a"})\n${data.address ? `Address: ${data.address}\n` : ""}${clip(data.content_md)}`;
+    return `PAGE ${path}: ${data.steps!.title} in ${data.cities!.name} (method: ${data.method ?? "unknown"}${data.method_note ? `, ${data.method_note}` : ""}; last verified ${data.last_verified ?? "n/a"})\n${data.address ? `Address: ${data.address}\n` : ""}${clip(data.content_md)}`;
   }
 
   return null;
@@ -192,7 +192,7 @@ async function webSearch(
   });
 }
 
-const SHARED_RULES = `You write for stressed newcomers to Germany. Plain English, calm, short sentences. No emojis. NEVER invent fees, deadlines, laws or office names that are not in the provided material. End every answer with: "General information, not legal advice."`;
+const SHARED_RULES = `You write for stressed newcomers to Germany. Plain English, calm, short sentences under 25 words. No emojis. NEVER use an em dash (—): use a full stop, colon, brackets or comma, and write ranges as "3 to 6 months". No bold for emphasis, no scaffolding labels ("The flow:", "The catch:"), no idioms, no "X, not Y" flourishes. NEVER invent fees, deadlines, laws or office names that are not in the provided material. End every answer with: "General information, not legal advice."`;
 
 export async function POST(request: Request) {
   const apiKey = process.env.GROQ_API_KEY;
@@ -297,7 +297,7 @@ ${SHARED_RULES}
 
 SEARCH RESULTS:
 ${results
-  .map((r) => `SOURCE: ${r.title} — ${r.url}\n${r.content.slice(0, 1200)}`)
+  .map((r) => `SOURCE: ${r.title} (${r.url})\n${r.content.slice(0, 1200)}`)
   .join("\n\n---\n\n")}`,
         messages,
         600,
@@ -317,7 +317,7 @@ ${results
     answer:
       "That one isn't covered in the guide yet" +
       (tavilyKey ? " and the web search came up empty" : "") +
-      ". The best official starting point is [Make it in Germany](https://www.make-it-in-germany.com/en/) — the German government's portal for internationals.\n\nGeneral information, not legal advice.",
+      ". The best official starting point is [Make it in Germany](https://www.make-it-in-germany.com/en/), the German government's portal for internationals.\n\nGeneral information, not legal advice.",
     source: "site",
   });
 }

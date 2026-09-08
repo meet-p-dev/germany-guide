@@ -192,7 +192,7 @@ export async function CompactStepView({
                 className="border border-border bg-card-muted/60 text-foreground/80"
               >
                 <span className="font-semibold">{costLabel}</span>
-                {costNote && <span className="text-muted"> — {costNote}</span>}
+                {costNote && <span className="text-muted"> ({costNote})</span>}
               </Chip>
             )}
             {meta.deadlineRule && (
@@ -240,7 +240,7 @@ export async function CompactStepView({
                     <Check aria-hidden className="mt-0.5 h-4 w-4 shrink-0 text-primary" />
                     <span>
                       <span className="font-medium">{doc.name}</span>
-                      {doc.note && <span className="text-muted"> — {doc.note}</span>}
+                      {doc.note && <span className="text-muted"> ({doc.note})</span>}
                     </span>
                   </li>
                 ))}
@@ -373,7 +373,7 @@ export async function CompactStepView({
               <BookOpen className="h-4 w-4 shrink-0 text-muted" aria-hidden />
               <span className="font-display font-bold">Read the full guide</span>
               <span className="hidden text-sm text-muted sm:inline">
-                — how this works everywhere, all cases
+                · how this works everywhere, all cases
               </span>
             </span>
             <ArrowUpRight className="h-5 w-5 shrink-0 text-muted" aria-hidden />
@@ -394,7 +394,7 @@ export async function CompactStepView({
       </div>
 
       <p className="mt-12 border-t border-border pt-6 text-xs leading-relaxed text-muted">
-        General information, not legal advice. Procedures change — verify with
+        General information, not legal advice. Procedures change, so verify with
         the official source before acting.
       </p>
     </article>

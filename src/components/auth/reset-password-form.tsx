@@ -40,7 +40,7 @@ export function ResetPasswordForm() {
     if (updateError) {
       setError(
         updateError.message.toLowerCase().includes("different from the old")
-          ? "That's already your current password — pick a new one."
+          ? "That is already your current password. Pick a new one."
           : updateError.message,
       );
     } else {
@@ -105,7 +105,7 @@ export function ResetPasswordForm() {
         Choose a new password.
       </h1>
       <p className="mt-3 leading-relaxed text-muted">
-        Pick something strong — this protects your deadlines, notes and
+        Pick something strong. This protects your deadlines, notes and
         reference numbers.
       </p>
       <form onSubmit={submit} className="mt-8 space-y-4">

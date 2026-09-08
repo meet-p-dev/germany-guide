@@ -16,7 +16,7 @@ import { Button } from "@/components/ui/button";
 const STATUS_COPY: Record<string, string> = {
   confirmed: "You are getting the update email.",
   pending:
-    "Almost there — open the confirmation email we sent and press the button in it.",
+    "Almost there. Open the confirmation email we sent and press the button in it.",
   unsubscribed: "You are not getting the update email.",
   none: "You are not getting the update email.",
 };
@@ -71,7 +71,7 @@ export function NewsletterPreference() {
             Update email
           </h2>
           <p className="mt-1.5 text-sm leading-relaxed text-muted">
-            A short note when German fees, rules or city procedures change —
+            A short note when German fees, rules or city procedures change,
             roughly monthly, never more. Separate from your account: turning it
             off changes nothing else.
           </p>

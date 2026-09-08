@@ -81,7 +81,7 @@ export function ChatWidget() {
           {
             role: "assistant",
             content:
-              "The assistant isn't switched on yet — meanwhile, everything is browsable via The process, Problems and Letters.",
+              "The assistant is not switched on yet. Everything is still browsable via The process, Problems and Letters.",
           },
         ]);
         return;
@@ -103,7 +103,7 @@ export function ChatWidget() {
             }
           : {
               role: "assistant",
-              content: data.error ?? "Something went wrong — try again.",
+              content: data.error ?? "Something went wrong. Try again.",
             },
       ]);
     } catch {
@@ -172,7 +172,7 @@ export function ChatWidget() {
             <div className="border-b border-border bg-card-muted/60 px-5 py-4">
               <p className="font-display font-bold">Guide assistant</p>
               <p className="mt-0.5 text-xs leading-relaxed text-muted">
-                Answers from this guide, with links. Web finds are labeled — always
+                Answers from this guide, with links. Web finds are labeled, and you should always
                 verify those at the source.
               </p>
             </div>
@@ -207,7 +207,7 @@ export function ChatWidget() {
                   {entry.role === "assistant" && entry.source === "web" && (
                     <p className="mb-1 inline-flex items-center gap-1.5 rounded-full bg-gold-soft px-2.5 py-1 text-[11px] font-semibold text-gold">
                       <Globe className="h-3 w-3" />
-                      Found on the web — verify at the source
+                      Found on the web. Verify at the source
                     </p>
                   )}
                   {entry.role === "assistant" && entry.source === "site" && (
@@ -243,7 +243,7 @@ export function ChatWidget() {
               {retry && !loading && (
                 <div className="mr-auto max-w-[88%] rounded-2xl border border-border bg-card-muted/70 px-4 py-3 text-sm">
                   <p className="text-muted">
-                    You look offline — I&apos;ll re-send your question
+                    You look offline. I will re-send your question
                     automatically the moment your connection is back.
                   </p>
                   <button
@@ -282,7 +282,7 @@ export function ChatWidget() {
                 </button>
               </div>
               <p className="mt-2 px-1 text-[11px] leading-relaxed text-muted">
-                AI-generated — general information, not legal advice.
+                AI-generated. General information, not legal advice.
               </p>
             </div>
           </motion.div>

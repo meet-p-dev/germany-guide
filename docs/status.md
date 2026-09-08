@@ -53,6 +53,52 @@ The web-search rung still needs `TAVILY_API_KEY`.
 
 ## Changelog
 
+### 2026-09-08 (later)
+- **UI copy in `src` brought in line with the new house style.** 232 em dashes
+  in reader-facing strings across ~60 files are gone, hand-edited one by one so
+  each became the punctuation the sentence actually wanted (a full stop, colon,
+  brackets or comma) rather than a blanket substitution. The site `<title>`,
+  the OpenGraph title, the RSS channel title, every page `description`, all
+  error and empty states, the auth and newsletter flows, the plan wizard, the
+  journey board and the account dashboard. What remains in `src` is only
+  comments, two functional regexes in `seo.ts` (which *strip* and *split* on
+  dashes in DB content, so they must keep the character), and the two AI system
+  prompts that now name the rule.
+  - **Both AI features were taught the house style.** `SHARED_RULES` in
+    `/api/chat` and `/api/assist` now ban the em dash, cap sentence length and
+    forbid scaffolding labels. Without this the letter decoder, step Q&A and
+    chat widget would have kept generating exactly the prose we are removing.
+  - Joiners changed shape rather than disappearing: `doc.name — doc.note`
+    became `doc.name (doc.note)`, image `alt` became `${city.name}, ${tagline}`,
+    and phase subtitles use ` · `, which the codebase already uses in the title
+    template.
+  - **Caught in review, not by the gate:** one replacement produced "a full
+    guide, and and the ones marked…" on `/process`, and two JSX text merges lost
+    a separator and a capital. `tsc`, `eslint` and `build` were green through
+    all three. Prose bugs need reading, not compiling — a duplicated-word scan
+    over the diff is worth running after any bulk copy edit.
+  - Verified: gate green; Explorer and Committed visitors walked plan → journey
+    → step in light and dark; every rendered em dash left on those pages traced
+    to a content table, not to `src`.
+- **House style written down: [`writing.md`](writing.md).** The content reads as
+  AI-generated, which undermines the sourcing work — a reader who thinks a page
+  was generated also thinks it was not checked. Measured against the live DB:
+  em dashes in **203/240** `city_facts`, **114/126** `city_steps`, **30/30**
+  `steps` and **36/36** `problems.solution_md` (about one every 250 characters);
+  bold running at **20 spans per `city_steps` row** (~one every 8 words, worst
+  page 15.8 per 150 words against a budget of 2); and `**The flow:**` opening
+  **86 of 126** city pages word for word. Plus **261** em dashes in `.tsx` UI
+  copy, including the site `<title>`.
+  The guide adopts GOV.UK house style (plain English, front-loading, active
+  voice, <=25-word sentences, `must`/`need`/`can` used precisely, bold for
+  actions not emphasis), diverging on two points for our audience: German terms
+  stay, and no idiom or negative contractions for non-native readers. It bans
+  the em dash outright, sets the emphasis budget, lists the banned
+  constructions with real before/after rewrites from the live tables, and ships
+  runnable SQL detectors. Imported from `CLAUDE.md`; `rules.md` §1, §3 and §5
+  now point at it. **No content was rewritten** — this is the standard, the
+  cleanup is queued in `todo.md`.
+
 ### 2026-09-08
 - **Canonical host is `www.germanyguide.net`.** Every canonical, the sitemap,
   `metadataBase`, the JSON-LD `BASE_URL`, the RSS feed, robots.txt and the

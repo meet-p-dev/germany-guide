@@ -18,7 +18,7 @@ const PROVIDER_LABELS: Record<string, string> = {
 function friendlyPasswordError(message: string): string {
   const lower = message.toLowerCase();
   if (lower.includes("different from the old")) {
-    return "That's already your current password — pick a new one.";
+    return "That is already your current password. Pick a new one.";
   }
   if (
     lower.includes("current password") ||
@@ -28,7 +28,7 @@ function friendlyPasswordError(message: string): string {
     return "To change your password, enter your current one above. If you only ever signed in with Google, use “Forgot password?” on the sign-in page to set your first password.";
   }
   if (lower.includes("weak") || lower.includes("pwned") || lower.includes("leaked")) {
-    return "That password has appeared in a data breach — please choose a different one.";
+    return "That password has appeared in a data breach. Please choose a different one.";
   }
   return message;
 }
@@ -183,7 +183,7 @@ export function ProfileSettings({ session }: { session: Session }) {
             )}
             {identityStatus === "error" && (
               <span role="alert" className="text-sm font-medium text-primary">
-                Saving failed — try again.
+                Saving failed. Try again.
               </span>
             )}
           </div>
