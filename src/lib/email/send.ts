@@ -5,17 +5,30 @@
  * dependency to keep in step with the rest of the stack.
  *
  * DNS note (matters more than it looks): the root domain's MX records point at
- * iCloud for the team@/kontakt@ mailboxes. The *sending* domain is therefore a
- * subdomain — `send.germanyguide.net` — whose SPF/DKIM records cannot collide
- * with those mailboxes. Replies are steered back to the real inbox with
- * Reply-To, so a reader answering the newsletter still reaches a human.
+ * iCloud for the team@/kontakt@ mailboxes, so nothing here may touch them.
+ *
+ * Resend's verified domain is the **root**, `germanyguide.net`, and its record
+ * layout keeps that promise on its own: DKIM goes on the root
+ * (`resend._domainkey.germanyguide.net`) while the return-path SPF and MX live
+ * on `send.germanyguide.net`. The root MX stays iCloud's, untouched.
+ *
+ * So the visible sender must be `@germanyguide.net`, NOT
+ * `@send.germanyguide.net` — Resend matches the From domain against the domain
+ * you verified, and the subdomain is not a separate entry. Root DKIM signs the
+ * message, which is what gives DMARC alignment for a root-domain From.
+ * Replies are steered to the real inbox with Reply-To, so a reader answering
+ * the newsletter still reaches a human.
  */
 
 const RESEND_URL = "https://api.resend.com/emails";
 
-/** Visible sender. Must be on the domain verified in Resend. */
-const FROM = process.env.NEWSLETTER_FROM ?? "Germany Guide <team@send.germanyguide.net>";
-/** Where replies land — a real mailbox, not the sending subdomain. */
+/**
+ * Visible sender. Must be on the domain verified in Resend — the root
+ * `germanyguide.net`. Matches the address Supabase already sends auth mail
+ * from, so both streams build one sending reputation rather than two.
+ */
+const FROM = process.env.NEWSLETTER_FROM ?? "Germany Guide <noreply@germanyguide.net>";
+/** Where replies land — a real iCloud mailbox, not the noreply address. */
 const REPLY_TO = process.env.NEWSLETTER_REPLY_TO ?? "team@germanyguide.net";
 
 export interface SendResult {

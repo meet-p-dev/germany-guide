@@ -182,6 +182,14 @@
   never wrote. Check the whole repo, not just `.next`:
   `find . -name "* 2.*" -not -path "./node_modules/*" -not -path "./.git/*"`.
   A duplicate landing in `src/` would be worse — it would compile.
+- **It happened, 2026-09-08.** `src/lib/seo 2.ts` appeared beside the `seo.ts`
+  created that morning and was **committed** by a `git add -A`, because nothing
+  in the gate objects: it is an identical copy, nothing imports it, so `tsc`,
+  `eslint` and `build` all stayed green. Caught only by running the repo-wide
+  `find` above while clearing `.next` duplicates. **Run that `find` before any
+  `git add -A` in this repo**, especially after creating a new file — "Keep
+  Downloaded" stops eviction but does not stop the sync from forking a file
+  that is written while syncing.
 
 ## Content written but invisible on the site
 **2026-09-04**
