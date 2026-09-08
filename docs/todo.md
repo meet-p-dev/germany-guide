@@ -29,10 +29,17 @@ Nothing on this page is now urgent in that sense.
          `CRON_SECRET` (any long random string; without it the cron route
          refuses to run). `NEWSLETTER_FROM` is now only needed to *override* the
          default, which is already correct at `noreply@germanyguide.net`.
-         **Unverified:** whether `RESEND_API_KEY` is set was not checkable from
-         here — the signup form renders either way, and Supabase's SMTP works
-         from its own stored credential, not this env var. `/admin/newsletter`
-         is the place that tells you.
+         **Verified 2026-09-08: they are NOT set.** Submitting the real signup
+         form on `/updates` returned *"Email sending is not switched on yet.
+         Please try again shortly — nothing was saved"*, which is the
+         `newsletterConfigured()` branch — so at least one of the two is
+         missing in Production. The probe was clean: that check runs *before*
+         `createServiceClient()`, and `newsletter_subscribers` is still empty
+         (0 rows), so nothing was written and no mail was sent. The public
+         message does not say *which* of the two is missing; `/admin/newsletter`
+         does, listing each as "set"/"missing" — it needs an admin sign-in.
+         Note this is independent of auth email: Supabase SMTP uses its own
+         stored password and is proven working.
       2. Check `/admin/newsletter` — it should stop saying "not switched on".
          Subscribe yourself, confirm from the email, and press "Send a test to
          me" before the first real digest.

@@ -63,6 +63,14 @@ The web-search rung still needs `TAVILY_API_KEY`.
   `List-Unsubscribe` endpoint, where a 301 on a POST breaks one-click
   unsubscribe in some mail clients. Mailboxes (`kontakt@`, `team@`) and the
   `send.germanyguide.net` sending subdomain are unrelated and unchanged.
+- **The newsletter is still dormant, now confirmed rather than assumed.** A real
+  submission to the `/updates` signup form on 2026-09-08 returned "Email sending
+  is not switched on yet", the `newsletterConfigured()` branch, so
+  `SUPABASE_SERVICE_ROLE_KEY` and/or `RESEND_API_KEY` is missing in Vercel
+  Production. `newsletter_subscribers` remains at 0 rows — the guard runs before
+  any DB call, so the forms genuinely do not lose an address. **This is separate
+  from auth email**, which sends through Supabase's own stored SMTP password and
+  works.
 - **Custom SMTP is live and proven.** Supabase Auth → Emails → SMTP Settings is
   enabled against `smtp.resend.com:465`, username `resend`, sender
   `noreply@germanyguide.net` / "Germany Guide". **Verified end to end on
