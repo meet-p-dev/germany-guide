@@ -10,43 +10,47 @@
 
 ## 1. Blocked on the owner (Claude cannot do these)
 
-These are dashboard/account actions outside the codebase. The first two are the
-only genuinely **urgent** items on this page.
+These are dashboard/account actions outside the codebase. **Custom SMTP — long
+the most urgent item here — is done and proven** (2026-09-08, see `status.md`),
+so signup and password reset no longer sit on the default sender's ~2/hour cap.
+Nothing on this page is now urgent in that sense.
 
-- [ ] **Custom SMTP** (Supabase → Auth → Emails). The default sender is capped
-      around 2 emails/hour and rejects `@example.com` — **it will fail under real
-      traffic**, breaking signup and password reset. Set up Resend or Postmark.
-      The domain now has real mailboxes (`team@` / `kontakt@germanyguide.net`,
-      iCloud+ custom domain), so sender identity is settled — what is missing is
-      a **sending** provider and its API key. **DNS caution:** the root domain's
-      MX records now point at iCloud; verify the sending domain on a
-      **subdomain** (`send.germanyguide.net`) so its records cannot collide with
-      the mailboxes, and set `Reply-To: team@germanyguide.net`.
-- [ ] **Switch the newsletter on.** The code shipped to production on
-      2026-09-06 — before that it had been committed locally but **never
-      pushed**, so `main` was two commits behind `origin/main` and the last
-      production deploy was `791448d`. It is now deployed but dormant, and the
-      forms tell visitors it is unavailable rather than losing their address.
-      DNS checked 2026-09-06 against the authoritative Cloudflare nameservers:
-      the root MX is iCloud (mailboxes, correct) and **no Resend records exist
-      yet** — no `send.germanyguide.net` SPF/MX, no `resend._domainkey` DKIM.
-      Needed, in this order:
-      1. **Resend account** (free: 3,000/month, 100/day) and verify
-         **`send.germanyguide.net`** — a subdomain, so its records cannot
-         collide with the iCloud MX on the root. Add the DKIM/SPF records
-         Resend shows you.
-      2. **Turn Resend's open- and click-tracking OFF.** `/privacy` states that
-         we use neither; leaving them on makes that page untrue.
-      3. Vercel env vars, **Production**: `RESEND_API_KEY`,
-         `SUPABASE_SERVICE_ROLE_KEY` (Supabase → Settings → API), and
-         `CRON_SECRET` (any long random string — without it the cron route
-         refuses to run at all). Optional: `NEWSLETTER_FROM`,
-         `NEWSLETTER_REPLY_TO`, `NEWSLETTER_MAX_PER_RUN`.
-      4. Use the same Resend account for the **custom SMTP** item above — one
-         setup covers both.
-      5. Then check `/admin/newsletter`: it should stop saying "not switched
-         on". Subscribe yourself, confirm from the email, and press "Send a
-         test to me" before the first real digest.
+- [ ] **Two Resend DNS records, in Cloudflare** (neither blocks sending; SMTP is
+      live and proven — see `status.md`).
+      1. **Add the missing `send` MX:** name `send`, type MX, content
+         `feedback-smtp.eu-west-1.amazonses.com`, priority 10. Resend's UI shows
+         this row as "Verified" but that badge is **stale** — DNS has no MX at
+         that name, checked against both Cloudflare authoritative nameservers.
+         Without it, bounce/complaint feedback never routes.
+      2. **Optional DMARC:** `_dmarc` TXT `v=DMARC1; p=none;`. Cheap, and DKIM
+         already aligns.
+      **Do NOT enable Resend's "Enable Receiving"** while doing this — it wants
+      an MX on the **root**, which would override the iCloud MX and break the
+      `kontakt@`/`team@` mailboxes.
+
+- [ ] **Switch the newsletter on.** *Rewritten 2026-09-08 — the previous version
+      of this item was wrong on almost every point.* What is actually true now:
+      the Resend account exists, the **root** `germanyguide.net` is **Verified**
+      (region Ireland `eu-west-1`), DKIM and the return-path SPF are live, and
+      open/click tracking is **already off**, so `/privacy` stays true. The old
+      instruction to verify `send.germanyguide.net` as a separate subdomain is
+      **superseded** — do not do it; the root is verified and Resend's layout
+      already keeps the iCloud MX untouched.
+      What is genuinely left:
+      1. **Vercel env vars, Production** — `RESEND_API_KEY`,
+         `SUPABASE_SERVICE_ROLE_KEY` (Supabase → Settings → API) and
+         `CRON_SECRET` (any long random string; without it the cron route
+         refuses to run). `NEWSLETTER_FROM` is now only needed to *override* the
+         default, which is already correct at `noreply@germanyguide.net`.
+         **Unverified:** whether `RESEND_API_KEY` is set was not checkable from
+         here — the signup form renders either way, and Supabase's SMTP works
+         from its own stored credential, not this env var. `/admin/newsletter`
+         is the place that tells you.
+      2. Check `/admin/newsletter` — it should stop saying "not switched on".
+         Subscribe yourself, confirm from the email, and press "Send a test to
+         me" before the first real digest.
+      Vercel gotchas: exact variable name, tick **Production**, and save
+      **before** redeploying.
 - [ ] **Enable leaked-password protection** and a minimum length of 8 (the
       security advisor flags this).
 - [ ] **Legal check before serious traffic:** confirm the real name/address in

@@ -63,6 +63,38 @@ The web-search rung still needs `TAVILY_API_KEY`.
   `List-Unsubscribe` endpoint, where a 301 on a POST breaks one-click
   unsubscribe in some mail clients. Mailboxes (`kontakt@`, `team@`) and the
   `send.germanyguide.net` sending subdomain are unrelated and unchanged.
+- **Custom SMTP is live and proven.** Supabase Auth → Emails → SMTP Settings is
+  enabled against `smtp.resend.com:465`, username `resend`, sender
+  `noreply@germanyguide.net` / "Germany Guide". **Verified end to end on
+  2026-09-08** by sending a real password reset from `/signin`: Resend logged it
+  as **Delivered** to the owner's Gmail. Before that test nothing had ever been
+  sent — Resend's dashboard read "No sent emails yet" — so the configuration had
+  never actually been exercised. The default-SMTP cap that `todo.md` warned
+  would break signup under real traffic is gone.
+- **The Resend domain is the ROOT `germanyguide.net`** (Verified, region
+  **Ireland `eu-west-1`**), *not* the `send.` subdomain the docs planned for.
+  Resend's own layout keeps the mailboxes safe anyway: DKIM on the root, and
+  return-path SPF/MX on `send.germanyguide.net`, so the root MX stays iCloud's.
+  Consequence for code: the visible sender must be `@germanyguide.net`. The
+  newsletter's `NEWSLETTER_FROM` had defaulted to `@send.germanyguide.net`,
+  which Resend would have rejected — fixed 2026-09-08.
+- **Two DNS gaps remain, neither blocking sending:**
+  1. **The `send` MX is missing.** Resend wants `send` → MX
+     `feedback-smtp.eu-west-1.amazonses.com`, priority 10. DNS has the SPF TXT
+     at that name but **no MX**, confirmed against both Cloudflare authoritative
+     nameservers and public resolvers. **Resend's UI shows that row as
+     "Verified", which is stale** — cached from setup two months ago. Without
+     it, bounce and complaint feedback has nowhere to route, which degrades
+     sending reputation over time as dead addresses accumulate.
+  2. **No DMARC record.** Resend offers `_dmarc` → `v=DMARC1; p=none;`. Optional,
+     but DKIM already aligns, so it is nearly free and helps with Gmail/Yahoo.
+- **Never switch on Resend's "Enable Receiving".** It asks for an MX on **`@`
+  (the root)** pointing at `inbound-smtp.eu-west-1.amazonaws.com`, which would
+  override the iCloud MX and **break the `kontakt@` and `team@` mailboxes**. It
+  currently reads "not started" and must stay that way. This is the concrete
+  form of the collision the docs had warned about in the abstract.
+- **Resend open/click tracking is off** (no custom tracking subdomain
+  configured), which is what `/privacy` claims. Leave it off.
 - **Supabase Auth moved to the www host** (project `ilfhjffpzvzphbvhdpup`,
   Authentication → URL Configuration). Site URL is now
   `https://www.germanyguide.net`. The redirect allowlist holds **both**
