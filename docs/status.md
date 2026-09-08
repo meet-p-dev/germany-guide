@@ -78,16 +78,18 @@ The web-search rung still needs `TAVILY_API_KEY`.
   Consequence for code: the visible sender must be `@germanyguide.net`. The
   newsletter's `NEWSLETTER_FROM` had defaulted to `@send.germanyguide.net`,
   which Resend would have rejected — fixed 2026-09-08.
-- **Two DNS gaps remain, neither blocking sending:**
-  1. **The `send` MX is missing.** Resend wants `send` → MX
-     `feedback-smtp.eu-west-1.amazonses.com`, priority 10. DNS has the SPF TXT
-     at that name but **no MX**, confirmed against both Cloudflare authoritative
-     nameservers and public resolvers. **Resend's UI shows that row as
-     "Verified", which is stale** — cached from setup two months ago. Without
-     it, bounce and complaint feedback has nowhere to route, which degrades
-     sending reputation over time as dead addresses accumulate.
-  2. **No DMARC record.** Resend offers `_dmarc` → `v=DMARC1; p=none;`. Optional,
-     but DKIM already aligns, so it is nearly free and helps with Gmail/Yahoo.
+- **Mail DNS is complete as of 2026-09-08.** Added in Cloudflare and confirmed
+  live on the authoritative nameservers *and* public resolvers (1.1.1.1,
+  8.8.8.8):
+  - `send` **MX** → `feedback-smtp.eu-west-1.amazonses.com`, priority 10. This
+    was genuinely missing while **Resend's UI showed the row as "Verified"** —
+    a stale badge cached from setup two months earlier. Without it, bounce and
+    complaint feedback had nowhere to route. **Trust DNS over a provider's
+    dashboard badge.**
+  - `_dmarc` **TXT** → `v=DMARC1; p=none;` (monitor-only, no enforcement).
+  Re-checked after the change: root MX is still `mx01/mx02.mail.icloud.com`,
+  root SPF still `include:icloud.com`, the `send` SPF and the root DKIM
+  untouched, and Resend still reads **Verified**.
 - **Never switch on Resend's "Enable Receiving".** It asks for an MX on **`@`
   (the root)** pointing at `inbound-smtp.eu-west-1.amazonaws.com`, which would
   override the iCloud MX and **break the `kontakt@` and `team@` mailboxes**. It

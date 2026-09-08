@@ -15,19 +15,6 @@ the most urgent item here — is done and proven** (2026-09-08, see `status.md`)
 so signup and password reset no longer sit on the default sender's ~2/hour cap.
 Nothing on this page is now urgent in that sense.
 
-- [ ] **Two Resend DNS records, in Cloudflare** (neither blocks sending; SMTP is
-      live and proven — see `status.md`).
-      1. **Add the missing `send` MX:** name `send`, type MX, content
-         `feedback-smtp.eu-west-1.amazonses.com`, priority 10. Resend's UI shows
-         this row as "Verified" but that badge is **stale** — DNS has no MX at
-         that name, checked against both Cloudflare authoritative nameservers.
-         Without it, bounce/complaint feedback never routes.
-      2. **Optional DMARC:** `_dmarc` TXT `v=DMARC1; p=none;`. Cheap, and DKIM
-         already aligns.
-      **Do NOT enable Resend's "Enable Receiving"** while doing this — it wants
-      an MX on the **root**, which would override the iCloud MX and break the
-      `kontakt@`/`team@` mailboxes.
-
 - [ ] **Switch the newsletter on.** *Rewritten 2026-09-08 — the previous version
       of this item was wrong on almost every point.* What is actually true now:
       the Resend account exists, the **root** `germanyguide.net` is **Verified**

@@ -10,6 +10,33 @@
 
 ---
 
+## A provider dashboard said "Verified" for a DNS record that did not exist
+**2026-09-08**
+
+- **Symptom:** Resend's domain page showed all three records for
+  `germanyguide.net` with green **Verified** badges, including
+  `send` MX → `feedback-smtp.eu-west-1.amazonses.com`. `dig` found no MX at
+  `send.germanyguide.net` at all — against both Cloudflare authoritative
+  nameservers and 1.1.1.1 / 8.8.8.8. The Cloudflare zone confirmed it: the name
+  had only the SPF TXT.
+- **Cause:** the badge reflects the **last successful check**, not the current
+  state. The domain was verified two months earlier; the record was removed or
+  never persisted afterwards, and nothing re-checked. Sending kept working
+  because Resend verifies on DKIM, so the gap was invisible — the cost was
+  silent: bounce and complaint feedback had nowhere to route, which erodes
+  sending reputation as dead addresses accumulate.
+- **Fix:** added the MX in Cloudflare (`send`, priority 10) plus a monitor-only
+  `_dmarc` TXT `v=DMARC1; p=none;`, then re-queried DNS to confirm.
+- **Next time:** **trust DNS over a dashboard badge.** Verify mail records with
+  `dig` against the authoritative nameservers before believing any provider UI,
+  and re-check the records you did *not* touch afterwards — here that meant
+  proving the root MX was still iCloud's, since an MX mistake on the root would
+  have silently killed the `kontakt@`/`team@` mailboxes.
+- **Related hazard, not hit but one click away:** Resend's "Enable Receiving"
+  asks for an MX on the **root** pointing at `inbound-smtp.…amazonaws.com`.
+  Turning it on would override the iCloud MX and break those mailboxes. It reads
+  "not started" and must stay that way.
+
 ## Page titles were truncated on 60 of the 126 city-step pages
 **2026-09-07**
 
