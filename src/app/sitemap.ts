@@ -7,7 +7,7 @@ import {
   getProblems,
 } from "@/lib/content";
 
-const BASE = "https://germanyguide.net";
+const BASE = "https://www.germanyguide.net";
 
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   const [stepSlugs, cities, cityStepPairs, problems, letters] =

@@ -3,7 +3,7 @@ import { Suspense } from "react";
 import { getCities, getPhasesWithSteps } from "@/lib/content";
 import { PlanWizard } from "@/components/plan/plan-wizard";
 
-const BASE_URL = "https://germanyguide.net";
+const BASE_URL = "https://www.germanyguide.net";
 
 export const metadata: Metadata = {
   title: "Build Your Germany Move Plan",

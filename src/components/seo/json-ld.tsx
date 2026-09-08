@@ -10,7 +10,7 @@ export function JsonLd({ data }: { data: Record<string, unknown> }) {
   );
 }
 
-const BASE_URL = "https://germanyguide.net";
+const BASE_URL = "https://www.germanyguide.net";
 
 export function organizationJsonLd() {
   return {

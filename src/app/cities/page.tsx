@@ -6,7 +6,7 @@ import { CityBrowser, type BrowserCity } from "@/components/city/city-browser";
 import { Kicker } from "@/components/ui/kicker";
 import { Stagger, StaggerItem } from "@/components/motion/reveal";
 
-const BASE_URL = "https://germanyguide.net";
+const BASE_URL = "https://www.germanyguide.net";
 
 export const metadata: Metadata = {
   title: "German Cities: Bureaucracy, City by City",

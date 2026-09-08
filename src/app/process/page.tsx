@@ -5,7 +5,7 @@ import { Kicker } from "@/components/ui/kicker";
 import { ButtonLink } from "@/components/ui/button";
 import { ArrowRight } from "lucide-react";
 
-const BASE_URL = "https://germanyguide.net";
+const BASE_URL = "https://www.germanyguide.net";
 
 export const metadata: Metadata = {
   title: "How Moving to Germany Works, Step by Step",

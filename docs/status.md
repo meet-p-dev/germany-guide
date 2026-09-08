@@ -4,11 +4,11 @@
 > [`todo.md`](todo.md). **Verify counts against the live DB before relying on
 > them** — see rules §4.
 >
-> Last updated: **2026-09-07**
+> Last updated: **2026-09-08**
 
 ## Where it stands
 
-**Live at germanyguide.net.** Next.js 16 (App Router, TS strict, Tailwind v4) on
+**Live at www.germanyguide.net** (the apex `germanyguide.net` 301s to it). Next.js 16 (App Router, TS strict, Tailwind v4) on
 Vercel, content in Supabase (`ilfhjffpzvzphbvhdpup`), Framer Motion, Vercel
 Analytics (cookieless).
 
@@ -52,6 +52,19 @@ a trust ladder (site → web → honest fallback). `GROQ_API_KEY` is set in Verc
 The web-search rung still needs `TAVILY_API_KEY`.
 
 ## Changelog
+
+### 2026-09-08
+- **Canonical host is `www.germanyguide.net`.** Every canonical, the sitemap,
+  `metadataBase`, the JSON-LD `BASE_URL`, the RSS feed, robots.txt and the
+  newsletter links said `https://germanyguide.net` — but Vercel 301s the apex to
+  `www`, so all 266 sitemap URLs and every `<link rel="canonical">` pointed at a
+  redirect. Owner confirmed `www` is the intended host, so the code moved to it
+  rather than the redirect being flipped. Includes the RFC 8058
+  `List-Unsubscribe` endpoint, where a 301 on a POST breaks one-click
+  unsubscribe in some mail clients. Mailboxes (`kontakt@`, `team@`) and the
+  `send.germanyguide.net` sending subdomain are unrelated and unchanged.
+- **Search Console:** verify the **`www.germanyguide.net`** property, not the
+  apex, and submit `https://www.germanyguide.net/sitemap.xml`.
 
 ### 2026-09-07
 - **On-page SEO pass, code only — no content table was touched.** New

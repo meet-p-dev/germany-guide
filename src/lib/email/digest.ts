@@ -150,7 +150,7 @@ export async function runDigest(): Promise<DigestRunResult> {
       text,
       headers: {
         // The provider-rendered unsubscribe button posts to the API route.
-        "List-Unsubscribe": `<https://germanyguide.net/api/newsletter/unsubscribe?token=${recipient.unsubscribe_token}>, <mailto:team@germanyguide.net?subject=unsubscribe>`,
+        "List-Unsubscribe": `<https://www.germanyguide.net/api/newsletter/unsubscribe?token=${recipient.unsubscribe_token}>, <mailto:team@germanyguide.net?subject=unsubscribe>`,
         "List-Unsubscribe-Post": "List-Unsubscribe=One-Click",
       },
     });
@@ -225,7 +225,7 @@ export async function sendDigestPreview(to: string): Promise<DigestRunResult> {
 
   const { subject, html, text } = digestEmail({
     items,
-    unsubscribeUrl: "https://germanyguide.net/newsletter/unsubscribe?token=preview",
+    unsubscribeUrl: "https://www.germanyguide.net/newsletter/unsubscribe?token=preview",
   });
 
   const result = await sendEmail({

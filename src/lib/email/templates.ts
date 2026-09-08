@@ -13,7 +13,7 @@
  *   footer builder is shared so no template can forget it.
  */
 
-const BASE_URL = "https://germanyguide.net";
+const BASE_URL = "https://www.germanyguide.net";
 
 const COLORS = {
   background: "#faf9f4",

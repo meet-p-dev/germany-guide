@@ -3,7 +3,7 @@ import { getGlossaryTerms } from "@/lib/content";
 import { GlossaryBrowser } from "@/components/glossary/glossary-browser";
 import { Kicker } from "@/components/ui/kicker";
 
-const BASE_URL = "https://germanyguide.net";
+const BASE_URL = "https://www.germanyguide.net";
 
 export const metadata: Metadata = {
   title: "German Bureaucracy Terms, Translated",

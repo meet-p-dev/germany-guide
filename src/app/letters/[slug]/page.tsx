@@ -11,7 +11,7 @@ import {
   breadcrumbJsonLd,
 } from "@/components/seo/json-ld";
 
-const BASE_URL = "https://germanyguide.net";
+const BASE_URL = "https://www.germanyguide.net";
 
 export const revalidate = 3600;
 export const dynamicParams = true;

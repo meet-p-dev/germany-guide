@@ -3,7 +3,7 @@ import { getPhasesWithSteps, type CostType } from "@/lib/content";
 import { Kicker } from "@/components/ui/kicker";
 import { CostExplorer, type CostItem } from "@/components/costs/cost-explorer";
 
-const BASE_URL = "https://germanyguide.net";
+const BASE_URL = "https://www.germanyguide.net";
 
 export const metadata: Metadata = {
   title: "What Germany Costs in Your First Year",

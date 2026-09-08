@@ -37,7 +37,7 @@ const cabinetGrotesk = localFont({
 });
 
 export const metadata: Metadata = {
-  metadataBase: new URL("https://germanyguide.net"),
+  metadataBase: new URL("https://www.germanyguide.net"),
   title: {
     default: "Germany Guide — bureaucracy explained for internationals",
     template: "%s · Germany Guide",
@@ -54,7 +54,7 @@ export const metadata: Metadata = {
     title: "Germany Guide — arrive in Germany without the chaos",
     description:
       "A clear, personalised checklist for moving to Germany that knows how your exact city works.",
-    url: "https://germanyguide.net",
+    url: "https://www.germanyguide.net",
     images: [{ url: "/images/hero-moving-in.jpg", width: 1600, height: 1063 }],
   },
   twitter: {

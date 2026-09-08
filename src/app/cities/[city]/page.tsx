@@ -26,7 +26,7 @@ import { CityFactsSections } from "@/components/city/city-facts-sections";
 import { JsonLd, breadcrumbJsonLd } from "@/components/seo/json-ld";
 import { Kicker } from "@/components/ui/kicker";
 
-const BASE_URL = "https://germanyguide.net";
+const BASE_URL = "https://www.germanyguide.net";
 import { SetCityButton } from "@/components/city/set-city-button";
 import { Reveal, Stagger, StaggerItem } from "@/components/motion/reveal";
 

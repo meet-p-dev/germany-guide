@@ -7,7 +7,7 @@ import { Kicker } from "@/components/ui/kicker";
 import { Stagger, StaggerItem } from "@/components/motion/reveal";
 import { cn } from "@/lib/utils";
 
-const BASE_URL = "https://germanyguide.net";
+const BASE_URL = "https://www.germanyguide.net";
 
 export const metadata: Metadata = {
   title: "Decode Your German Official Mail",

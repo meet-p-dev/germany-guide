@@ -13,6 +13,6 @@ export default function robots(): MetadataRoute.Robots {
         "/privacy",
       ],
     },
-    sitemap: "https://germanyguide.net/sitemap.xml",
+    sitemap: "https://www.germanyguide.net/sitemap.xml",
   };
 }

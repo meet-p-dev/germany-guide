@@ -12,7 +12,7 @@ export const revalidate = 3600;
 // Title and description come from the root layout; this only pins the
 // canonical so the trailing-slash and query-string variants collapse to one URL.
 export const metadata: Metadata = {
-  alternates: { canonical: "https://germanyguide.net" },
+  alternates: { canonical: "https://www.germanyguide.net" },
 };
 
 export default function HomePage() {

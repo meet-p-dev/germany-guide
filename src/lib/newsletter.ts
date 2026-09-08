@@ -19,7 +19,7 @@ import { createServiceClient, hasServiceRole } from "@/lib/supabase/service-clie
  * the form cannot be used to test who has an account.
  */
 
-export const BASE_URL = "https://germanyguide.net";
+export const BASE_URL = "https://www.germanyguide.net";
 
 /** One confirmation email per address per this window, to stop mail-bombing. */
 const RESEND_COOLDOWN_MS = 5 * 60 * 1000;

@@ -19,7 +19,7 @@ import { ButtonLink } from "@/components/ui/button";
 import { Kicker } from "@/components/ui/kicker";
 import { Reveal, Stagger, StaggerItem } from "@/components/motion/reveal";
 
-const BASE_URL = "https://germanyguide.net";
+const BASE_URL = "https://www.germanyguide.net";
 
 export const metadata: Metadata = {
   title: "Why Germany? The Honest Case for Moving",

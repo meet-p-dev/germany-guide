@@ -4,7 +4,7 @@
 > [`status.md`](status.md). Keep this file honest: delete finished items rather
 > than marking them done, and move anything shipped into `status.md`.
 >
-> Last updated: **2026-09-07**
+> Last updated: **2026-09-08**
 
 ---
 
@@ -47,8 +47,8 @@ only genuinely **urgent** items on this page.
       5. Then check `/admin/newsletter`: it should stop saying "not switched
          on". Subscribe yourself, confirm from the email, and press "Send a
          test to me" before the first real digest.
-- [ ] **Auth URL config + email templates.** Site URL `https://germanyguide.net`,
-      redirect `https://germanyguide.net/**`. Recovery/confirm templates must link to
+- [ ] **Auth URL config + email templates.** Site URL `https://www.germanyguide.net`,
+      redirect `https://www.germanyguide.net/**`. Recovery/confirm templates must link to
       `{{ .SiteURL }}/auth/callback?token_hash={{ .TokenHash }}&type=recovery&next=/reset-password`
       (and `type=email&next=/journey` for the signup confirmation).
 - [ ] **Enable leaked-password protection** and a minimum length of 8 (the
@@ -56,7 +56,9 @@ only genuinely **urgent** items on this page.
 - [ ] **Legal check before serious traffic:** confirm the real name/address in
       `/impressum`. The contact address is now `kontakt@germanyguide.net` on both
       `/impressum` and `/privacy` (was a Gmail address) — that part is done.
-- [ ] **Search Console:** click Verify, submit `sitemap.xml`. Traffic data lags by
+- [ ] **Search Console:** click Verify on the **`www.germanyguide.net`**
+      property (the apex 301s to www, so verifying the apex measures a
+      redirect), then submit `https://www.germanyguide.net/sitemap.xml`. Traffic data lags by
       days or weeks — don't act on an empty dashboard.
 - [ ] **`TAVILY_API_KEY`** in Vercel *Production* to switch on the AI web-search
       rung. Vercel gotchas: exact name, tick Production, save **before** redeploy.
