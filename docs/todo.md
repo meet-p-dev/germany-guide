@@ -15,36 +15,16 @@ the most urgent item here — is done and proven** (2026-09-08, see `status.md`)
 so signup and password reset no longer sit on the default sender's ~2/hour cap.
 Nothing on this page is now urgent in that sense.
 
-- [ ] **Switch the newsletter on.** *Rewritten 2026-09-08 — the previous version
-      of this item was wrong on almost every point.* What is actually true now:
-      the Resend account exists, the **root** `germanyguide.net` is **Verified**
-      (region Ireland `eu-west-1`), DKIM and the return-path SPF are live, and
-      open/click tracking is **already off**, so `/privacy` stays true. The old
-      instruction to verify `send.germanyguide.net` as a separate subdomain is
-      **superseded** — do not do it; the root is verified and Resend's layout
-      already keeps the iCloud MX untouched.
-      What is genuinely left:
-      1. **Vercel env vars, Production** — `RESEND_API_KEY`,
-         `SUPABASE_SERVICE_ROLE_KEY` (Supabase → Settings → API) and
-         `CRON_SECRET` (any long random string; without it the cron route
-         refuses to run). `NEWSLETTER_FROM` is now only needed to *override* the
-         default, which is already correct at `noreply@germanyguide.net`.
-         **Verified 2026-09-08: they are NOT set.** Submitting the real signup
-         form on `/updates` returned *"Email sending is not switched on yet.
-         Please try again shortly — nothing was saved"*, which is the
-         `newsletterConfigured()` branch — so at least one of the two is
-         missing in Production. The probe was clean: that check runs *before*
-         `createServiceClient()`, and `newsletter_subscribers` is still empty
-         (0 rows), so nothing was written and no mail was sent. The public
-         message does not say *which* of the two is missing; `/admin/newsletter`
-         does, listing each as "set"/"missing" — it needs an admin sign-in.
-         Note this is independent of auth email: Supabase SMTP uses its own
-         stored password and is proven working.
-      2. Check `/admin/newsletter` — it should stop saying "not switched on".
-         Subscribe yourself, confirm from the email, and press "Send a test to
-         me" before the first real digest.
-      Vercel gotchas: exact variable name, tick **Production**, and save
-      **before** redeploying.
+- [ ] **Finish the newsletter: set `CRON_SECRET`.** The newsletter itself went
+      live 2026-09-08 (see `status.md`) — signup, confirmation email and delivery
+      all verified. What is left is the **monthly digest cron**, which refuses to
+      run without `CRON_SECRET` in Vercel Production. Generate one with
+      `openssl rand -base64 32`, add it, and redeploy (env vars are read at build
+      time). Then confirm the owner's own pending subscription from the email and
+      use `/admin/newsletter` → "Send a test to me" before the first real digest.
+      Note `NEXT_PUBLIC_SITE_URL` in Vercel predates the www move and is
+      referenced nowhere in `src/` — safe to delete, and worth deleting so it
+      stops looking meaningful.
 - [ ] **Enable leaked-password protection** and a minimum length of 8 (the
       security advisor flags this).
 - [ ] **Legal check before serious traffic:** confirm the real name/address in

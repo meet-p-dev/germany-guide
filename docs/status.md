@@ -63,14 +63,20 @@ The web-search rung still needs `TAVILY_API_KEY`.
   `List-Unsubscribe` endpoint, where a 301 on a POST breaks one-click
   unsubscribe in some mail clients. Mailboxes (`kontakt@`, `team@`) and the
   `send.germanyguide.net` sending subdomain are unrelated and unchanged.
-- **The newsletter is still dormant, now confirmed rather than assumed.** A real
-  submission to the `/updates` signup form on 2026-09-08 returned "Email sending
-  is not switched on yet", the `newsletterConfigured()` branch, so
-  `SUPABASE_SERVICE_ROLE_KEY` and/or `RESEND_API_KEY` is missing in Vercel
-  Production. `newsletter_subscribers` remains at 0 rows — the guard runs before
-  any DB call, so the forms genuinely do not lose an address. **This is separate
-  from auth email**, which sends through Supabase's own stored SMTP password and
-  works.
+- **The newsletter is LIVE as of 2026-09-08**, verified end to end: submitting
+  the real `/updates` form returned "Almost there — check your inbox", a
+  `newsletter_subscribers` row was created with status **`pending`** (correctly
+  unconfirmed — double opt-in working), and Resend logged
+  "Confirm your Germany Guide updates" as **Delivered**.
+  - **What was actually missing was `SUPABASE_SERVICE_ROLE_KEY`, not the Resend
+    key.** `RESEND_API_KEY` had been set in Vercel since **19 July** (All
+    Environments). The gate is `hasServiceRole() && emailConfigured()`, so the
+    service-role half had always been the blocker. Anyone debugging this again:
+    read *both* halves of the gate before blaming the newer-looking one.
+  - `CRON_SECRET` is **still not set**, so the monthly digest cron cannot run.
+    Signup and confirmation do not depend on it.
+  - Env vars are read at build time on Vercel, so each change needed an
+    `--allow-empty` rebuild before it took effect.
 - **Custom SMTP is live and proven.** Supabase Auth → Emails → SMTP Settings is
   enabled against `smtp.resend.com:465`, username `resend`, sender
   `noreply@germanyguide.net` / "Germany Guide". **Verified end to end on
