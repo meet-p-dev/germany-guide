@@ -12,15 +12,19 @@
 Vercel, content in Supabase (`ilfhjffpzvzphbvhdpup`), Framer Motion, Vercel
 Analytics (cookieless).
 
+All counts below are a live `count(*)` taken 2026-09-08. Re-run before relying
+on them (rules §4).
+
 | Content | Count |
 |---|---|
-| Cities live | **40** (0 coming_soon) |
-| `city_steps` | **126** — every city has the big three (anmeldung, residence-permit, visa-extension); Munich/Ingolstadt/Nuremberg add public-transport + find-housing-remotely |
-| `city_facts` | **240** — all 40 cities × 6 (first_days, housing ×2, insurance, banking, while_waiting) |
+| Cities live | **41** (0 coming_soon) |
+| `city_steps` | **129** — every city has the big three (anmeldung, residence-permit, visa-extension); Munich/Ingolstadt/Nuremberg add public-transport + find-housing-remotely |
+| `city_facts` | **287** — 41 × `study_costs`, plus the six-fact shape (first_days, housing ×2, insurance, banking, while_waiting) on the 41 cities |
+| `city_steps.lead_time` | **46 of 129** filled; the rest inherit the generic `steps.lead_time` |
 | Guide steps | 30 across 5 phases (decide → prepare → arrive → settle → live) |
-| Glossary terms | 82 |
-| Problems & solutions | 18 |
-| Letter Helper entries | 13 |
+| Glossary terms | 141 |
+| Problems & solutions | 36 |
+| Letter Helper entries | 22 |
 | `/updates` items | 10 (+ RSS) |
 
 **Features:** stage-first plan wizard, adaptive journey checklist, compact
@@ -52,6 +56,51 @@ a trust ladder (site → web → honest fallback). `GROQ_API_KEY` is set in Verc
 The web-search rung still needs `TAVILY_API_KEY`.
 
 ## Changelog
+
+### 2026-09-08 (latest)
+- **Tuition is on the site: a new `study_costs` `city_facts` category, filled
+  for all 41 cities.** This was the largest cost difference between German
+  cities and the site said nothing about it. Two shapes, and they are not the
+  same shape:
+  - **Baden-Württemberg charges by state law.** €1,500/semester for non-EU/EEA
+    students under the LHGebG, since WS 2017/18, identical at every state
+    university, plus €650 for a Zweitstudium. Covers Stuttgart, Karlsruhe,
+    Freiburg, Heidelberg, Mannheim and Ulm.
+  - **Bavaria has no Land-wide answer.** Under the BayHIG each Hochschule sets
+    its own fee in its own Satzung, so "does Bavaria charge?" has no answer.
+    **TUM has charged since WS 2024/25** at €2,000–3,000 (BA) and €4,000–6,000
+    (MA) per semester, while **LMU in the same city charges nothing**. THI
+    Ingolstadt €800/€1,200 from SS 2026; TH Nürnberg €1,000 from WS 2026/27;
+    FAU €1,000–3,000 / €2,000–6,000 from SS 2027; OTH Regensburg a €500 service
+    fee on five English-taught programmes. Würzburg (JMU and THWS), Uni
+    Augsburg, Uni Regensburg and LMU charge nothing.
+  - The other 27 cities charge no tuition. Each fact carries that city's own
+    Semesterbeitrag with the semester it belongs to, and its real local
+    exceptions (Saxony and Thuringia long-term study fees, Bremen
+    Langzeitstudierende, Magdeburg's ITVET Master, Saarbrücken's €12,000 MBA).
+  - **Every figure came from the institution's or ministry's own page.**
+    Aggregator figures were checked and discarded; one claimed a THWS fee that
+    THWS says does not exist. See `solutions.md`.
+- **`city_steps.lead_time` filled for 46 rows.** The field already rendered as a
+  Clock chip but was null on all 126 rows, so every city showed the same generic
+  sentence. Values were extracted from durations already stated in verified
+  content, so **`last_verified` did not move**. Munich's residence permit now
+  reads "The office quotes up to 10 months"; Ulm's Anmeldung "Walk-in Mon–Fri,
+  no appointment needed".
+- **Fürth is built and no longer an empty page.** It had been created
+  2026-09-06 as `status = 'live'` with **0 `city_steps` and 0 `city_facts`**, so
+  `/cities/fuerth` served a shell in production. It now has the big three steps
+  and seven facts. Local findings: the **Bürgerzentrum and the Ausländerbehörde
+  share one building** at Schwabacher Straße 170, **Fürth runs its own
+  Ausländerbehörde** rather than using Nuremberg's, short-notice registration
+  slots drop **weekdays around 11:00**, and there are **no Studierendenwerk
+  halls in Fürth** (the provider serves Erlangen, Nuremberg, Ansbach and
+  Ingolstadt).
+- **All 50 new rows are written to `writing.md`**, which landed the same day: no
+  em dashes, no `**The flow:**`, emphasis inside budget. Titles, link labels,
+  `source` and `method_note` were cleaned too, not just `content_md`. The
+  remaining em dashes on a city page come from `steps.quick_action` and the
+  other 126 pre-existing `city_steps`, which is the backlog in `todo.md` §3b.
 
 ### 2026-09-08 (later)
 - **UI copy in `src` brought in line with the new house style.** 232 em dashes
