@@ -56,10 +56,14 @@ only genuinely **urgent** items on this page.
 - [ ] **Legal check before serious traffic:** confirm the real name/address in
       `/impressum`. The contact address is now `kontakt@germanyguide.net` on both
       `/impressum` and `/privacy` (was a Gmail address) — that part is done.
-- [ ] **Search Console:** click Verify on the **`www.germanyguide.net`**
-      property (the apex 301s to www, so verifying the apex measures a
-      redirect), then submit `https://www.germanyguide.net/sitemap.xml`. Traffic data lags by
-      days or weeks — don't act on an empty dashboard.
+- [ ] **Search Console — one thing left to check.** Verification, sitemaps and
+      the first indexing requests are done (2026-09-08, see `status.md`). The
+      open item: the `https://www.germanyguide.net/sitemap.xml` entry read
+      "couldn't fetch" on submission. The file was hand-validated and is fine,
+      and the apex sitemap entry reads Success with 266 pages, so discovery is
+      not blocked — but confirm the www entry flips to Success. If it is still
+      failing after a few days, delete and re-add it. Traffic data lags by days
+      or weeks; don't act on an empty dashboard.
 - [ ] **`TAVILY_API_KEY`** in Vercel *Production* to switch on the AI web-search
       rung. Vercel gotchas: exact name, tick Production, save **before** redeploy.
 - [ ] **Google OAuth consent screen:** set app name "Germany Guide" + logo in

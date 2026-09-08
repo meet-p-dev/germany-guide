@@ -63,8 +63,33 @@ The web-search rung still needs `TAVILY_API_KEY`.
   `List-Unsubscribe` endpoint, where a 301 on a POST breaks one-click
   unsubscribe in some mail clients. Mailboxes (`kontakt@`, `team@`) and the
   `send.germanyguide.net` sending subdomain are unrelated and unchanged.
-- **Search Console:** verify the **`www.germanyguide.net`** property, not the
-  apex, and submit `https://www.germanyguide.net/sitemap.xml`.
+- **Search Console is verified and wired up** (account
+  `germanyguide.net@gmail.com`). The property is a **Domain property,
+  `sc-domain:germanyguide.net`**, which covers every subdomain and both
+  protocols — so it already covers `www` and no separate www property is
+  needed. A second, older URL-prefix property `https://germanyguide.net/`
+  also exists; it only covers the apex, which now just redirects, so it is
+  effectively dead weight (harmless, left in place).
+  - Sitemaps: the apex `https://germanyguide.net/sitemap.xml` was submitted
+    2026-09-07 and reads **Success, 266 pages** (it follows the redirect and
+    now serves the www URLs). `https://www.germanyguide.net/sitemap.xml` was
+    added 2026-09-08 and currently says "couldn't fetch" — the file was
+    validated by hand (no BOM, correct namespace, 266 locs, all www, no
+    duplicates, 36 KB, `200 application/xml`), so this is Google's fetch
+    queue, not the file. Re-check it.
+  - **Indexing requested** for 5 URLs: `/`, `/cities`, `/process`,
+    `/cities/munich/anmeldung`, `/cities/berlin/residence-permit`.
+  - **The homepage had been dropped as "Page with redirect."** Its last crawl
+    was **2026-07-06**, when Googlebot followed `www` to a redirect. A live
+    test on 2026-09-08 now returns "URL is available to Google / Page can be
+    indexed", so the host fix resolved it — but it explains why the site has
+    no index presence at all today.
+  - **Rich-result reality check:** the live test lists **Breadcrumbs** as the
+    only detected enhancement. `FAQPage` is not reported (Google restricted
+    FAQ rich results to government and health sites in 2023) and `HowTo` is
+    not reported (Google retired HowTo rich results in 2023). Both schemas are
+    still worth keeping for entity understanding and AI surfaces, but neither
+    will produce a visual snippet. Do not chase them.
 
 ### 2026-09-07
 - **On-page SEO pass, code only — no content table was touched.** New
