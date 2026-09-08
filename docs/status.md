@@ -63,6 +63,19 @@ The web-search rung still needs `TAVILY_API_KEY`.
   `List-Unsubscribe` endpoint, where a 301 on a POST breaks one-click
   unsubscribe in some mail clients. Mailboxes (`kontakt@`, `team@`) and the
   `send.germanyguide.net` sending subdomain are unrelated and unchanged.
+- **Supabase Auth moved to the www host** (project `ilfhjffpzvzphbvhdpup`,
+  Authentication → URL Configuration). Site URL is now
+  `https://www.germanyguide.net`. The redirect allowlist holds **both**
+  `https://germanyguide.net/**` and `https://www.germanyguide.net/**` — the
+  apex entry is kept deliberately so a recovery or confirmation link already
+  sitting in someone's inbox still resolves. Verified by reloading the page,
+  not just by the success toast.
+  - The **email templates were already correct** and needed no edit: both use
+    `{{ .SiteURL }}`, so they picked up the new host on their own. Confirm
+    sign-up links to `{{ .SiteURL }}/auth/callback?token_hash={{ .TokenHash }}`
+    `&type=email&next=/journey`, reset password to the same with
+    `&type=recovery&next=/reset-password`. `todo.md` had been carrying this as
+    outstanding; it was stale.
 - **Search Console is verified and wired up** (account
   `germanyguide.net@gmail.com`). The property is a **Domain property,
   `sc-domain:germanyguide.net`**, which covers every subdomain and both

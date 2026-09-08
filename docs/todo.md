@@ -47,10 +47,6 @@ only genuinely **urgent** items on this page.
       5. Then check `/admin/newsletter`: it should stop saying "not switched
          on". Subscribe yourself, confirm from the email, and press "Send a
          test to me" before the first real digest.
-- [ ] **Auth URL config + email templates.** Site URL `https://www.germanyguide.net`,
-      redirect `https://www.germanyguide.net/**`. Recovery/confirm templates must link to
-      `{{ .SiteURL }}/auth/callback?token_hash={{ .TokenHash }}&type=recovery&next=/reset-password`
-      (and `type=email&next=/journey` for the signup confirmation).
 - [ ] **Enable leaked-password protection** and a minimum length of 8 (the
       security advisor flags this).
 - [ ] **Legal check before serious traffic:** confirm the real name/address in
