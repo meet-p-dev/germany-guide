@@ -44,6 +44,7 @@ export async function generateMetadata({
   return {
     title: `${letter.name}: what it means`,
     description: `Received "${letter.german_name ?? letter.name}"${letter.sender ? ` from ${letter.sender}` : ""}? What it is, how urgent it is, and what to do.`,
+    alternates: { canonical: `${BASE_URL}/letters/${letter.slug}` },
   };
 }
 

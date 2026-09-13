@@ -4,7 +4,7 @@
 > [`todo.md`](todo.md). **Verify counts against the live DB before relying on
 > them** — see rules §4.
 >
-> Last updated: **2026-09-08**
+> Last updated: **2026-09-13**
 
 ## Where it stands
 
@@ -57,7 +57,37 @@ The web-search rung still needs `TAVILY_API_KEY`.
 
 ## Changelog
 
-### 2026-09-08 (latest)
+### 2026-09-13 (latest)
+- **Indexing audit, from Search Console.** The URL-prefix property
+  (`https://germanyguide.net/`, last update 4 Sept) reads **132 indexed, 440 not
+  indexed**: 238 *Discovered, currently not indexed*, 132 *Crawled, currently
+  not indexed*, 59 *Not found (404)*, 8 *Excluded by noindex*, 3 *Soft 404*.
+  The Domain property (`sc-domain:germanyguide.net`) still says "processing
+  data". The owner's "226 not found" was several of these rows added together.
+- **Real 404s now.** The root `src/app/loading.tsx` made every unknown slug
+  return 200 plus a noindex meta tag (streaming commits the status first). It
+  is deleted; `/guide/zzz`, `/cities/berlin/zzz`, `/problems/zzz` and
+  `/letters/zzz` return 404 on a local production build. See `solutions.md`.
+- **Old URLs redirect.** All 70 404, soft-404 and noindex URLs came from the
+  site's structure before the July rebuild (`/germany/<city>/<task>`,
+  `/tasks/<slug>`, `/glossary/<term>`, renamed problem and letter slugs,
+  `hannover` and `duesseldorf`). `next.config.ts` now sends each one, in one
+  hop, to the page that replaced it (308). 30 were tested locally, all landing
+  on a 200.
+- **Canonicals on the last 59 pages.** `/problems/*` (36), `/letters/*` (22) and
+  `/journey` had none. Every URL in the sitemap now has one.
+- Crawled all 269 sitemap URLs as Googlebot: all 200, no stray noindex, no
+  duplicate titles, and every internal link resolves except Cloudflare's
+  `/cdn-cgi/l/email-protection` (from Email Obfuscation on the mailto links;
+  harmless).
+- **Growth, Stage 1 started.** `marketing/reels.md` holds 10 Reel and Short
+  scripts built only on facts already verified in the city traps below;
+  `marketing/outreach.md` holds 8 backlink targets (the Embassy's ISG portal and
+  Indian student associations in Munich, Aachen, Berlin, Hamburg and Darmstadt),
+  6 YouTube creators with subscriber counts read on 2026-09-13, and message
+  templates. Nothing has been sent or posted.
+
+### 2026-09-08
 - **Tuition is on the site: a new `study_costs` `city_facts` category, filled
   for all 41 cities.** This was the largest cost difference between German
   cities and the site said nothing about it. Two shapes, and they are not the

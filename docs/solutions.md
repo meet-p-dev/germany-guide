@@ -10,6 +10,38 @@
 
 ---
 
+## Every missing page returned 200, and Google called them "soft 404" or "noindex"
+**2026-09-13**
+
+- **Symptom:** Search Console (URL-prefix property `https://germanyguide.net/`)
+  listed 59 URLs as **Not found (404)**, 3 as **Soft 404** and 8 as
+  **Excluded by 'noindex' tag**. `curl` on any made-up slug
+  (`/guide/zzz`, `/cities/berlin/zzz`, `/problems/zzz`) returned **200** with
+  the site's default title and `<meta name="robots" content="noindex">`.
+- **Cause 1, the status code:** `src/app/loading.tsx` at the root wrapped every
+  page in a Suspense boundary. Once a fallback renders, Next.js commits to
+  `200 OK` and starts streaming, so a later `notFound()` cannot change the
+  status; Next injects a noindex meta tag instead. This is documented in
+  `node_modules/next/dist/docs/01-app/02-guides/streaming.md`, "The HTTP
+  contract".
+- **Cause 2, the URLs:** all 70 came from the site's structure before the
+  July 2026 rebuild: `/germany/<city>/<task>`, `/germany/<city>`, `/tasks/<slug>`,
+  `/glossary/<term>`, and problem and letter slugs that were renamed. Google
+  keeps crawling URLs it once knew for months.
+- **Fix:** deleted the root `loading.tsx`, so unknown slugs now return a real
+  404. Added permanent redirects in `next.config.ts` from every old pattern to
+  the page that replaced it (one hop, all tested). Old URLs with no honest
+  equivalent, such as `/problems/having-a-baby-in-germany`, are left to 404
+  rather than redirected somewhere unrelated, which Google would treat as a
+  soft 404 anyway. Also added the canonical tag that was missing on all 36
+  `/problems/*`, all 22 `/letters/*` and `/journey`.
+- **Next time:** test a made-up URL after any change to a layout, `loading.tsx`
+  or Suspense boundary: `curl -s -o /dev/null -w '%{http_code}' <site>/guide/zzz`
+  must print 404. Do not add a `loading.tsx` above a route that calls
+  `notFound()`. And the "226 not found" number the owner saw was really
+  several different reasons added together; open each row of the
+  **Why pages aren't indexed** table before deciding what is broken.
+
 ## A university-fee aggregator invented a tuition fee that does not exist
 **2026-09-08**
 

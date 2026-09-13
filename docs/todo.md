@@ -4,7 +4,7 @@
 > [`status.md`](status.md). Keep this file honest: delete finished items rather
 > than marking them done, and move anything shipped into `status.md`.
 >
-> Last updated: **2026-09-08**
+> Last updated: **2026-09-13**
 
 ---
 
@@ -32,14 +32,14 @@ Nothing on this page is now urgent in that sense.
 - [ ] **Legal check before serious traffic:** confirm the real name/address in
       `/impressum`. The contact address is now `kontakt@germanyguide.net` on both
       `/impressum` and `/privacy` (was a Gmail address) — that part is done.
-- [ ] **Search Console — one thing left to check.** Verification, sitemaps and
-      the first indexing requests are done (2026-09-08, see `status.md`). The
-      open item: the `https://www.germanyguide.net/sitemap.xml` entry read
-      "couldn't fetch" on submission. The file was hand-validated and is fine,
-      and the apex sitemap entry reads Success with 266 pages, so discovery is
-      not blocked — but confirm the www entry flips to Success. If it is still
-      failing after a few days, delete and re-add it. Traffic data lags by days
-      or weeks; don't act on an empty dashboard.
+- [ ] **Search Console: validate the fixes once they are live.** The 404,
+      soft-404 and noindex causes were fixed 2026-09-13 (see `status.md`). In
+      the URL-prefix property, open **Soft 404** and **Excluded by noindex** and
+      press *Validate fix*; the 404 validation was already started 2026-09-12 and
+      will now see redirects. Also confirm the www sitemap entry reads Success,
+      and check whether the Domain property has finished processing. The 370
+      *Discovered / Crawled, currently not indexed* URLs are not a code fault:
+      they need backlinks and time (see §2b).
 - [ ] **`TAVILY_API_KEY`** in Vercel *Production* to switch on the AI web-search
       rung. Vercel gotchas: exact name, tick Production, save **before** redeploy.
 - [ ] **Google OAuth consent screen:** set app name "Germany Guide" + logo in
@@ -78,6 +78,29 @@ Nothing on this page is now urgent in that sense.
 - [ ] **Verify both AI features actually work in production.** They can read as
       "not switched on" in some environments even with the key set — check before
       demoing.
+
+## 2b. Growth, Stage 1 (free channels, started 2026-09-13)
+
+Traffic first, and free channels before paid ones: ads bring visits that stop
+when the budget stops, while indexed pages keep bringing people in. Material is
+in `marketing/`. **Claude drafts, the owner approves every post and every
+message**; nothing is sent from an automated login.
+
+- [ ] **Film and post the 10 Reels** in `marketing/reels.md`, starting with #1
+      (online Anmeldung does not work for non-EU arrivals). Re-check each fact
+      on its linked page first. Schedule through Meta Business Suite, or connect
+      Metricool so Claude can queue drafts for approval.
+- [ ] **Send the 8 backlink emails** in `marketing/outreach.md` from
+      `kontakt@germanyguide.net`, one follow-up after 7 days, and track status
+      in the table.
+- [ ] **Finish the creator shortlist** to about 20 (6 found so far) and check
+      each channel's last upload before pitching.
+- [ ] **Instagram bio link** should point at a tagged URL
+      (`?utm_source=instagram&utm_medium=social`) so Vercel Analytics can
+      separate social traffic.
+- [ ] Stage 2 (small Meta ad test) waits until Stage 1 has run for a few weeks
+      and the owner sets a budget. **No Meta Pixel**: it needs a consent banner
+      and would make `/privacy` untrue. Use UTM links instead.
 
 ## 3. Automation — the review gate is in, the sweeps are not scheduled
 
