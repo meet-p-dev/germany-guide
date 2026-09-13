@@ -10,6 +10,26 @@
 
 ---
 
+## A Vercel build failed with "Gateway Timeout" on one city page
+**2026-09-13**
+
+- **Symptom:** the production deploy for `cfbb731` went to **ERROR** although
+  `tsc`, `eslint` and `npm run build` had all passed locally. The Vercel build
+  log read `Error occurred prerendering page "/cities/essen/anmeldung"` and
+  `Error: {"message":"Gateway Timeout"}`. Production kept serving the previous
+  deploy, so a new file in `public/` stayed a 404.
+- **Cause:** at build time Next.js prerenders all ~286 pages, each reading
+  Supabase. One of those requests timed out at Supabase's gateway, and a
+  single failed page stops the whole build. Nothing in the commit touched
+  that page.
+- **Fix:** check that Supabase is answering, then push again (an empty commit
+  is enough). The retry built normally.
+- **Next time:** after every push, confirm the deploy reached **READY**
+  (`list_deployments`) before relying on anything in it. A failed build is
+  silent: the live site looks fine, just old. If the timeout comes back on
+  most builds rather than once, look at Supabase load or the query behind
+  `getStepBySlug`, not at the page that happened to fail.
+
 ## Every missing page returned 200, and Google called them "soft 404" or "noindex"
 **2026-09-13**
 
