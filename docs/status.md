@@ -87,6 +87,13 @@ The web-search rung still needs `TAVILY_API_KEY`.
   redirects. The owner removed the old URL-prefix property the same day;
   the Domain property `sc-domain:germanyguide.net` remains, and its www
   sitemap reads **Success, 266 pages**.
+- **Index checker and IndexNow.** `npm run seo:index-status` asks Google's URL
+  Inspection API about every sitemap URL (indexed or not, Google's chosen
+  canonical, last crawl) and writes a CSV to `reports/`; it needs a
+  service-account key the owner creates once (`automation.md`). `npm run
+  seo:indexnow` submits the whole sitemap to Bing and the other IndexNow
+  engines; its public key file is `public/ea45c23029c17ad38685d2d01a83bc64.txt`.
+  Both dry-run cleanly against the live sitemap (269 URLs).
 - Crawled all 269 sitemap URLs as Googlebot: all 200, no stray noindex, no
   duplicate titles, and every internal link resolves except Cloudflare's
   `/cdn-cgi/l/email-protection` (from Email Obfuscation on the mailto links;

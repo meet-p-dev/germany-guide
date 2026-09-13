@@ -127,6 +127,55 @@ Each is a slash command in `.claude/commands/`:
 | `/updates-scout` | weekly | Watches official sources and drafts an `/updates` item |
 | `/session-close` | end of every session | Updates `status.md` / `todo.md` / `solutions.md` |
 
+## Search engine scripts
+
+Two plain Node scripts in `scripts/`, no dependencies. Neither writes to the
+database or the site.
+
+| Command | Cadence | What it does |
+|---|---|---|
+| `npm run seo:index-status` | monthly | Asks Google, through the URL Inspection API, whether each sitemap URL is indexed and which canonical Google chose. Writes `reports/index-status-<date>.csv` (gitignored) and prints a summary |
+| `npm run seo:indexnow` | after pages are added or changed | Sends every sitemap URL to IndexNow (Bing, Yandex, Seznam, Naver). Google does not use IndexNow |
+
+Both accept `--dry-run`. `seo:index-status` also takes `--limit N` and
+`--only /path-prefix`. The quota is 2,000 inspections a day per property, so
+one full run (about 270 URLs) is well inside it.
+
+### One-time setup for `seo:index-status` (owner)
+
+The script authenticates as a Google Cloud **service account**, so there is no
+password in it and nothing to log in to each month. Creating the account and
+its key is a credential step, so the owner does it:
+
+1. In [Google Cloud Console](https://console.cloud.google.com/), pick the
+   project that already holds the Google sign-in client (or create one).
+2. **APIs & Services → Library → "Google Search Console API" → Enable.**
+3. **IAM & Admin → Service Accounts → Create service account.** Name it
+   `gsc-index-status`. No roles are needed on the project.
+4. Open it → **Keys → Add key → JSON.** Save the file outside the repo, at
+   `~/.config/germany-guide/gsc-service-account.json`. Never commit it.
+5. In Search Console → **Settings → Users and permissions → Add user**, paste
+   the service account's email (ends in `iam.gserviceaccount.com`) with
+   **Restricted** permission, on `sc-domain:germanyguide.net`.
+6. Run
+   `GSC_KEY_FILE=~/.config/germany-guide/gsc-service-account.json npm run seo:index-status`.
+
+A `403` on every row means step 5 is missing or was done on another property.
+
+### IndexNow key
+
+`public/ea45c23029c17ad38685d2d01a83bc64.txt` is the IndexNow key file. The key
+is **not** a secret: IndexNow proves ownership by fetching that file from the
+site. Do not rename or delete it, or submissions start failing with `403`.
+
+### Bing Webmaster Tools (owner)
+
+IndexNow already feeds Bing, but Bing Webmaster Tools shows what Bing has
+indexed. Creating the account is the owner's step: sign in at
+[bing.com/webmasters](https://www.bing.com/webmasters) and choose **Import from
+Google Search Console**. That verifies the site and imports the sitemap in one
+go, with no DNS record needed.
+
 ## What stays human
 
 Not "for now" — by design:

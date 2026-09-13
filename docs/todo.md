@@ -45,6 +45,14 @@ Nothing on this page is now urgent in that sense.
       "couldn't fetch" on 2026-09-08). The 370
       *Discovered / Crawled, currently not indexed* URLs are not a code fault:
       they need backlinks and time (see §2b).
+- [ ] **Give the index checker read access, then run it.** Follow the six
+      steps in `automation.md` ("One-time setup for `seo:index-status`"):
+      a Google Cloud service account, its JSON key saved outside the repo, and
+      its email added as a Restricted user in Search Console. Then
+      `npm run seo:index-status` checks all 269 URLs in a few minutes.
+- [ ] **Bing Webmaster Tools:** sign in at bing.com/webmasters and choose
+      *Import from Google Search Console*. IndexNow already sends Bing the
+      pages; this adds Bing's own reports.
 - [ ] **`TAVILY_API_KEY`** in Vercel *Production* to switch on the AI web-search
       rung. Vercel gotchas: exact name, tick Production, save **before** redeploy.
 - [ ] **Google OAuth consent screen:** set app name "Germany Guide" + logo in
