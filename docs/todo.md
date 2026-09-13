@@ -32,12 +32,13 @@ Nothing on this page is now urgent in that sense.
 - [ ] **Legal check before serious traffic:** confirm the real name/address in
       `/impressum`. The contact address is now `kontakt@germanyguide.net` on both
       `/impressum` and `/privacy` (was a Gmail address) — that part is done.
-- [ ] **Search Console: validate the fixes once they are live.** The 404,
-      soft-404 and noindex causes were fixed 2026-09-13 (see `status.md`). In
-      the URL-prefix property, open **Soft 404** and **Excluded by noindex** and
-      press *Validate fix*; the 404 validation was already started 2026-09-12 and
-      will now see redirects. Also confirm the www sitemap entry reads Success,
-      and check whether the Domain property has finished processing. The 370
+- [ ] **Search Console: watch the three validations finish.** The 404,
+      soft-404 and noindex causes were fixed and deployed 2026-09-13 (`8477181`,
+      see `status.md`). In the URL-prefix property, *Validate fix* was started
+      for **Soft 404** and **Excluded by noindex** on 2026-09-13, and for
+      **Not found (404)** on 2026-09-12; Google takes up to about two weeks.
+      Also confirm the www sitemap entry reads Success, and check whether the
+      Domain property has finished processing. The 370
       *Discovered / Crawled, currently not indexed* URLs are not a code fault:
       they need backlinks and time (see §2b).
 - [ ] **`TAVILY_API_KEY`** in Vercel *Production* to switch on the AI web-search
