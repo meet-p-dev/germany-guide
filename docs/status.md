@@ -93,7 +93,10 @@ The web-search rung still needs `TAVILY_API_KEY`.
   service-account key the owner creates once (`automation.md`). `npm run
   seo:indexnow` submits the whole sitemap to Bing and the other IndexNow
   engines; its public key file is `public/ea45c23029c17ad38685d2d01a83bc64.txt`.
-  Both dry-run cleanly against the live sitemap (269 URLs).
+  Both dry-run cleanly against the live sitemap (269 URLs). **All 269 URLs
+  were submitted to IndexNow on 2026-09-13 and accepted (HTTP 200)**, so
+  Bing, Yandex, Seznam and Naver have the whole site. The Google checker
+  still waits on the owner's service-account setup.
 - Crawled all 269 sitemap URLs as Googlebot: all 200, no stray noindex, no
   duplicate titles, and every internal link resolves except Cloudflare's
   `/cdn-cgi/l/email-protection` (from Email Obfuscation on the mailto links;

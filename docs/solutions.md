@@ -10,6 +10,25 @@
 
 ---
 
+## IndexNow answered 403 "key not valid" although the key file was live
+**2026-09-13**
+
+- **Symptom:** `npm run seo:indexnow` confirmed
+  `public/ea45c23029c17ad38685d2d01a83bc64.txt` returned 200 with the right
+  32 characters, then IndexNow answered **403**.
+- **Cause:** timing. The submission ran about a minute after the key file
+  first went live, before IndexNow had fetched and accepted it. The file
+  itself was fine: 200, `text/plain`, no BOM, no trailing newline, and the
+  same answer for Bingbot, an empty user agent, Python, Go and curl, so
+  Cloudflare was not challenging bots.
+- **Fix:** a few minutes later, one URL sent straight to
+  `https://www.bing.com/indexnow` returned 200, and the full sitemap through
+  `api.indexnow.org` returned 200 for all 269 URLs. The script's 403 message
+  now says to wait and retry.
+- **Next time:** after deploying a new key, wait a few minutes before the
+  first submission. If a 403 persists past that, fetch the key file with a
+  bot user agent before assuming the key is wrong.
+
 ## A Vercel build failed with "Gateway Timeout" on one city page
 **2026-09-13**
 

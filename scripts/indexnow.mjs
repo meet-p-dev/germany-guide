@@ -50,7 +50,9 @@ async function main() {
     200: "accepted",
     202: "accepted, key check pending",
     400: "bad request",
-    403: "key not valid (file missing or wrong content)",
+    // Also returned for a few minutes after a new key file first goes live,
+    // before IndexNow has fetched it. Wait and run again before debugging.
+    403: "key not valid yet (just deployed? wait a few minutes and retry)",
     422: "URLs do not belong to the host, or key mismatch",
     429: "too many requests, try again later",
   };
