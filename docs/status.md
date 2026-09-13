@@ -76,6 +76,17 @@ The web-search rung still needs `TAVILY_API_KEY`.
   on a 200.
 - **Canonicals on the last 59 pages.** `/problems/*` (36), `/letters/*` (22) and
   `/journey` had none. Every URL in the sitemap now has one.
+- **www is consistent everywhere (checked 2026-09-13).** The apex 301s to
+  `www` with the path and query kept (`/cities/munich/anmeldung`,
+  `/sitemap.xml`, `/guide/anmeldung?x=1`); plain `http` apex takes two hops
+  (to https apex, then www), which Google follows. The sitemap (269 URLs),
+  `robots.txt` `Sitemap:` line, RSS feed, canonicals, `og:url` and JSON-LD all
+  use `https://www.germanyguide.net`, and `src/` has no apex URL left. The
+  apex `robots.txt` is answered by Cloudflare without redirecting and holds
+  only Cloudflare's AI-crawler block; harmless, since every apex page
+  redirects. The owner removed the old URL-prefix property the same day;
+  the Domain property `sc-domain:germanyguide.net` remains, and its www
+  sitemap reads **Success, 266 pages**.
 - Crawled all 269 sitemap URLs as Googlebot: all 200, no stray noindex, no
   duplicate titles, and every internal link resolves except Cloudflare's
   `/cdn-cgi/l/email-protection` (from Email Obfuscation on the mailto links;

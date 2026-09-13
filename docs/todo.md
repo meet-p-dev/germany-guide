@@ -32,13 +32,17 @@ Nothing on this page is now urgent in that sense.
 - [ ] **Legal check before serious traffic:** confirm the real name/address in
       `/impressum`. The contact address is now `kontakt@germanyguide.net` on both
       `/impressum` and `/privacy` (was a Gmail address) — that part is done.
-- [ ] **Search Console: watch the three validations finish.** The 404,
-      soft-404 and noindex causes were fixed and deployed 2026-09-13 (`8477181`,
-      see `status.md`). In the URL-prefix property, *Validate fix* was started
-      for **Soft 404** and **Excluded by noindex** on 2026-09-13, and for
-      **Not found (404)** on 2026-09-12; Google takes up to about two weeks.
-      Also confirm the www sitemap entry reads Success, and check whether the
-      Domain property has finished processing. The 370
+- [ ] **Search Console: read the Domain property once it has processed.** The
+      404, soft-404 and noindex causes were fixed and deployed 2026-09-13
+      (`8477181`, see `status.md`). The owner then **removed the old URL-prefix
+      property** (`https://germanyguide.net/`), so the *Validate fix* runs
+      started there are gone with it. What remains is the **Domain property
+      `sc-domain:germanyguide.net`**, which covers www and the apex together
+      and is the only one needed. On 2026-09-13 its Page indexing report still
+      read "Processing data". When it shows numbers, open each row of *Why
+      pages aren't indexed* and press *Validate fix* on 404, Soft 404 and
+      noindex. The www sitemap now reads **Success, 266 pages** (it had read
+      "couldn't fetch" on 2026-09-08). The 370
       *Discovered / Crawled, currently not indexed* URLs are not a code fault:
       they need backlinks and time (see §2b).
 - [ ] **`TAVILY_API_KEY`** in Vercel *Production* to switch on the AI web-search
