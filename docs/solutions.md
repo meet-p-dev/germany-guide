@@ -10,6 +10,28 @@
 
 ---
 
+## The scheduled index check sat on "Running tools" for hours
+**2026-09-14**
+
+- **Symptom:** the first run of the `germany-guide-index-check` scheduled task
+  showed `npm run -s seo:index-status` as running for over 4 hours. A full
+  check takes about 2 minutes. It was in Auto mode, so it was not waiting for
+  a permission prompt, although that was the first guess.
+- **Cause:** `node scripts/index-status.mjs` was alive at 0% CPU with four
+  established HTTPS connections to Google and one to the site, waiting for
+  responses that never came. Node's built-in `fetch` has no overall deadline,
+  so a single stalled response blocks its batch forever. No proxy or sandbox
+  variables were set; it was not a blocked network.
+- **Fix:** every request in the script now goes through `fetchWithTimeout`
+  (30 seconds, `AbortSignal.timeout`), and each inspection retries once on a
+  timeout, network error or Google 5xx before becoming an error row. A run
+  now always finishes and reports what failed.
+- **Next time:** for a hung script, check the process before guessing:
+  `ps -o pid,etime,%cpu,stat -p <pid>` and `lsof -a -p <pid> -i -n -P`. Idle
+  CPU plus open connections means it is waiting on the network. Any script
+  that calls an external API from a scheduled task needs a timeout on every
+  request.
+
 ## IndexNow answered 403 "key not valid" although the key file was live
 **2026-09-13**
 

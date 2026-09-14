@@ -112,7 +112,7 @@ The web-search rung still needs `TAVILY_API_KEY`.
     in the pages blocks it; what moves it is crawl priority, which comes from
     links from other sites and from time.
 - **Indexing pipeline, 2026-09-14.** The scheduled task
-  `germany-guide-index-check` runs the checker every 2 days at 09:00 and
+  `germany-guide-index-check` runs the checker every day at 09:00 and
   reports what moved (`automation.md`). The checker now keeps
   `reports/index-history.csv` (baseline: 1 indexed, 10 crawled, 123
   discovered, 135 unknown) and reads the key from

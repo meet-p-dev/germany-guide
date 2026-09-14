@@ -32,6 +32,11 @@ const CONCURRENCY = 4; // well under the 600-per-minute limit
 // Where the owner keeps the key (docs/automation.md); GSC_KEY_FILE overrides.
 const DEFAULT_KEY_FILE = "~/.config/germany-guide/gsc-service-account.json";
 const HISTORY_FILE = "reports/index-history.csv";
+// Node's fetch has no overall deadline, so one stalled Google response once
+// hung a scheduled run indefinitely. Every request now gets one.
+const REQUEST_TIMEOUT_MS = 30_000;
+const fetchWithTimeout = (url, init = {}) =>
+  fetch(url, { ...init, signal: AbortSignal.timeout(REQUEST_TIMEOUT_MS) });
 
 const args = process.argv.slice(2);
 const flag = (name) => args.includes(name);
@@ -41,7 +46,7 @@ const option = (name) => {
 };
 
 async function sitemapUrls() {
-  const res = await fetch(`${SITE}/sitemap.xml`);
+  const res = await fetchWithTimeout(`${SITE}/sitemap.xml`);
   if (!res.ok) throw new Error(`sitemap.xml returned ${res.status}`);
   const xml = await res.text();
   return [...xml.matchAll(/<loc>([^<]+)<\/loc>/g)].map((m) => m[1].trim());
@@ -67,7 +72,7 @@ async function accessToken(keyFile) {
   signer.update(`${header}.${claims}`);
   const signature = signer.sign(key.private_key).toString("base64url");
 
-  const res = await fetch("https://oauth2.googleapis.com/token", {
+  const res = await fetchWithTimeout("https://oauth2.googleapis.com/token", {
     method: "POST",
     headers: { "Content-Type": "application/x-www-form-urlencoded" },
     body: new URLSearchParams({
@@ -82,8 +87,8 @@ async function accessToken(keyFile) {
   return body.access_token;
 }
 
-async function inspect(url, token) {
-  const res = await fetch(INSPECT_URL, {
+async function inspectOnce(url, token) {
+  const res = await fetchWithTimeout(INSPECT_URL, {
     method: "POST",
     headers: {
       Authorization: `Bearer ${token}`,
@@ -91,7 +96,26 @@ async function inspect(url, token) {
     },
     body: JSON.stringify({ inspectionUrl: url, siteUrl: PROPERTY, languageCode: "en-US" }),
   });
-  const body = await res.json();
+  return { res, body: await res.json() };
+}
+
+// One retry for a timeout, network error or Google 5xx; after that the URL
+// becomes an error row, so a run always finishes.
+async function inspect(url, token) {
+  let res;
+  let body;
+  for (let attempt = 1; attempt <= 2; attempt++) {
+    try {
+      ({ res, body } = await inspectOnce(url, token));
+      if (res.status < 500) break;
+    } catch (err) {
+      if (attempt === 2) {
+        const reason = err.name === "TimeoutError" ? "timed out after 30s" : err.message;
+        return { url, error: `request failed: ${reason}` };
+      }
+    }
+    await new Promise((resolve) => setTimeout(resolve, 2000));
+  }
   if (!res.ok) {
     return { url, error: `${res.status} ${body.error?.message ?? ""}`.trim() };
   }

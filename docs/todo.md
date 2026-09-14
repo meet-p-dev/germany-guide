@@ -46,7 +46,7 @@ Nothing on this page is now urgent in that sense.
       *Discovered / Crawled, currently not indexed* URLs are not a code fault:
       they need backlinks and time (see §2b).
 - [ ] **Request indexing by hand, about 10 URLs a day.** Google has no API for
-      it. The scheduled check (`germany-guide-index-check`, every 2 days) ends
+      it. The scheduled check (`germany-guide-index-check`, daily at 09:00) ends
       each report with the 10 URLs to paste into Search Console > URL
       inspection > Request indexing. Baseline 2026-09-14: 1 indexed, 10
       crawled, 123 discovered, 135 unknown (`reports/index-history.csv`).

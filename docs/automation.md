@@ -148,7 +148,9 @@ otherwise. The quota is 2,000 inspections a day per property, so one full run
 
 **Scheduled:** a Claude desktop scheduled task, `germany-guide-index-check`
 (`~/.claude/scheduled-tasks/germany-guide-index-check/SKILL.md`), runs the full
-check at 09:00 every 2 days, re-runs IndexNow only when the sitemap gained
+check at 09:00 every day (daily since 2026-09-14, so each morning's report
+carries that day's 10 URLs to request by hand; one run uses about 270 of the
+2,000 daily inspections), re-runs IndexNow only when the sitemap gained
 URLs, and writes the owner a short report ending with the day's 10 URLs to
 request by hand. It is read-only on the site: no code, content, docs or
 commits. It runs only while the desktop app is open.
