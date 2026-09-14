@@ -125,11 +125,37 @@ export const getCityStepPairs = cache(async () => {
   const supabase = createContentClient();
   const { data, error } = await supabase
     .from("city_steps")
-    .select("cities(slug), steps(slug)");
+    .select("updated_at, cities(slug), steps(slug)");
   if (error) throw error;
   return data
     .filter((row) => row.cities && row.steps)
-    .map((row) => ({ city: row.cities!.slug, step: row.steps!.slug }));
+    .map((row) => ({
+      city: row.cities!.slug,
+      step: row.steps!.slug,
+      updatedAt: row.updated_at,
+    }));
+});
+
+/**
+ * Last-edit dates for the sitemap. Only tables whose `updated_at` is kept
+ * current by a trigger are used, so every <lastmod> is a real edit date.
+ */
+export const getStepUpdatedDates = cache(async () => {
+  const supabase = createContentClient();
+  const { data, error } = await supabase.from("steps").select("slug, updated_at");
+  if (error) throw error;
+  return data;
+});
+
+export const getCityFactUpdatedDates = cache(async () => {
+  const supabase = createContentClient();
+  const { data, error } = await supabase
+    .from("city_facts")
+    .select("updated_at, cities(slug)");
+  if (error) throw error;
+  return data
+    .filter((row) => row.cities)
+    .map((row) => ({ city: row.cities!.slug, updatedAt: row.updated_at }));
 });
 
 export const getCities = cache(async (): Promise<City[]> => {

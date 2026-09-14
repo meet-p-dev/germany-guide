@@ -137,9 +137,21 @@ database or the site.
 | `npm run seo:index-status` | monthly | Asks Google, through the URL Inspection API, whether each sitemap URL is indexed and which canonical Google chose. Writes `reports/index-status-<date>.csv` (gitignored) and prints a summary |
 | `npm run seo:indexnow` | after pages are added or changed | Sends every sitemap URL to IndexNow (Bing, Yandex, Seznam, Naver). Google does not use IndexNow |
 
-Both accept `--dry-run`. `seo:index-status` also takes `--limit N` and
-`--only /path-prefix`. The quota is 2,000 inspections a day per property, so
-one full run (about 270 URLs) is well inside it.
+Both accept `--dry-run`. `seo:index-status` also takes `--limit N`,
+`--only /path-prefix` and `--url <address>` (repeatable). Those partial runs
+write `index-status-<date>-partial.csv` and leave the history alone. A full
+run appends one row to `reports/index-history.csv` and prints which pages
+moved forward or back since the previous full run. The key is read from
+`~/.config/germany-guide/gsc-service-account.json` unless `GSC_KEY_FILE` says
+otherwise. The quota is 2,000 inspections a day per property, so one full run
+(about 270 URLs) is well inside it.
+
+**Scheduled:** a Claude desktop scheduled task, `germany-guide-index-check`
+(`~/.claude/scheduled-tasks/germany-guide-index-check/SKILL.md`), runs the full
+check at 09:00 every 2 days, re-runs IndexNow only when the sitemap gained
+URLs, and writes the owner a short report ending with the day's 10 URLs to
+request by hand. It is read-only on the site: no code, content, docs or
+commits. It runs only while the desktop app is open.
 
 ### One-time setup for `seo:index-status` (owner)
 

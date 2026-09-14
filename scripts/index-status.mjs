@@ -29,6 +29,9 @@ const SCOPE = "https://www.googleapis.com/auth/webmasters.readonly";
 const INSPECT_URL =
   "https://searchconsole.googleapis.com/v1/urlInspection/index:inspect";
 const CONCURRENCY = 4; // well under the 600-per-minute limit
+// Where the owner keeps the key (docs/automation.md); GSC_KEY_FILE overrides.
+const DEFAULT_KEY_FILE = "~/.config/germany-guide/gsc-service-account.json";
+const HISTORY_FILE = "reports/index-history.csv";
 
 const args = process.argv.slice(2);
 const flag = (name) => args.includes(name);
@@ -118,6 +121,82 @@ async function inBatches(items, size, fn) {
 
 const csvCell = (v) => `"${String(v ?? "").replaceAll('"', '""')}"`;
 
+// Reads a report written by this script back into { url: coverage }.
+function parseReport(csv) {
+  const map = new Map();
+  for (const line of csv.split("\n").slice(1)) {
+    const cells = line.match(/"((?:[^"]|"")*)"/g)?.map((c) => c.slice(1, -1).replaceAll('""', '"'));
+    if (cells?.length >= 3) map.set(cells[0], cells[2]);
+  }
+  return map;
+}
+
+const bucket = (coverage) =>
+  /indexed/i.test(coverage) && !/not indexed/i.test(coverage)
+    ? "indexed"
+    : /^Crawled/i.test(coverage)
+      ? "crawled"
+      : /^Discovered/i.test(coverage)
+        ? "discovered"
+        : /unknown/i.test(coverage)
+          ? "unknown"
+          : "other";
+
+// Appends one line per full run to reports/index-history.csv and prints what
+// moved since the previous full report, so a scheduled run can say "3 more
+// pages indexed since Tuesday" instead of repeating totals.
+async function recordHistory(rows, date, file) {
+  const totals = { indexed: 0, crawled: 0, discovered: 0, unknown: 0, other: 0 };
+  for (const r of rows) totals[bucket(r.coverage)] += 1;
+
+  let history = "";
+  try {
+    history = await readFile(HISTORY_FILE, "utf8");
+  } catch {
+    history = "date,total,indexed,crawled,discovered,unknown,other\n";
+  }
+  const previousLine = history.trim().split("\n").slice(1).filter((l) => !l.startsWith(date)).at(-1);
+  const line = [date, rows.length, totals.indexed, totals.crawled, totals.discovered, totals.unknown, totals.other].join(",");
+  const kept = history.trim().split("\n").filter((l) => !l.startsWith(`${date},`));
+  await writeFile(HISTORY_FILE, `${[...kept, line].join("\n")}\n`);
+
+  console.log(`\nTotals: ${Object.entries(totals).map(([k, v]) => `${k} ${v}`).join(", ")}`);
+  if (!previousLine) {
+    console.log("No earlier full run to compare with.");
+    return;
+  }
+  const previousDate = previousLine.split(",")[0];
+  let previous;
+  try {
+    previous = parseReport(await readFile(`reports/index-status-${previousDate}.csv`, "utf8"));
+  } catch {
+    console.log(`Earlier report for ${previousDate} is missing; totals only.`);
+    return;
+  }
+  const [, , ...oldCounts] = previousLine.split(",").map(Number);
+  const names = ["indexed", "crawled", "discovered", "unknown", "other"];
+  console.log(
+    `Since ${previousDate}: ${names.map((n, i) => `${n} ${totals[n] - oldCounts[i] >= 0 ? "+" : ""}${totals[n] - oldCounts[i]}`).join(", ")}`,
+  );
+
+  const order = { unknown: 0, other: 0, discovered: 1, crawled: 2, indexed: 3 };
+  const moved = rows
+    .map((r) => ({ url: r.url, from: bucket(previous.get(r.url) ?? ""), to: bucket(r.coverage) }))
+    .filter((m) => previous.has(m.url) && m.from !== m.to);
+  const up = moved.filter((m) => order[m.to] > order[m.from]);
+  const down = moved.filter((m) => order[m.to] < order[m.from]);
+  if (up.length) {
+    console.log(`\nMoved forward (${up.length}):`);
+    for (const m of up) console.log(`  ${m.from} -> ${m.to}  ${m.url}`);
+  }
+  if (down.length) {
+    console.log(`\nMoved BACK (${down.length}), look at these:`);
+    for (const m of down) console.log(`  ${m.from} -> ${m.to}  ${m.url}`);
+  }
+  if (!up.length && !down.length) console.log("No page changed state.");
+  console.log(`History: ${HISTORY_FILE} (this run: ${file})`);
+}
+
 async function main() {
   // --url <address> (repeatable) inspects exactly those addresses instead of
   // the sitemap, e.g. the old no-www versions during the move to www.
@@ -133,10 +212,7 @@ async function main() {
   if (offHost.length) console.log(`  WARNING: ${offHost.length} sitemap URLs are not on ${SITE}`);
   if (flag("--dry-run")) return;
 
-  const keyFile = (process.env.GSC_KEY_FILE ?? "").replace(/^~/, homedir());
-  if (!keyFile) {
-    throw new Error("Set GSC_KEY_FILE to the service account's JSON key (kept outside the repo).");
-  }
+  const keyFile = (process.env.GSC_KEY_FILE ?? DEFAULT_KEY_FILE).replace(/^~/, homedir());
   const token = await accessToken(keyFile);
   const rows = await inBatches(urls, CONCURRENCY, (u) => inspect(u, token));
 
@@ -173,6 +249,7 @@ async function main() {
   if (errors.length) {
     console.log(`\n${errors.length} requests failed, first: ${errors[0].url} ${errors[0].error}`);
   }
+  if (!partial) await recordHistory(rows, date, file);
   console.log(`\nFull table: ${file}`);
 }
 

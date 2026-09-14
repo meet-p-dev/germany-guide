@@ -45,15 +45,14 @@ Nothing on this page is now urgent in that sense.
       "couldn't fetch" on 2026-09-08). The 370
       *Discovered / Crawled, currently not indexed* URLs are not a code fault:
       they need backlinks and time (see §2b).
-- [ ] **Move the service-account key out of Downloads.** The checker works
-      (first run 2026-09-14, see `status.md`), but the key sits in
-      `~/Downloads/germany-guide-502915-5b30626f0e7a.json`, readable by any
-      user on the machine. Move it to `~/.config/germany-guide/` and
-      `chmod 600` it, as `automation.md` describes.
-- [ ] **Re-run `npm run seo:index-status` about monthly** (next: mid-October)
-      and compare against `reports/index-status-2026-09-14.csv`: 1 indexed,
-      10 crawled, 114 discovered, 144 unknown. Rising "crawled" and "indexed"
-      counts are the signal that outreach is working.
+- [ ] **Request indexing by hand, about 10 URLs a day.** Google has no API for
+      it. The scheduled check (`germany-guide-index-check`, every 2 days) ends
+      each report with the 10 URLs to paste into Search Console > URL
+      inspection > Request indexing. Baseline 2026-09-14: 1 indexed, 10
+      crawled, 123 discovered, 135 unknown (`reports/index-history.csv`).
+- [ ] **Disable the scheduled index check once every page is indexed**; the
+      report says so when it happens. Scheduled tasks run only while the
+      Claude desktop app is open (a missed run fires on next launch).
 - [ ] **Bing Webmaster Tools:** sign in at bing.com/webmasters and choose
       *Import from Google Search Console*. IndexNow already sends Bing the
       pages; this adds Bing's own reports.

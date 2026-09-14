@@ -111,6 +111,17 @@ The web-search rung still needs `TAVILY_API_KEY`.
   - So the site is effectively being indexed from scratch under www. Nothing
     in the pages blocks it; what moves it is crawl priority, which comes from
     links from other sites and from time.
+- **Indexing pipeline, 2026-09-14.** The scheduled task
+  `germany-guide-index-check` runs the checker every 2 days at 09:00 and
+  reports what moved (`automation.md`). The checker now keeps
+  `reports/index-history.csv` (baseline: 1 indexed, 10 crawled, 123
+  discovered, 135 unknown) and reads the key from
+  `~/.config/germany-guide/gsc-service-account.json` (moved out of
+  Downloads, mode 600).
+- **Sitemap `<lastmod>`** on guide steps, city step pages and city hubs, from
+  `updated_at` columns that triggers keep current (81 of 129 `city_steps` and
+  all 30 `steps` carry real edit dates). Problems, letters and fixed pages get
+  no lastmod, since their tables only record `created_at`.
 - Crawled all 269 sitemap URLs as Googlebot: all 200, no stray noindex, no
   duplicate titles, and every internal link resolves except Cloudflare's
   `/cdn-cgi/l/email-protection` (from Email Obfuscation on the mailto links;
