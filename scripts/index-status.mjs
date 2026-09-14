@@ -119,7 +119,10 @@ async function inBatches(items, size, fn) {
 const csvCell = (v) => `"${String(v ?? "").replaceAll('"', '""')}"`;
 
 async function main() {
-  let urls = await sitemapUrls();
+  // --url <address> (repeatable) inspects exactly those addresses instead of
+  // the sitemap, e.g. the old no-www versions during the move to www.
+  const explicit = args.flatMap((a, i) => (a === "--url" && args[i + 1] ? [args[i + 1]] : []));
+  let urls = explicit.length ? explicit : await sitemapUrls();
   const only = option("--only");
   if (only) urls = urls.filter((u) => u.startsWith(`${SITE}${only}`));
   const limit = Number(option("--limit"));
@@ -140,7 +143,9 @@ async function main() {
   const columns = ["url", "verdict", "coverage", "indexing", "fetch", "robots", "lastCrawl", "googleCanonical", "userCanonical", "error"];
   const date = new Date().toISOString().slice(0, 10);
   await mkdir("reports", { recursive: true });
-  const file = `reports/index-status-${date}.csv`;
+  // A partial run gets its own file so it never overwrites the day's full report.
+  const partial = explicit.length > 0 || Boolean(only) || limit > 0;
+  const file = `reports/index-status-${date}${partial ? "-partial" : ""}.csv`;
   await writeFile(
     file,
     [columns.join(","), ...rows.map((r) => columns.map((c) => csvCell(r[c])).join(","))].join("\n"),

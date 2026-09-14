@@ -45,11 +45,15 @@ Nothing on this page is now urgent in that sense.
       "couldn't fetch" on 2026-09-08). The 370
       *Discovered / Crawled, currently not indexed* URLs are not a code fault:
       they need backlinks and time (see §2b).
-- [ ] **Give the index checker read access, then run it.** Follow the six
-      steps in `automation.md` ("One-time setup for `seo:index-status`"):
-      a Google Cloud service account, its JSON key saved outside the repo, and
-      its email added as a Restricted user in Search Console. Then
-      `npm run seo:index-status` checks all 269 URLs in a few minutes.
+- [ ] **Move the service-account key out of Downloads.** The checker works
+      (first run 2026-09-14, see `status.md`), but the key sits in
+      `~/Downloads/germany-guide-502915-5b30626f0e7a.json`, readable by any
+      user on the machine. Move it to `~/.config/germany-guide/` and
+      `chmod 600` it, as `automation.md` describes.
+- [ ] **Re-run `npm run seo:index-status` about monthly** (next: mid-October)
+      and compare against `reports/index-status-2026-09-14.csv`: 1 indexed,
+      10 crawled, 114 discovered, 144 unknown. Rising "crawled" and "indexed"
+      counts are the signal that outreach is working.
 - [ ] **Bing Webmaster Tools:** sign in at bing.com/webmasters and choose
       *Import from Google Search Console*. IndexNow already sends Bing the
       pages; this adds Bing's own reports.

@@ -95,8 +95,22 @@ The web-search rung still needs `TAVILY_API_KEY`.
   engines; its public key file is `public/ea45c23029c17ad38685d2d01a83bc64.txt`.
   Both dry-run cleanly against the live sitemap (269 URLs). **All 269 URLs
   were submitted to IndexNow on 2026-09-13 and accepted (HTTP 200)**, so
-  Bing, Yandex, Seznam and Naver have the whole site. The Google checker
-  still waits on the owner's service-account setup.
+  Bing, Yandex, Seznam and Naver have the whole site.
+- **First real Google index check, 2026-09-14** (URL Inspection API, all 269
+  www URLs): **1 indexed** (the homepage, crawled 8 Sept), **10 crawled, not
+  indexed** (`/process`, `/cities`, `/problems`, `/letters`, `/glossary`,
+  `/guide/visa-extension`, Munich Anmeldung, Berlin residence permit and two
+  letters; Google already picks the www address as canonical for all ten),
+  **114 discovered, not indexed**, **144 unknown to Google**.
+  - The "132 indexed" in the deleted URL-prefix property was a report last
+    updated 4 Sept, before the www move. Today's live data does not hold
+    those pages under the apex either: 10 sampled apex URLs gave 8 unknown,
+    the apex homepage "page with redirect" (to www), and the apex Munich
+    Anmeldung "redirect error" from a crawl on 7 Sept, the day before the
+    canonical fix. That page now reaches www in one hop.
+  - So the site is effectively being indexed from scratch under www. Nothing
+    in the pages blocks it; what moves it is crawl priority, which comes from
+    links from other sites and from time.
 - Crawled all 269 sitemap URLs as Googlebot: all 200, no stray noindex, no
   duplicate titles, and every internal link resolves except Cloudflare's
   `/cdn-cgi/l/email-protection` (from Email Obfuscation on the mailto links;
