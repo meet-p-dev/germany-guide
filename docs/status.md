@@ -4,7 +4,7 @@
 > [`todo.md`](todo.md). **Verify counts against the live DB before relying on
 > them** — see rules §4.
 >
-> Last updated: **2026-09-13**
+> Last updated: **2026-09-24**
 
 ## Where it stands
 
@@ -17,7 +17,7 @@ on them (rules §4).
 
 | Content | Count |
 |---|---|
-| Cities live | **41** (0 coming_soon) |
+| Cities live | **41**, plus **4 coming_soon** since 2026-09-24 (Bielefeld, Tübingen, Braunschweig, Marburg), whose content waits in the review queue |
 | `city_steps` | **129** — every city has the big three (anmeldung, residence-permit, visa-extension); Munich/Ingolstadt/Nuremberg add public-transport + find-housing-remotely |
 | `city_facts` | **287** — 41 × `study_costs`, plus the six-fact shape (first_days, housing ×2, insurance, banking, while_waiting) on the 41 cities |
 | `city_steps.lead_time` | **46 of 129** filled; the rest inherit the generic `steps.lead_time` |
@@ -57,7 +57,39 @@ The web-search rung still needs `TAVILY_API_KEY`.
 
 ## Changelog
 
-### 2026-09-13 (latest)
+### 2026-09-24 (latest)
+- **Four new cities researched and queued: Bielefeld (NRW), Tübingen
+  (Baden-Württemberg), Braunschweig (Lower Saxony), Marburg (Hesse).** One
+  city from each of the largest Länder that Fürth (Bavaria) did not already
+  cover. Each has the big three `city_steps` and the seven-fact shape, so 40
+  content rows, all written to `writing.md` and all from the city's,
+  university's or Studierendenwerk's own pages. They went through the review
+  gate, not straight into the tables: `run_id = 'city-research-2026-09-24'`,
+  44 proposals (12 `city_steps` inserts, 28 `city_facts` inserts, and 4
+  `cities.status` updates to `live`, to approve last).
+  - The four `cities` rows were inserted directly as **`coming_soon`**, because
+    a queued `city_steps` insert needs a real `city_id`. A coming-soon city
+    renders the honest "We're verifying this city" panel and is kept out of the
+    sitemap, so no unreviewed claim reaches a visitor.
+  - Fürth, built 2026-09-08, had no card in `site-config.ts`, so the home page
+    counted 40 cities. It now has one, as do the four new cities.
+  - Local findings worth keeping: **Marburg's Stadtbüro moved in August 2025**
+    to Frauenbergstraße 31 (entrance Franz-Tuczek-Weg); other sites still give
+    No. 35. Marburg takes registration walk-ins Wed 08:00–12:00 and Fri
+    07:30–12:00. **Tübingen's Ausländeramt is closed on Wednesdays** and covers
+    city residents only. **Braunschweig's Ausländerbehörde withdrew its online
+    booking**, so appointments are by email, and it emails students an
+    extension appointment about 8 weeks before expiry. **Bielefeld** releases
+    Ausländerbehörde slots weekdays at 20:00 (same-day at 07:30), and any of its
+    11 Bürgerberatung offices will register you.
+  - Private rents for Tübingen, Braunschweig and Marburg are miet-check.de
+    asking prices; MMI published a city figure only for Bielefeld (€375, March
+    2026) and a Lower Saxony average (€431).
+- **Fixed a dropped space in two JSX strings**: "Marburgis next in line" on
+  every coming-soon city page, and "3 citiesmatch" in the city search. See
+  `solutions.md`.
+
+### 2026-09-13
 - **Indexing audit, from Search Console.** The URL-prefix property
   (`https://germanyguide.net/`, last update 4 Sept) reads **132 indexed, 440 not
   indexed**: 238 *Discovered, currently not indexed*, 132 *Crawled, currently
@@ -496,6 +528,11 @@ Werkstudent 20h/week · national WG-room average **€512/mo** (MMI, March 2026)
 - **Augsburg** — Bürgeramt is at An der Blauen Kappe 18, *not* the Rathaus.
 - **Essen** — the Ausländerbehörde is **closed Wednesdays**.
 - **Bochum** — Querenburg, the office nearest the RUB campus, is **closed**.
+- **Marburg** — the Stadtbüro **moved in Aug 2025** to Frauenbergstraße 31;
+  city and Landkreis Marburg-Biedenkopf have separate Ausländerbehörden.
+- **Tübingen** — the city Ausländeramt is **closed Wednesdays** and covers city
+  residents only; Rottenburg and the Landkreis have their own offices.
+- **Braunschweig** — no online booking at the Ausländerbehörde; **email only**.
 
 **Local wins worth surfacing:**
 - **Stuttgart** — Anmeldung **and** first permit in *one visit* at any Bürgerbüro
@@ -510,3 +547,9 @@ Werkstudent 20h/week · national WG-room average **€512/mo** (MMI, March 2026)
 - **Bochum** — finished eAT collected with **no appointment** (Historic Town Hall
   pickup box).
 - **Würzburg** — walk-in Service-Points, caseworkers by **first letter of surname**.
+- **Marburg** — registration **walk-ins Wed and Fri mornings**; the Stadtbüro
+  now updates the address on an eAT when you re-register.
+- **Bielefeld** — Ausländerbehörde slots open **weekdays at 20:00**; register at
+  any of 11 offices.
+- **Braunschweig** — students are **emailed an extension appointment** about 8
+  weeks before expiry.

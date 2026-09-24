@@ -150,7 +150,7 @@ export default async function CityHubPage({
             We&apos;re verifying {city.name}&apos;s local process.
           </h2>
           <p className="mt-3 max-w-xl leading-relaxed text-muted">
-            {city.name} is next in line. We add a city&apos;s registration,
+            {city.name}{" "}is next in line. We add a city&apos;s registration,
             residence-permit and extension details only after checking them
             first-hand, so nothing here is a guess. In the meantime, the
             Germany-wide guide covers every step of your journey.

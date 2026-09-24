@@ -106,8 +106,8 @@ export function CityBrowser({ cities }: { cities: BrowserCity[] }) {
         filtered.length > 0 ? (
           <>
             <p className="mt-8 text-sm text-muted">
-              {filtered.length} {filtered.length === 1 ? "city" : "cities"} match
-              &ldquo;{query.trim()}&rdquo;
+              {filtered.length} {filtered.length === 1 ? "city" : "cities"}{" "}
+              match &ldquo;{query.trim()}&rdquo;
             </p>
             <div className="mt-4 grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
               {filtered.map((city) => (

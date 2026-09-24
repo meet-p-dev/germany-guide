@@ -10,6 +10,25 @@
 
 ---
 
+## JSX dropped the space after `{expression}`: "Marburgis next in line"
+**2026-09-24**
+
+- **Symptom:** the coming-soon panel on `/cities/<city>` read "Marburgis next in
+  line", and the city search read "3 citiesmatch “aa”". The source had a plain
+  space: `{city.name} is next in line. We add a city&apos;s …`.
+- **Cause:** the compiled output was `children:[h.name,"is next in line…"]`.
+  The leading space of a JSX text node was dropped when that same text node
+  contained an HTML entity (`&apos;`, `&ldquo;`). The same pattern without an
+  entity (`{liveCities.length} cities covered so far.`) kept its space.
+  `tsc`, `eslint` and `build` were all green. It had never been visible because
+  no city had been `coming_soon` until 2026-09-24.
+- **Fix:** an explicit `{" "}` after the expression in both places.
+- **Next time:** grep the compiled chunks, not the source:
+  `grep -rhoE '.{40}"is next in line' .next/server/chunks/ssr/*.js` shows
+  whether the space survived. To find other cases, look for an expression
+  followed by a space and text that contains an entity before the next `<` or
+  `{`.
+
 ## The scheduled index check sat on "Running tools" for hours
 **2026-09-14**
 

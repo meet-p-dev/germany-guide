@@ -364,6 +364,46 @@ export const CITIES: CityCard[] = [
     image: null,
     status: "live",
   },
+  {
+    slug: "fuerth",
+    name: "Fürth",
+    state: "Bavaria",
+    tagline: "Nuremberg's neighbour, with its own authorities.",
+    image: null,
+    status: "live",
+  },
+  {
+    slug: "bielefeld",
+    name: "Bielefeld",
+    state: "North Rhine-Westphalia",
+    tagline: "A university city in eastern Westphalia.",
+    image: null,
+    status: "live",
+  },
+  {
+    slug: "tuebingen",
+    name: "Tübingen",
+    state: "Baden-Württemberg",
+    tagline: "A university town on the Neckar.",
+    image: null,
+    status: "live",
+  },
+  {
+    slug: "braunschweig",
+    name: "Braunschweig",
+    state: "Lower Saxony",
+    tagline: "A research city, home to TU Braunschweig.",
+    image: null,
+    status: "live",
+  },
+  {
+    slug: "marburg",
+    name: "Marburg",
+    state: "Hesse",
+    tagline: "A university town on the Lahn.",
+    image: null,
+    status: "live",
+  },
 ];
 
 export type PersonaStatus = "live" | "coming_soon";

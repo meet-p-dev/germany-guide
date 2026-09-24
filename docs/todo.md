@@ -4,11 +4,21 @@
 > [`status.md`](status.md). Keep this file honest: delete finished items rather
 > than marking them done, and move anything shipped into `status.md`.
 >
-> Last updated: **2026-09-13**
+> Last updated: **2026-09-24**
 
 ---
 
 ## 1. Blocked on the owner (Claude cannot do these)
+
+- [ ] **Review the four new cities at `/admin/review`** (run
+      `city-research-2026-09-24`, 44 proposals). Bielefeld, Tübingen,
+      Braunschweig and Marburg exist as `coming_soon` and show the "We're
+      verifying" panel until then. Approve each city's 3 `city_steps` and 7
+      `city_facts` first, and its `cities.status` → `live` proposal **last**,
+      or the city goes live with empty cards. Then push (or merge
+      `claude/vibrant-euler-c41dz4`) so the ISR pages and the home-page count
+      rebuild. The branch's `site-config.ts` already counts all four as live,
+      so merge it after approving, not before.
 
 These are dashboard/account actions outside the codebase. **Custom SMTP — long
 the most urgent item here — is done and proven** (2026-09-08, see `status.md`),
@@ -161,6 +171,10 @@ this order, highest visible return first. **The `src` UI pass is done**
       cities first. Also the ~20 bold spans per row.
 - [ ] **`city_facts`**, 240 rows — mostly a dash-and-bold fix, not a rewrite.
 - [ ] **`problems`, `letters`, `glossary_terms`** as they are next touched.
+- [ ] **The `/updates` item "City guides now cover 36 cities"** still shows in
+      the home-page banner. It is stale (41 live, 45 after review) and its
+      title has an em dash. Supersede it with a new item once the four new
+      cities are live.
 - [ ] **A `/style-check` sweep** in `.claude/commands/`, running the §8
       detectors and queueing rewrites through `proposed_changes` like any other
       content change.
