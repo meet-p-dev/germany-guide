@@ -4,7 +4,7 @@
 > [`todo.md`](todo.md). **Verify counts against the live DB before relying on
 > them** — see rules §4.
 >
-> Last updated: **2026-09-24**
+> Last updated: **2026-09-30**
 
 ## Where it stands
 
@@ -12,14 +12,14 @@
 Vercel, content in Supabase (`ilfhjffpzvzphbvhdpup`), Framer Motion, Vercel
 Analytics (cookieless).
 
-All counts below are a live `count(*)` taken 2026-09-08. Re-run before relying
+All counts below are a live `count(*)` taken 2026-09-30. Re-run before relying
 on them (rules §4).
 
 | Content | Count |
 |---|---|
-| Cities live | **41**, plus **4 coming_soon** since 2026-09-24 (Bielefeld, Tübingen, Braunschweig, Marburg), whose content waits in the review queue |
-| `city_steps` | **129** — every city has the big three (anmeldung, residence-permit, visa-extension); Munich/Ingolstadt/Nuremberg add public-transport + find-housing-remotely |
-| `city_facts` | **287** — 41 × `study_costs`, plus the six-fact shape (first_days, housing ×2, insurance, banking, while_waiting) on the 41 cities |
+| Cities live | **45** (0 coming_soon); Bielefeld, Tübingen, Braunschweig and Marburg went live 2026-09-24 |
+| `city_steps` | **141** — every city has the big three (anmeldung, residence-permit, visa-extension); Munich/Ingolstadt/Nuremberg add public-transport + find-housing-remotely |
+| `city_facts` | **315** — 45 × `study_costs`, plus the six-fact shape (first_days, housing ×2, insurance, banking, while_waiting) on the 45 cities |
 | `city_steps.lead_time` | **46 of 129** filled; the rest inherit the generic `steps.lead_time` |
 | Guide steps | 30 across 5 phases (decide → prepare → arrive → settle → live) |
 | Glossary terms | 141 |
@@ -57,7 +57,22 @@ The web-search rung still needs `TAVILY_API_KEY`.
 
 ## Changelog
 
-### 2026-09-24 (latest)
+### 2026-09-30 (latest)
+- **The four new cities are fully live.** The owner approved all 44 proposals
+  of `city-research-2026-09-24` on 2026-09-24, so the cities, steps and facts
+  were live from then. The code (the five `site-config.ts` cards and the JSX
+  spacing fix) sat on `claude/vibrant-euler-c41dz4` until 2026-09-30, when it
+  was fast-forwarded into `main` as `6b45f5a` and deployed (Vercel
+  `dpl_AYHLKP8voGxF6sjuaNrE8BHnkwCz`, READY). Checked on the live site: the
+  home page reads "View all 45 cities", the sitemap grew from 269 to **285
+  URLs** with all 16 new city pages, and the new step pages return 200 with
+  their content. IndexNow accepted all 285 URLs (HTTP 200) the same day.
+- Why the owner "could not see" them before the merge: the home page only
+  features five big cities and still counted 40, and the sitemap is built at
+  deploy time, so it lacked the new URLs until a deploy ran. `/cities` and the
+  city pages themselves were already showing the content.
+
+### 2026-09-24
 - **Four new cities researched and queued: Bielefeld (NRW), Tübingen
   (Baden-Württemberg), Braunschweig (Lower Saxony), Marburg (Hesse).** One
   city from each of the largest Länder that Fürth (Bavaria) did not already
